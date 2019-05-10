@@ -14,8 +14,9 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: ssh -p $PORT $USER@$PRODUCTION_SERVER 'cd /var/www/hentai && git pull' &&
-      ssh -p $PORT $USER@$PRODUCTION_SERVER 'cd /var/www/hentai && composer install'
-      && ssh -p $PORT $USER@$PRODUCTION_SERVER 'service supervisord restart'
+    script:
+      ssh -p $PORT $USER@$PRODUCTION_SERVER 'cd /var/www/hentai && git pull origin master' &&
+      ssh -p $PORT $USER@$PRODUCTION_SERVER 'cd /var/www/hentai && composer install' &&
+      ssh -p $PORT $USER@$PRODUCTION_SERVER 'service supervisord restart'
     on:
       branch: master
