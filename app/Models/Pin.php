@@ -14,11 +14,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\Relation\Traits\CanBeBookmarked;
 use App\Services\Relation\Traits\CanBeFavorited;
 use App\Services\Relation\Traits\CanBeVoted;
+use Spatie\Permission\Traits\HasRoles;
 
 class Pin extends Model
 {
-    use SoftDeletes,
+    use SoftDeletes, HasRoles,
         CanBeVoted, CanBeBookmarked, CanBeFavorited;
+
+    protected $guard_name = 'api';
 
     protected $fillable = [
         'slug',

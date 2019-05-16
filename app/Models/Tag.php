@@ -13,10 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
 use App\Services\Relation\Traits\CanLike;
 use App\Services\Relation\Traits\CanFavorite;
+use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
 {
-    use CanBeFollowed, CanLike, CanFavorite;
+    use CanBeFollowed, CanLike, CanFavorite, HasRoles;
+
+    protected $guard_name = 'api';
 
     protected $fillable = [
         'slug',

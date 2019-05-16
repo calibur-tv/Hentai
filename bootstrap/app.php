@@ -29,6 +29,8 @@ $app->configure('app');
 
 $app->configure('cors');
 
+$app->configure('permission');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -61,9 +63,6 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
 $app->middleware([
     \Barryvdh\Cors\HandleCors::class,
 ]);
@@ -71,8 +70,13 @@ $app->middleware([
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'admin' => App\Http\Middleware\AdminMiddleware::class,
-    'throttle' => App\Http\Middleware\ThrottleMiddleware::class
+    'throttle' => App\Http\Middleware\ThrottleMiddleware::class,
+    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role' => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
+
+
+$app->alias('cache', \Illuminate\Cache\CacheManager::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +98,7 @@ $app->register(Mews\Purifier\PurifierServiceProvider::class);
 $app->register(Overtrue\LaravelFollow\FollowServiceProvider::class);
 $app->register(App\Providers\QueryLogServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

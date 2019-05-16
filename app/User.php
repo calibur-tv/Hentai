@@ -14,10 +14,11 @@ use App\Services\Relation\Traits\CanBookmark;
 use App\Services\Relation\Traits\CanFavorite;
 use App\Services\Relation\Traits\CanVote;
 use App\Services\Relation\Traits\CanSubscribe;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, SoftDeletes,
+    use Authenticatable, Authorizable, SoftDeletes, HasRoles,
         CanFollow, CanLike, CanBookmark, CanFavorite, CanVote, CanSubscribe;
 
     /**
