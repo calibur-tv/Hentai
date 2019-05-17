@@ -97,8 +97,7 @@ class TagController extends Controller
         }
 
         $tag->update([
-            'name' => Purifier::clean($request->get('name')),
-            'avatar' => $request->get('avatar')
+            'name' => Purifier::clean($request->get('name'))
         ]);
 
         // TODO 操作缓存
@@ -110,7 +109,7 @@ class TagController extends Controller
      * 删除 tag，并且删除 PinTag 中的数据
      * TODO：子标签怎么办
      */
-    public function destroy(Request $request)
+    public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string'
@@ -130,27 +129,8 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        $pins = PinTag
-            ::where('tag_id', $tag->id)
-            ->groupBy('tag_id') // TODO 拿到 count
-            ->pluck('pin_id')
-            ->get()
-            ->toArray();
-
-        foreach ($pins as $item)
-        {
-            Pin
-                ::where('id', $item['pin_id'])
-                ->increment('tag_count', -$item['xxx']);
-
-            // TODO cache
-        }
-
-        // TODO cache
-        PinTag
-            ::where('tag_id', $tag->id)
-            ->delete();
         $tag->delete();
+        // TODO cache
 
         return $this->resNoContent();
     }
@@ -202,7 +182,7 @@ class TagController extends Controller
     /**
      * 将近义词 tag 重定向过去
      */
-    public function redirect(Request $request)
+    public function relink(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
@@ -233,7 +213,7 @@ class TagController extends Controller
         }
 
         $tag->update([
-            'redirect_slug' => $request->get('target_slug')
+            'parent_slug' => $request->get('target_slug')
         ]);
         // TODO cache
 

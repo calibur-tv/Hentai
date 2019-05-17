@@ -79,11 +79,11 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 
     $route->post('update', 'TagController@update');
 
-    $route->post('destroy', 'TagController@destroy');
+    $route->post('delete', 'TagController@delete');
 
     $route->post('combine', 'TagController@combine');
 
-    $route->post('redirect', 'TagController@redirect');
+    $route->post('relink', 'TagController@relink');
 
 //    $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
 //    {
