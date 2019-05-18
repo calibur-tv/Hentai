@@ -11,7 +11,7 @@ namespace App\Http\Repositorys\v1;
 
 use App\Http\Repositories\Repository;
 use App\Http\Transformers\PinResource;
-use App\Http\Transformers\TagResource;
+use App\Http\Transformers\Tag\TagItemResource;
 use App\Http\Transformers\UserResource;
 use App\Models\Pin;
 use App\Models\Tag;
@@ -72,7 +72,7 @@ class PinRepository extends Repository
                     $tags[$i]['count'] = $item['count'];
                 }
 
-                $tags = TagResource::collection($tags);
+                $tags = TagItemResource::collection($tags);
             }
 
             $pin->tags = $tags;

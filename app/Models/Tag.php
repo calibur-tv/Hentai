@@ -30,6 +30,11 @@ class Tag extends Model
         'parent_slug',
     ];
 
+    public function getAvatarAttribute($avatar)
+    {
+        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-poster');
+    }
+
     public function parent()
     {
         return $this->belongsTo('App\Models\Tag', 'parent_slug', 'slug');

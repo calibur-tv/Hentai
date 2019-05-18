@@ -10,7 +10,8 @@ namespace App\Http\Repositorys\v1;
 
 
 use App\Http\Repositories\Repository;
-use App\Http\Transformers\TagResource;
+use App\Http\Transformers\Tag\TagBodyResource;
+use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
 
 class TagRepository extends Repository
@@ -28,7 +29,7 @@ class TagRepository extends Repository
                 return 'nil';
             }
 
-            return new TagResource($tag);
+            return new TagItemResource($tag);
         });
 
         if ($result === 'nil')
@@ -53,9 +54,9 @@ class TagRepository extends Repository
             }
 
             return [
-                'tag' => new TagResource($tag),
-                'parent' => $tag->parent_slug ? new TagResource($tag->parent()->first()) : null,
-                'children' => TagResource::collection($tag->children()->get())
+                'tag' => new TagBodyResource($tag),
+                'parent' => $tag->parent_slug ? new TagItemResource($tag->parent()->first()) : null,
+                'children' => TagItemResource::collection($tag->children()->get())
             ];
         }, 'd', true);
 

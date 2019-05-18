@@ -4,8 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositorys\v1\TagRepository;
-use App\Http\Transformers\TagResource;
-use App\Models\Pin;
+use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Http\Request;
@@ -62,13 +61,20 @@ class TagController extends Controller
             'creator_id' => 1 // TODO
         ]);
 
+        $tag->extra()->create([
+            'text' => json_encode([
+                'alias' => $name,
+                'intro' => ''
+            ])
+        ]);
+
         $tag->update([
             'slug' => $this->id2slug($tag->id)
         ]);
 
         // TODO 操作缓存
 
-        return $this->resOK(new TagResource($tag));
+        return $this->resOK(new TagItemResource($tag));
     }
 
     /**
@@ -79,7 +85,9 @@ class TagController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:1|max:32',
             'slug' => 'required|string',
-            'avatar' => 'present|string'
+            'avatar' => 'required|string',
+            'intro' => 'required|string|max:233',
+            'alias' => 'required|string|max:100',
         ]);
 
         if ($validator->fails())
@@ -97,9 +105,18 @@ class TagController extends Controller
         }
 
         $tag->update([
+            'avatar' => $this->convertImagePath($request->get('avatar')),
             'name' => Purifier::clean($request->get('name'))
         ]);
 
+        $tag->extra()->update([
+            'text' => json_encode([
+                'intro' => Purifier::clean($request->get('intro')),
+                'alias' => Purifier::clean($request->get('alias'))
+            ])
+        ]);
+
+        // TODO 敏感词检测
         // TODO 操作缓存
 
         return $this->resNoContent();
