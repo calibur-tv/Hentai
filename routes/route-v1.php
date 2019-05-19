@@ -150,3 +150,19 @@ $route->group(['prefix' => 'flow'], function () use ($route)
 
     $route->get('users', 'FlowController@users');
 });
+
+$route->group(['prefix' => 'console'], function () use ($route)
+{
+    $route->group(['prefix' => 'role'], function () use ($route)
+    {
+        $route->get('show_all_roles', 'RoleController@showAllRoles');
+
+        $route->post('create_role', 'RoleController@createRole');
+
+        $route->post('create_permission', 'RoleController@createPermission');
+
+        $route->post('toggle_permission_to_role', 'RoleController@togglePermissionToRole');
+
+        $route->post('toggle_role_to_user', 'RoleController@toggleRoleToUser');
+    });
+});

@@ -69,7 +69,6 @@ $app->middleware([
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'admin' => App\Http\Middleware\AdminMiddleware::class,
     'throttle' => App\Http\Middleware\ThrottleMiddleware::class,
     'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role' => Spatie\Permission\Middlewares\RoleMiddleware::class,
@@ -89,7 +88,7 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class);
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);

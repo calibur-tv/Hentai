@@ -7,10 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\Relation\Traits\CanBeVoted;
+use Spatie\Permission\Traits\HasRoles;
 
 class Comment extends Model
 {
-    use SoftDeletes, CanBeVoted;
+    use SoftDeletes, CanBeVoted, HasRoles;
 
     protected $fillable = [
         'from_user_id',
