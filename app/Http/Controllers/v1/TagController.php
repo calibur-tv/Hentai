@@ -49,6 +49,15 @@ class TagController extends Controller
         $name = Purifier::clean($request->get('name'));
         $parentSlug = $request->get('parent_slug');
 
+        $parentTag = Tag
+            ::where('slug', $parentSlug)
+            ->first();
+
+        if (is_null($parentTag))
+        {
+            return $this->resErrBad();
+        }
+
         $wordsFilter = new WordsFilter();
         if ($wordsFilter->count($name))
         {
@@ -58,6 +67,7 @@ class TagController extends Controller
         $tag = Tag::create([
             'name' => $name,
             'parent_slug' => $parentSlug,
+            'deep' => $parentTag->deep + 1,
             'creator_id' => 1 // TODO
         ]);
 
@@ -123,8 +133,7 @@ class TagController extends Controller
     }
 
     /**
-     * 删除 tag，并且删除 PinTag 中的数据
-     * TODO：子标签怎么办
+     * 删除 tag，子标签移到回收站
      */
     public function delete(Request $request)
     {
@@ -137,8 +146,15 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
+        $trashSlug = 'fa0';
+        $slug = $request->get('slug');
+        if ($slug === $trashSlug)
+        {
+            return $this->resErrRole();
+        }
+
         $tag = Tag
-            ::where('slug', $request->get('slug'))
+            ::where('slug', $slug)
             ->first();
 
         if (is_null($tag))
@@ -147,21 +163,27 @@ class TagController extends Controller
         }
 
         $tag->delete();
+
+        Tag
+            ::where('parent_slug', $slug)
+            ->update([
+                'parent_slug' => $trashSlug // 回收站
+            ]);
+
         // TODO cache
 
         return $this->resNoContent();
     }
 
     /**
-     * 将重复的 tag 合并起来
-     * 旧的删掉
-     * 子标签归到"垃圾箱"
+     * 所有的子标签迁移到目标标签
+     * 该标签下的内容和关注关系迁移到目标标签
      */
     public function combine(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
-            'parent_slug' => 'required|string'
+            'target_slug' => 'required|string'
         ]);
 
         if ($validator->fails())
@@ -169,6 +191,7 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
+        $slug = $request->get('slug');
         $tag = Tag
             ::where('slug', $request->get('slug'))
             ->first();
@@ -178,18 +201,21 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        $parent = Tag
-            ::where('slug', $request->get('parent_slug'))
+        $targetSlug = $request->get('target_slug');
+        $target = Tag
+            ::where('slug', $targetSlug)
             ->first();
 
-        if (is_null($parent))
+        if (is_null($target))
         {
             return $this->resErrNotFound();
         }
 
-        $tag->update([
-            'parent_slug' => $request->get('parent_slug')
-        ]);
+        Tag
+            ::where('parent_slug', $slug)
+            ->update([
+                'parent_slug' => $targetSlug
+            ]);
 
         // TODO cache
 

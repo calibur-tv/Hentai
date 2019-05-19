@@ -55,7 +55,7 @@ class Controller extends BaseController
     {
         return response([
             'code' => 403,
-            'message' => $message ?: '没有权限访问该页面'
+            'message' => $message ?: '没有权限进行该操作'
         ], 403);
     }
 

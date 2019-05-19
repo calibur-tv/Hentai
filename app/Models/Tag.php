@@ -25,6 +25,7 @@ class Tag extends Model
         'slug',
         'name',
         'avatar',
+        'deep',
         'redirect_slug',
         'creator_id',
         'parent_slug',
