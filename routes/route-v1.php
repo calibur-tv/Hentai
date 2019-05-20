@@ -157,6 +157,8 @@ $route->group(['prefix' => 'console'], function () use ($route)
     {
         $route->get('show_all_roles', 'RoleController@showAllRoles');
 
+        $route->get('show_all_users', 'RoleController@getUsersByCondition');
+
         $route->post('create_role', 'RoleController@createRole');
 
         $route->post('create_permission', 'RoleController@createPermission');

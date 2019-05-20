@@ -31,22 +31,13 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app['auth']->viaRequest('api', function ($request)
         {
-            $header = $this->parseAuthHeader($request);
-            if (!$header)
+            $token = $this->parseAuthHeader($request);
+            if (!$token)
             {
                 return null;
             }
 
-            $arr = explode('-', $header);
-            $uid = $this->slug2id($arr[0]);
-            $user = User::where('id', $uid)->first();
-
-            if (is_null($user) || $user->api_token !== $arr[1])
-            {
-                return null;
-            }
-
-            return $user;
+            return User::where('api_token', $token)->first();
         });
     }
 
@@ -60,10 +51,5 @@ class AuthServiceProvider extends ServiceProvider
         }
 
         return trim(str_ireplace($prefix, '', $token));
-    }
-
-    protected function slug2id($slug)
-    {
-        return floor(base_convert($slug, 36, 10) / 1000);
     }
 }

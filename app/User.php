@@ -21,6 +21,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     use Authenticatable, Authorizable, SoftDeletes, HasRoles,
         CanFollow, CanLike, CanBookmark, CanFavorite, CanVote, CanSubscribe;
 
+    protected $guard_name = 'api';
     /**
      * The attributes that are mass assignable.
      *
@@ -42,7 +43,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password',
+        'api_token'
     ];
 
     public function pins()

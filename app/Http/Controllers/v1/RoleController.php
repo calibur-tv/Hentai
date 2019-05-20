@@ -71,7 +71,7 @@ class RoleController extends Controller
         $isDelete = $request->get('is_delete');
 
         $user = User
-            ::where('id', $userId)
+            ::where('slug', $userId)
             ->first();
 
         $role = Role::findById($roleId);
@@ -81,15 +81,15 @@ class RoleController extends Controller
             return $this->resErrNotFound();
         }
 
-        $result = $isDelete
+        $isDelete
             ? $user->removeRole($role)
             : $user->assignRole($role);
 
-        return $this->resOK($result);
+        return $this->resOK($user);
     }
 
     /**
-     * 展示所有的角色、权限、用户
+     * 展示所有的角色、权限
      */
     public function showAllRoles()
     {
@@ -104,5 +104,20 @@ class RoleController extends Controller
                 ::select('id', 'name')
                 ->get()
         ]);
+    }
+
+    /**
+     * 获取某一条件的所有用户
+     */
+    public function getUsersByCondition(Request $request)
+    {
+        $key = $request->get('key');
+        $value = $request->get('value');
+
+        $users = $key === 'role'
+            ? User::role($value)->get()
+            : User::permission($value)->get();
+
+        return $this->resOK($users);
     }
 }
