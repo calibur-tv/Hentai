@@ -119,11 +119,9 @@ class TagController extends Controller
             'name' => Purifier::clean($request->get('name'))
         ]);
 
-        $tag->extra()->update([
-            'text' => json_encode([
-                'intro' => Purifier::clean($request->get('intro')),
-                'alias' => Purifier::clean($request->get('alias'))
-            ])
+        $tag->updateExtra([
+            'intro' => Purifier::clean($request->get('intro')),
+            'alias' => Purifier::clean($request->get('alias'))
         ]);
 
         // TODO 敏感词检测

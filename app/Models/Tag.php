@@ -70,4 +70,14 @@ class Tag extends Model
     {
         return $this->morphOne('App\Models\Content', 'contentable');
     }
+
+    public function updateExtra($data)
+    {
+        $extra = $this->extra()->pluck('text');
+        $extra = json_decode(json_decode($extra)[0], true);
+
+        $this->extra()->update([
+            'text' => json_encode(array_merge($extra, $data))
+        ]);
+    }
 }
