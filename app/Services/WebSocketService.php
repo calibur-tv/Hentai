@@ -50,8 +50,10 @@ class WebSocketService implements WebSocketHandlerInterface
         $server->push($fd, 'Goodbye');
     }
 
+    /* https://wiki.swoole.com/wiki/page/397.html
     public function onRequest(Request $request, Response $response)
     {
 
     }
+    */
 }
