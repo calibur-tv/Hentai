@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositories\Repository;
+use App\Services\Geetest\Captcha;
 use Illuminate\Http\Request;
 
 class ImageController extends Controller
@@ -14,6 +14,22 @@ class ImageController extends Controller
     public function mark(Request $request)
     {
 
+    }
+
+    /**
+     * 获取 Geetest 验证码
+     *
+     * @Get("/image/captcha")
+     *
+     * @Transaction({
+     *      @Response(200, body={"code": 0, "data": {"success": "数字0或1", "gt": "Geetest.gt", "challenge": "Geetest.challenge", "payload": "字符串荷载"}})
+     * })
+     */
+    public function captcha()
+    {
+        $captcha = new Captcha();
+
+        return $this->resOK($captcha->get());
     }
 
     public function uptoken()

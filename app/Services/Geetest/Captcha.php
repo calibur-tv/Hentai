@@ -15,8 +15,8 @@ class Captcha
 
     public function __construct()
     {
-        $this->captcha_id  = config('geetest.id');
-        $this->private_key = config('geetest.key');
+        $this->captcha_id  = config('app.geetest.id');
+        $this->private_key = config('app.geetest.key');
     }
 
     /**
@@ -233,7 +233,7 @@ class Captcha
                 return $data;
             } else {
                 return 0;
-            } 
+            }
         }
     }
 

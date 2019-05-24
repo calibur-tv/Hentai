@@ -29,6 +29,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
 $route->group(['prefix' => 'image'], function () use ($route)
 {
+    $route->get('captcha', 'ImageController@captcha');
+
     $route->get('uptoken', 'ImageController@uptoken');
 });
 

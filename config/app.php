@@ -117,5 +117,10 @@ return [
 
     'image-cdn' => [
         'https://m1.calibur.tv/'
+    ],
+
+    'geetest' => [
+        'id' => env('GEETEST_ID'),
+        'key' => env('GEETEST_KEY')
     ]
 ];
