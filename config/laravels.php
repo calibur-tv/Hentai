@@ -59,8 +59,8 @@ return [
         'daemonize'          => env('LARAVELS_DAEMONIZE', false),
         'dispatch_mode'      => 2, // dispatch_mode只能设置为2、4、5，https://wiki.swoole.com/wiki/page/277.html
         // 表示每60秒遍历一次，一个连接如果600秒内未向服务器发送任何数据，此连接将被强制关闭
-        // 'heartbeat_idle_time'      => 600,
-        // 'heartbeat_check_interval' => 60,
+        'heartbeat_idle_time'      => 600,
+        'heartbeat_check_interval' => 60,
         'reactor_num'        => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 4,
         'worker_num'         => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 8,
         //'task_worker_num'    => function_exists('swoole_cpu_num') ? swoole_cpu_num() * 2 : 8,
