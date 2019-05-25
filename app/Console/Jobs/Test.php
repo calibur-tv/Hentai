@@ -39,11 +39,12 @@ class Test extends Command
 
         foreach ($users as $user)
         {
-            $user->createApiToken();
             $user->update([
                 'slug' => $this->id2slug($user->id),
                 'migration_state' => 1
             ]);
+
+            $user->createApiToken();
 
             Log::info('user ' . $user->id . ' migration success');
         }

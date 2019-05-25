@@ -30,13 +30,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'email',
         'password',
         'nickname',
         'avatar',
         'slug',
         'api_token',
-        'is_admin'
+        'is_admin',
+        'migration_state'
     ];
 
     /**
@@ -82,7 +82,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function createApiToken()
     {
-        $token = Crypt::encrypt($this);
+        $token = Crypt::encrypt($this->slug . time());
 
         $this->update([
             'api_token' => $token
