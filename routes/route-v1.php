@@ -6,19 +6,22 @@ $route->group(['prefix' => '/door'], function () use ($route)
 
     $route->post('/register', 'DoorController@register');
 
-    $route->post('/bind_phone', 'DoorController@bindPhone');
-
     $route->post('/login', 'DoorController@login');
+
+    $route->group(['middleware' => 'auth'], function () use ($route)
+    {
+        $route->post('/get_user_info', 'DoorController@getUserInfo');
+
+        $route->post('/logout', 'DoorController@logout');
+    });
+
+    $route->post('/bind_phone', 'DoorController@bindPhone');
 
     $route->post('/wechat_mini_app_login', 'DoorController@wechatMiniAppLogin');
 
     $route->post('/wechat_mini_app_get_token', 'DoorController@wechatMiniAppToken');
 
-    $route->post('/current_user', 'DoorController@currentUser');
-
-    $route->post('/reset', 'DoorController@resetPassword');
-
-    $route->post('/logout', 'DoorController@logout');
+    $route->post('/reset_password', 'DoorController@resetPassword');
 
     $route->group(['prefix' => '/oauth2'], function () use ($route)
     {
