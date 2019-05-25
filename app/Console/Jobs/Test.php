@@ -29,7 +29,7 @@ class Test extends Command
     {
         $users = User
             ::where('migration_state', 0)
-            ->take(100)
+            ->take(1000)
             ->get();
 
         if (empty($users))
