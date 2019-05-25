@@ -26,7 +26,7 @@ class Test extends Command
      */
     public function handle()
     {
-        Log::info('test job');
+        Log::info('test job updated');
 
         return true;
     }
