@@ -32,6 +32,11 @@ class Test extends Command
             ->take(100)
             ->get();
 
+        if (empty($users))
+        {
+            Log::info('all user migration success');
+        }
+
         foreach ($users as $user)
         {
             $user->createApiToken();
@@ -39,6 +44,8 @@ class Test extends Command
                 'slug' => $this->id2slug($user->id),
                 'migration_state' => 1
             ]);
+
+            Log::info('user ' . $user->id . ' migration success');
         }
 
         return true;
