@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -65,5 +67,27 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function reports()
     {
         return $this->morphMany('App\Models\Report', 'reportable');
+    }
+
+    /**
+     * 确认密码是否正确
+     *
+     * @param string $password
+     * @return bool
+     */
+    public function verifyPassword(string $password): bool
+    {
+        return Hash::check($password, $this->password);
+    }
+
+    public function createApiToken()
+    {
+        $token = Crypt::encrypt($this);
+
+        $this->update([
+            'api_token' => $token
+        ]);
+
+        return $token;
     }
 }

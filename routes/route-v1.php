@@ -1,5 +1,33 @@
 <?php
 
+$route->group(['prefix' => '/door'], function () use ($route)
+{
+    $route->post('/message', 'DoorController@sendMessage');
+
+    $route->post('/register', 'DoorController@register');
+
+    $route->post('/bind_phone', 'DoorController@bindPhone');
+
+    $route->post('/login', 'DoorController@login');
+
+    $route->post('/wechat_mini_app_login', 'DoorController@wechatMiniAppLogin');
+
+    $route->post('/wechat_mini_app_get_token', 'DoorController@wechatMiniAppToken');
+
+    $route->post('/current_user', 'DoorController@currentUser');
+
+    $route->post('/reset', 'DoorController@resetPassword');
+
+    $route->post('/logout', 'DoorController@logout');
+
+    $route->group(['prefix' => '/oauth2'], function () use ($route)
+    {
+        $route->post('/qq', 'DoorController@qqAuthRedirect');
+
+        $route->post('/wechat', 'DoorController@wechatAuthRedirect');
+    });
+});
+
 $route->group(['prefix' => 'user'], function () use ($route)
 {
     $route->post('send_message', 'UserController@send_message');

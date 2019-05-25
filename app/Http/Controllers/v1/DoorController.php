@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
 
 class DoorController extends Controller
 {
@@ -167,7 +170,7 @@ class DoorController extends Controller
         $zone = $this->createUserZone($nickname);
         $data = [
             'nickname' => $nickname,
-            'password' => bcrypt($request->get('secret')),
+            'password' => Crypt::encrypt($request->get('secret')),
             'zone' => $zone,
             'phone' => $access
         ];
@@ -240,30 +243,23 @@ class DoorController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $data = [
-            'phone' => $request->get('access'),
-            'password' => $request->get('secret')
-        ];
+        $user = User
+            ::where('phone', $request->get('access'))
+            ->first();
 
-        if (Auth::attempt($data))
+        if (is_null($user))
         {
-            $user = Auth::user();
-
-            $jwtToken = $this->responseUser($user);
-
-            $UserIpAddress = new UserIpAddress();
-            $UserIpAddress->add(
-                explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-                $user->id
-            );
-
-            return response([
-                'code' => 0,
-                'data' => $jwtToken
-            ], 200);
+            return $this->resErrBad('未注册的账号');
         }
 
-        return $this->resErrBad('用户名或密码错误');
+        $matched = $user->verifyPassword($request->get('secret'));
+
+        if (!$matched)
+        {
+            return $this->resErrBad('密码错误');
+        }
+
+        return $this->resOK($user);
     }
 
     /**

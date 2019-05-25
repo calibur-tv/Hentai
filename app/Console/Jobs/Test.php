@@ -2,6 +2,7 @@
 
 namespace App\Console\Jobs;
 
+use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -26,8 +27,25 @@ class Test extends Command
      */
     public function handle()
     {
-        Log::info('test job updated');
+        $users = User
+            ::where('migration_state', 0)
+            ->take(100)
+            ->get();
+
+        foreach ($users as $user)
+        {
+            $user->createApiToken();
+            $user->update([
+                'slug' => $this->id2slug($user->id),
+                'migration_state' => 1
+            ]);
+        }
 
         return true;
+    }
+
+    protected function id2slug($id)
+    {
+        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
     }
 }
