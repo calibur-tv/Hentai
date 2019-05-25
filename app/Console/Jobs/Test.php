@@ -31,7 +31,7 @@ class Test extends Command
     {
         $bangumis = DB
             ::table('bangumis')
-            ::where('migration_state', 0)
+            ->where('migration_state', 0)
             ->take(1000)
             ->get();
 
