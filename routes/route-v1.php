@@ -108,31 +108,18 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
 
-    $route->post('create', 'TagController@create');
+    $route->group(['middleware' => ['auth']], function () use ($route)
+    {
+        $route->post('create', 'TagController@create');
 
-    $route->post('update', 'TagController@update');
+        $route->post('update', 'TagController@update');
 
-    $route->post('delete', 'TagController@delete');
+        $route->post('delete', 'TagController@delete');
 
-    $route->post('combine', 'TagController@combine');
+        $route->post('combine', 'TagController@combine');
 
-    $route->post('relink', 'TagController@relink');
-
-//    $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
-//    {
-//        $route->post('create', 'TagController@create');
-//    });
-//
-//    $route->group(['middleware' => 'admin'], function () use ($route)
-//    {
-//        $route->post('update', 'TagController@update');
-//
-//        $route->post('destroy', 'TagController@destroy');
-//
-//        $route->post('combine', 'TagController@combine');
-//
-//        $route->post('redirect', 'TagController@redirect');
-//    });
+        $route->post('relink', 'TagController@relink');
+    });
 });
 
 $route->group(['prefix' => 'comment'], function () use ($route)

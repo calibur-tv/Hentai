@@ -36,6 +36,12 @@ class TagController extends Controller
      */
     public function create(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('create_tag'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:1|max:32',
             'parent_slug' => 'required|string'
@@ -92,6 +98,12 @@ class TagController extends Controller
      */
     public function update(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('update_tag'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:1|max:32',
             'slug' => 'required|string',
@@ -135,6 +147,12 @@ class TagController extends Controller
      */
     public function delete(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('delete_tag'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string'
         ]);
@@ -179,6 +197,12 @@ class TagController extends Controller
      */
     public function combine(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('combine_tag'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'target_slug' => 'required|string'
@@ -225,6 +249,12 @@ class TagController extends Controller
      */
     public function relink(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('relink_tag'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'target_slug' => 'required|string'
