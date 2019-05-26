@@ -42,9 +42,9 @@ class Test extends Command
 
         foreach ($bangumis as $bangumi)
         {
-            $alias = $bangumi['alias'] === 'null' ? '' : json_decode($bangumi['alias'])->search;
-            $intro = $bangumi['summary'];
-            $name = $bangumi['name'];
+            $alias = $bangumi->alias === 'null' ? '' : json_decode($bangumi->alias)->search;
+            $intro = $bangumi->summary;
+            $name = $bangumi->name;
             $parent_slug = '2he';
 
             $tag = Tag::create([
@@ -67,12 +67,12 @@ class Test extends Command
 
             DB
                 ::table('bangumis')
-                ->where('id', $bangumi['id'])
+                ->where('id', $bangumi->id)
                 ->update([
                     'migration_state' => 1
                 ]);
 
-            Log::info('bangumi ' . $bangumi['id'] . ' migration success');
+            Log::info('bangumi ' . $bangumi->id . ' migration success');
         }
 
         return true;
