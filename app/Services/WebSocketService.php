@@ -20,7 +20,7 @@ class WebSocketService implements WebSocketHandlerInterface
     public function __construct()
     {
         // fd、reactorId：https://wiki.swoole.com/wiki/page/56.html
-        // 使用 swoole table 在每次 server 重启后都会被清空导致用户掉线
+        // 每次 server 重启后都会因为 fd 被重置导致用户掉线，需要客户端重连
     }
 
     // 在触发onOpen事件之前Laravel的生命周期已经完结，所以Laravel的Request是可读的
@@ -64,7 +64,9 @@ class WebSocketService implements WebSocketHandlerInterface
         // 要根据接受者 uid 找到他的 fd
         $data = json_decode($frame->data, true);
         $targetUid = $data['target_id'];
-        $targetFd = app('swoole')->wsTable->get('uid:' . $targetUid);
+        $targetFd = app('swoole')
+            ->wsTable
+            ->get('uid:' . $targetUid);
         if ($targetFd === false)
         {
             return;
