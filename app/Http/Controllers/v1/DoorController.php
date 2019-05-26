@@ -259,12 +259,24 @@ class DoorController extends Controller
             return $this->resErrBad('密码错误');
         }
 
+        $role = $request->get('role');
+        if ($role && $user->cant($role))
+        {
+            return $this->resErrRole();
+        }
+
         return $this->resOK($user->api_token);
     }
 
     public function getUserInfo(Request $request)
     {
         $user = $request->user();
+
+        $role = $request->get('role');
+        if ($role && $user->cant($role))
+        {
+            return $this->resErrRole();
+        }
 
         return $this->resOK($user);
     }

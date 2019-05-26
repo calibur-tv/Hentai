@@ -48,7 +48,7 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     // $route->post('reset_password', 'UserController@reset_password');
 
-    $route->group(['middleware' => 'admin'], function () use ($route)
+    $route->group(['middleware' => 'auth'], function () use ($route)
     {
         // $route->get('trials', 'UserController@trials');
 
@@ -94,7 +94,7 @@ $route->group(['prefix' => 'pin'], function () use ($route)
         $route->post('view', 'PinController@view');
     });
 
-    $route->group(['middleware' => 'admin'], function () use ($route)
+    $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->get('trials', 'PinController@trials');
 
@@ -141,7 +141,7 @@ $route->group(['prefix' => 'comment'], function () use ($route)
         $route->post('vote', 'CommentController@vote');
     });
 
-    $route->group(['middleware' => 'admin'], function () use ($route)
+    $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->get('trials', 'PinController@trials');
 
@@ -171,7 +171,7 @@ $route->group(['prefix' => 'flow'], function () use ($route)
     $route->get('users', 'FlowController@users');
 });
 
-$route->group(['prefix' => 'console'], function () use ($route)
+$route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
 {
     $route->group(['prefix' => 'role'], function () use ($route)
     {

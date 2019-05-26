@@ -22,6 +22,12 @@ class RoleController extends Controller
      */
     public function createRole(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('control_admin'))
+        {
+            return $this->resErrRole();
+        }
+
         $role = Role::create(['name' => $request->get('name')]);
 
         return $this->resOK($role);
@@ -32,6 +38,12 @@ class RoleController extends Controller
      */
     public function createPermission(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('control_admin'))
+        {
+            return $this->resErrRole();
+        }
+
         $permission = Permission::create(['name' => $request->get('name')]);
 
         return $this->resOK($permission);
@@ -42,6 +54,12 @@ class RoleController extends Controller
      */
     public function togglePermissionToRole(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('control_admin'))
+        {
+            return $this->resErrRole();
+        }
+
         $permissionId = $request->get('permission_id');
         $roleId = $request->get('role_id');
         $isDelete = $request->get('is_delete');
@@ -66,6 +84,12 @@ class RoleController extends Controller
      */
     public function toggleRoleToUser(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('control_admin'))
+        {
+            return $this->resErrRole();
+        }
+
         $userId = $request->get('user_id');
         $roleId = $request->get('role_id');
         $isDelete = $request->get('is_delete');
