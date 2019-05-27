@@ -187,4 +187,16 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
 
         $route->post('toggle_role_to_user', 'RoleController@toggleRoleToUser');
     });
+
+    $route->group(['prefix' => 'trial'], function () use ($route)
+    {
+        $route->group(['prefix' => 'words'], function () use ($route)
+        {
+            $route->get('show', 'TrialController@showWords');
+
+            $route->post('add', 'TrialController@addWords');
+
+            $route->post('delete', 'TrialController@deleteWords');
+        });
+    });
 });

@@ -3,3 +3,4 @@
 /storage
 .env
 .DS_Store
+*.tree
