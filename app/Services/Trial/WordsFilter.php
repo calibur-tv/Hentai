@@ -4,23 +4,27 @@ namespace App\Services\Trial;
 
 class WordsFilter
 {
-    protected static $BAD_WORDS;
+    protected static $BAD_WORDS_LEVEL_1;
+    protected static $BAD_WORDS_LEVEL_2;
+    protected $delete_line = 1;
+    protected $review_line = 3;
 
     public function count($text)
     {
-        if (app()->environment('local') || ! $text)
+        if ( ! $text)
         {
             return 0;
         }
 
-        if ( ! $this::$BAD_WORDS)
-        {
-            $this::$BAD_WORDS = trie_filter_load(__DIR__ . '/blackword.tree');
-        }
-
-        $arrRet = trie_filter_search_all($this::$BAD_WORDS, $text);
-
+        $this->loadWords();
         $words = [];
+
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
+        for ($k = 0; $k < count($arrRet); $k++)
+        {
+            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+        }
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
         for ($k = 0; $k < count($arrRet); $k++)
         {
             $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
@@ -29,29 +33,71 @@ class WordsFilter
         return count(array_unique($words));
     }
 
-    function filter($text)
+    public function check($text)
     {
-        if (app()->environment('local') || empty($text))
+        if ( ! $text)
         {
             return [
-                'text' => '',
-                'filters' => []
+                'review' => false,
+                'delete' => false
             ];
         }
 
-        if ( ! $this::$BAD_WORDS)
+        $this->loadWords();
+        $words = [];
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
+        for ($k = 0; $k < count($arrRet); $k++)
         {
-            $this::$BAD_WORDS = trie_filter_load(__DIR__ . "/blackword.tree");
+            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+        }
+        if (count($words) >= $this->delete_line)
+        {
+            return [
+                'review' => false,
+                'delete' => true
+            ];
         }
 
-        if (gettype($text) !== 'string')
+        $words = [];
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
+        for ($k = 0; $k < count($arrRet); $k++)
         {
-            $text = $text['text'];
+            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
         }
 
-        $arrRet = trie_filter_search_all($this::$BAD_WORDS, $text);
+        if (count($words) >= $this->review_line)
+        {
+            return [
+                'review' => true,
+                'delete' => false
+            ];
+        }
 
-        $words = array();
+        return [
+            'review' => false,
+            'delete' => false
+        ];
+    }
+
+    public function filter($text)
+    {
+        if (!$text)
+        {
+            return [
+                'text' => '',
+                'words' => []
+            ];
+        }
+
+        $this->loadWords();
+        $words = [];
+
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
+        for ($k = 0; $k < count($arrRet); $k++)
+        {
+            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+        }
+        $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
         for ($k = 0; $k < count($arrRet); $k++)
         {
             $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
@@ -64,7 +110,20 @@ class WordsFilter
 
         return [
             'text' => $text,
-            'filters' => array_unique($words)
+            'words' => array_unique($words)
         ];
+    }
+
+    protected function loadWords()
+    {
+        if ( ! $this::$BAD_WORDS_LEVEL_1)
+        {
+            $this::$BAD_WORDS_LEVEL_1 = trie_filter_load(__DIR__ . '/words_level_1.tree');
+        }
+
+        if ( ! $this::$BAD_WORDS_LEVEL_2)
+        {
+            $this::$BAD_WORDS_LEVEL_2 = trie_filter_load(__DIR__ . '/words_level_2.tree');
+        }
     }
 }
