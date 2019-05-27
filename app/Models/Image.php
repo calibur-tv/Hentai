@@ -21,6 +21,6 @@ class Image extends Model
         'height',
         'size',
         'mime',
-        'text',         // 简介
+        'text',
     ];
 }
