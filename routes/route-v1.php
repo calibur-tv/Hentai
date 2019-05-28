@@ -194,9 +194,13 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
         {
             $route->get('show', 'TrialController@showWords');
 
+            $route->get('test', 'TrialController@textTest');
+
             $route->post('add', 'TrialController@addWords');
 
             $route->post('delete', 'TrialController@deleteWords');
         });
+
+        $route->get('image/test', 'TrialController@imageTest');
     });
 });
