@@ -33,28 +33,9 @@ $route->group(['prefix' => '/door'], function () use ($route)
 
 $route->group(['prefix' => 'user'], function () use ($route)
 {
-    $route->post('send_message', 'UserController@send_message');
-
-    $route->post('sign_in', 'UserController@sign_in');
-
-    $route->post('sign_up', 'UserController@sign_up');
-
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
-        $route->post('sign_out', 'UserController@sign_out');
-
-        // $route->post('update_info', 'UserController@update_info');
-    });
-
-    // $route->post('reset_password', 'UserController@reset_password');
-
-    $route->group(['middleware' => 'auth'], function () use ($route)
-    {
-        // $route->get('trials', 'UserController@trials');
-
-        // $route->post('resolve', 'UserController@resolve');
-
-        // $route->post('reject', 'UserController@reject');
+        $route->post('update_info', 'UserController@update_info');
     });
 });
 

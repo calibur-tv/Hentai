@@ -30,13 +30,24 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'password',
+        'slug',
         'nickname',
         'avatar',
-        'slug',
+        'banner',
+        'birthday',
+        'birth_secret',
+        'phone',
+        'sex',
+        'sex_secret',
+        'signature',
+        'exp',
+        'password',
         'api_token',
-        'is_admin',
-        'migration_state'
+        'qq_open_id',
+        'qq_unique_id',
+        'wechat_unique_id',
+        'wechat_open_id',
+        'migration_state',
     ];
 
     /**
@@ -48,6 +59,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password',
         'api_token'
     ];
+
+    public function getAvatarAttribute($avatar)
+    {
+        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-avatar');
+    }
 
     public function pins()
     {

@@ -20,7 +20,7 @@ class TagBodyResource extends JsonResource
         return [
             'slug' => $this->slug,
             'name' => $this->name,
-            'avatar' => $this->avatar ?: 'default-avatar',
+            'avatar' => $this->avatar,
             'parent_slug' => $this->parent_slug,
             'alias' => $extra['alias'],
             'intro' => $extra['intro'] ?: '暂无简介'

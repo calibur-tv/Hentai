@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Transformers\User\UserAuthResource;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -278,7 +279,7 @@ class DoorController extends Controller
             return $this->resErrRole();
         }
 
-        return $this->resOK($user);
+        return $this->resOK(new UserAuthResource($user));
     }
 
     /**

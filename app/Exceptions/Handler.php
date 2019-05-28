@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class Handler extends ExceptionHandler
 {
@@ -44,16 +45,34 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function render($request, Exception $exception)
+    public function render($request, Exception $e)
     {
-        if ($exception instanceof NotFoundHttpException)
+        if ($e instanceof HttpResponseException)
+        {
+            return $e->getResponse();
+        }
+        else if ($e instanceof ModelNotFoundException)
         {
             return response([
                 'code' => 404,
                 'message' => '您访问的资源不存在'
             ], 404);
         }
+        else if ($e instanceof AuthorizationException)
+        {
+            return response([
+                'code' => 403,
+                'message' => '用户认证错误'
+            ], 403);
+        }
+        else if ($e instanceof ValidationException && $e->getResponse())
+        {
+            return $e->getResponse();
+        }
 
-        return parent::render($request, $exception);
+        return response([
+            'code' => 503,
+            'message' => '系统升级中'
+        ], 503);
     }
 }
