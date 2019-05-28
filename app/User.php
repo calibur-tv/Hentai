@@ -65,6 +65,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-avatar');
     }
 
+    public function getBannerAttribute($banner)
+    {
+        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($banner ?: 'default-banner');
+    }
+
     public function pins()
     {
         return $this->hasMany('App\Models\Pin');
