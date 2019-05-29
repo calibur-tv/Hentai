@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
 
 class CallbackController extends Controller
 {
