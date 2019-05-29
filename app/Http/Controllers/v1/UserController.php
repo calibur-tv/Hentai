@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +11,19 @@ use Mews\Purifier\Facades\Purifier;
 
 class UserController extends Controller
 {
+    public function show(Request $request)
+    {
+        $slug = $request->get('slug');
+        $userRepository = new UserRepository();
+        $user = $userRepository->item($slug);
+
+        if (is_null($user))
+        {
+            return $this->resErrNotFound();
+        }
+
+        return $this->resOK($user);
+    }
     /**
      * 更新用户信息
      */

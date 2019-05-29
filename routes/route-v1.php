@@ -33,6 +33,8 @@ $route->group(['prefix' => '/door'], function () use ($route)
 
 $route->group(['prefix' => 'user'], function () use ($route)
 {
+    $route->get('show', 'UserController@show');
+
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->post('update_info', 'UserController@update_info');
