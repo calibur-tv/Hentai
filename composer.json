@@ -11,6 +11,7 @@
         "illuminate/redis": "^5.8",
         "laravel/lumen-framework": "5.8.*",
         "mews/purifier": "^2.1",
+        "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-follow": "^1.1",
         "spatie/laravel-permission": "^2.37",
         "vlucas/phpdotenv": "^3.3"

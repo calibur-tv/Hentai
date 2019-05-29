@@ -122,5 +122,31 @@ return [
     'geetest' => [
         'id' => env('GEETEST_ID'),
         'key' => env('GEETEST_KEY')
+    ],
+
+    'oauth2' => [
+        // QQ 登录
+        'qq' => [
+            'client_id' => env('QQ_AUTH_APP_ID'),
+            'client_secret' => env('QQ_AUTH_APP_KEY'),
+            'redirect' => 'https://api.calibur.tv/callback/auth/qq'
+        ],
+        // PC 微信登录
+        'wechat' => [
+            'client_id' => env('WECHAT_APP_OPEN_ID'),
+            'client_secret' => env('WECHAT_APP_OPEN_SECRET'),
+            'redirect' => 'https://api.calibur.tv/callback/auth/wechat'
+        ],
+        // H5 微信登录
+        'weixin' => [
+            'client_id' => env('WECHAT_APP_OWNER_ID'),
+            'client_secret' => env('WECHAT_APP_OWNER_SECRET'),
+            'redirect' => 'https://api.calibur.tv/callback/auth/weixin'
+        ],
+        // 微信小程序
+        'wechat_mini_app' => [
+            'app_id' => env('WECHAT_MINI_APP_ID'),
+            'app_secret' => env('WECHAT_MINI_APP_SECRET')
+        ]
     ]
 ];

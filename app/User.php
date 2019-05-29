@@ -111,4 +111,22 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
         return $token;
     }
+
+    public function createUser($data)
+    {
+        $user = $this->create($data);
+        $slug = $this->id2slug($user->id);
+        $user->update([
+            'slug' => $slug
+        ]);
+        $user->slug = $slug;
+        $user->api_token = $user->createApiToken();
+
+        return $user;
+    }
+
+    protected function id2slug($id)
+    {
+        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
+    }
 }

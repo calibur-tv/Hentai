@@ -4,14 +4,15 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\User\UserAuthResource;
+use App\Services\WXBizDataCrypt;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
+use App\Services\Qiniu\Http\Client;
 
 class DoorController extends Controller
 {
-
     /**
      * 发送手机验证码
      *
@@ -168,48 +169,44 @@ class DoorController extends Controller
         }
 
         $nickname = $request->get('nickname');
-        $zone = $this->createUserZone($nickname);
         $data = [
             'nickname' => $nickname,
             'password' => Crypt::encrypt($request->get('secret')),
-            'zone' => $zone,
             'phone' => $access
         ];
 
         try
         {
-            $user = User::create($data);
+            $user = User::createUser($data);
         }
         catch (\Exception $e)
         {
-            app('sentry')->captureException($e);
-
-            return $this->resErrBad('昵称暂不可用，请尝试其它昵称');
+            return $this->resErrBad('未知错误，注册失败');
         }
 
-        $userId = $user->id;
-        $UserIpAddress = new UserIpAddress();
-        $UserIpAddress->add(
-            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-            $userId
-        );
+//        $userId = $user->id;
+//        $UserIpAddress = new UserIpAddress();
+//        $UserIpAddress->add(
+//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
+//            $userId
+//        );
+//
+//        $inviteCode = $request->get('inviteCode');
+//        if ($inviteCode)
+//        {
+//            $job = (new \App\Jobs\User\InviteUser($userId, $inviteCode));
+//            dispatch($job);
+//        }
+//        else
+//        {
+//            $virtualCoinService = new VirtualCoinService();
+//            $virtualCoinService->coinGift($userId, 1);
+//        }
+//
+//        $userRepository = new UserRepository();
+//        $userRepository->migrateSearchIndex('C', $userId);
 
-        $inviteCode = $request->get('inviteCode');
-        if ($inviteCode)
-        {
-            $job = (new \App\Jobs\User\InviteUser($userId, $inviteCode));
-            dispatch($job);
-        }
-        else
-        {
-            $virtualCoinService = new VirtualCoinService();
-            $virtualCoinService->coinGift($userId, 1);
-        }
-
-        $userRepository = new UserRepository();
-        $userRepository->migrateSearchIndex('C', $userId);
-
-        return $this->resCreated($this->responseUser($user));
+        return $this->resCreated($user->api_token);
     }
 
     /**
@@ -324,7 +321,7 @@ class DoorController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('services', []));
+            $socialite = new SocialiteManager(config('app.oauth2', []));
             $accessToken = new AccessToken([
                 'access_token' => $code
             ]);
@@ -335,8 +332,6 @@ class DoorController extends Controller
         }
         catch (\Exception $e)
         {
-            app('sentry')->captureException($e);
-
             return $this->resErrServiceUnavailable('登录失败了~');
         }
 
@@ -378,27 +373,22 @@ class DoorController extends Controller
         if ($isNewUser)
         {
             // signUp
-            $nickname = $this->getNickname($user['nickname']);
-            $zone = $this->createUserZone($nickname);
             $data = [
-                'nickname' => $nickname,
-                'zone' => $zone,
+                'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
-                'password' => bcrypt('calibur')
+                'password' => Crypt::encrypt(time())
             ];
 
             try
             {
-                $user = User::create($data);
+                $user = User::createUser($data);
                 $userRepository = new UserRepository();
                 $userRepository->migrateSearchIndex('C', $user->id);
             }
             catch (\Exception $e)
             {
-                app('sentry')->captureException($e);
-
-                return $this->resErrServiceUnavailable('请修改QQ昵称后重试');
+                return $this->resErrServiceUnavailable('未知错误，注册失败');
             }
         }
         else
@@ -414,14 +404,14 @@ class DoorController extends Controller
             }
         }
 
-        $userId = $user->id;
-        $UserIpAddress = new UserIpAddress();
-        $UserIpAddress->add(
-            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-            $userId
-        );
+//        $userId = $user->id;
+//        $UserIpAddress = new UserIpAddress();
+//        $UserIpAddress->add(
+//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
+//            $userId
+//        );
 
-        return $this->resCreated($this->responseUser($user));
+        return $this->resCreated($user->api_token);
     }
 
     /**
@@ -454,7 +444,7 @@ class DoorController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('services', []));
+            $socialite = new SocialiteManager(config('app.oauth2', []));
             $accessToken = new AccessToken([
                 'access_token' => $code,
                 'openid' => $open_id
@@ -466,8 +456,6 @@ class DoorController extends Controller
         }
         catch (\Exception $e)
         {
-            app('sentry')->captureException($e);
-
             return $this->resErrServiceUnavailable('登录失败了~');
         }
 
@@ -509,26 +497,21 @@ class DoorController extends Controller
         if ($isNewUser)
         {
             // signUp
-            $nickname = $this->getNickname($user['nickname']);
-            $zone = $this->createUserZone($nickname);
             $data = [
-                'nickname' => $nickname,
-                'zone' => $zone,
+                'nickname' => $user['nickname'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => bcrypt('calibur')
+                'password' => Crypt::encrypt(time())
             ];
 
             try
             {
-                $user = User::create($data);
-                $userRepository = new UserRepository();
-                $userRepository->migrateSearchIndex('C', $user->id);
+                $user = User::createUser($data);
+//                $userRepository = new UserRepository();
+//                $userRepository->migrateSearchIndex('C', $user->id);
             }
             catch (\Exception $e)
             {
-                app('sentry')->captureException($e);
-
                 return $this->resErrServiceUnavailable('请修改微信昵称后重试');
             }
         }
@@ -545,14 +528,14 @@ class DoorController extends Controller
             }
         }
 
-        $userId = $user->id;
-        $UserIpAddress = new UserIpAddress();
-        $UserIpAddress->add(
-            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-            $userId
-        );
+//        $userId = $user->id;
+//        $UserIpAddress = new UserIpAddress();
+//        $UserIpAddress->add(
+//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
+//            $userId
+//        );
 
-        return $this->resCreated($this->responseUser($user));
+        return $this->resCreated($user->api_token);
     }
 
     // Todo：绑定第三方账号
@@ -622,7 +605,7 @@ class DoorController extends Controller
         User::where('id', $userId)
             ->update([
                 'phone' => $phone,
-                'password' => bcrypt($request->get('password'))
+                'password' => Crypt::encrypt($request->get('password'))
             ]);
 
         return $this->resOK('手机号绑定成功');
@@ -647,7 +630,7 @@ class DoorController extends Controller
         $encryptedData = $request->get('encrypted_data');
         $iv = $request->get('iv');
         $sessionKey = $request->get('session_key');
-        $appId = config('services.wechat_mini_app.app_id');
+        $appId = config('app.oauth2.wechat_mini_app.app_id');
 
         $tool = new WXBizDataCrypt($appId, $sessionKey);
         $code = $tool->decryptData($encryptedData, $iv, $data);
@@ -662,26 +645,21 @@ class DoorController extends Controller
         $isNewUser = $this->accessIsNew('wechat_unique_id', $uniqueId);
         if ($isNewUser)
         {
-            $nickname = $this->getNickname($user['nickName']);
-            $zone = $this->createUserZone($nickname);
             $data = [
-                'nickname' => $nickname,
-                'zone' => $zone,
+                'nickname' => $user['nickName'],
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
-                'password' => bcrypt('calibur')
+                'password' => Crypt::encrypt(time())
             ];
 
             try
             {
-                $user = User::create($data);
-                $userRepository = new UserRepository();
-                $userRepository->migrateSearchIndex('C', $user->id);
+                $user = User::createUser($data);
+//                $userRepository = new UserRepository();
+//                $userRepository->migrateSearchIndex('C', $user->id);
             }
             catch (\Exception $e)
             {
-                app('sentry')->captureException($e);
-
                 return $this->resErrServiceUnavailable('请修改微信昵称后重试');
             }
         }
@@ -697,7 +675,7 @@ class DoorController extends Controller
             }
         }
 
-        return $this->resOK($this->responseUser($user));
+        return $this->resOK($user->api_token);
     }
 
     // 微信小程序获取用户的 session_key 或获取当前用户的 token
@@ -710,8 +688,8 @@ class DoorController extends Controller
         }
 
         $client = new Client();
-        $appId = config('services.wechat_mini_app.app_id');
-        $appSecret = config('services.wechat_mini_app.app_secret');
+        $appId = config('app.oauth2.wechat_mini_app.app_id');
+        $appSecret = config('app.oauth2.wechat_mini_app.app_secret');
         $resp = $client->get(
             "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
             [
@@ -742,143 +720,8 @@ class DoorController extends Controller
 
         return $this->resOK([
             'type' => 'token',
-            'data' => $this->responseUser($user)
+            'data' => $user->api_token
         ]);
-    }
-
-    /**
-     * 网站获取用户信息
-     *
-     * 每次页面刷新时调用
-     *
-     * @Post("/door/refresh")
-     *
-     * @Request(headers={"Authorization": "Bearer JWT-Token"})
-     * @Transaction({
-     *      @Response(200, body={"code": 0, "data": "用户对象"}),
-     *      @Response(401, body={"code": 40104, "message": "未登录的用户"})
-     * })
-     */
-    public function refreshUser()
-    {
-        $user = $this->getAuthUser();
-        if (!$user)
-        {
-            return $this->resErrAuth();
-        }
-
-        $user = $user->toArray();
-        $userId = $user['id'];
-
-        $imageRepository = new ImageRepository();
-        $userRepository = new UserRepository();
-        $userActivityService = new UserActivity();
-        $userLevel = new UserLevel();
-
-        $user['uptoken'] = $imageRepository->uptoken($userId);
-        $user['daySign'] = $userRepository->daySigned($userId);
-        $user['notification'] = $userRepository->getNotificationCount($userId);
-        $user['exp'] = $userLevel->computeExpObject($user['exp']);
-        $user['power'] = $userActivityService->get($userId);
-        $user['providers'] = [
-            'bind_qq' => !!$user['qq_unique_id'],
-            'bind_wechat' => !!$user['wechat_unique_id'],
-            'bind_phone' => !!$user['phone']
-        ];
-        if ($user['is_admin'])
-        {
-            $role = new Role();
-            $user['roles'] = $role->roles($userId);
-        }
-        else
-        {
-            $user['roles'] = [];
-        }
-
-        $transformer = new UserTransformer();
-
-        return $this->resOK($transformer->refresh($user));
-    }
-
-    /**
-     * 刷新用户的 jwt-token
-     *
-     * 每次`启动应用`时调用，新的 token 会在 response header 里返回
-     *
-     * @Post("/door/refresh_token")
-     *
-     * @Request(headers={"Authorization": "Bearer JWT-Token"})
-     * @Transaction({
-     *      @Response(200, body={"code": 0, "data": "success"}),
-     *      @Response(401, body={"code": 40107, "message": "登录凭证获取失败"})
-     * })
-     */
-    public function refreshJwtToken()
-    {
-        $userId = $this->getAuthUserId();
-        if (!$userId)
-        {
-            return response([
-                'code' => 40107,
-                'message' => config('error.40107')
-            ], 401);
-        }
-
-        return $this->resOK('success');
-    }
-
-    /**
-     * APP 获取当前登录用户的信息
-     *
-     * 每次`启动应用`成功后调用
-     *
-     * @Post("/door/current_user")
-     *
-     * @Request(headers={"Authorization": "Bearer JWT-Token"})
-     * @Transaction({
-     *      @Response(200, body={"code": 0, "data": "用户对象"}),
-     *      @Response(401, body={"code": 40104, "message": "未登录的用户"})
-     * })
-     */
-    public function currentUser()
-    {
-        $user = $this->getAuthUser();
-        if (!$user)
-        {
-            return $this->resErrAuth();
-        }
-
-        $user = $user->toArray();
-        $userId = $user['id'];
-
-        $imageRepository = new ImageRepository();
-        $userRepository = new UserRepository();
-        $userActivityService = new UserActivity();
-        $userLevel = new UserLevel();
-
-        $user['uptoken'] = $imageRepository->uptoken($userId);
-        $user['daySign'] = $userRepository->daySigned($userId);
-        $user['notification'] = $userRepository->getNotificationCount($userId);
-        $user['exp'] = $userLevel->computeExpObject($user['exp']);
-        $user['power'] = $userActivityService->get($userId);
-        $user['providers'] = [
-            'bind_qq' => !!$user['qq_unique_id'],
-            'bind_wechat' => !!$user['wechat_unique_id'],
-            'bind_phone' => !!$user['phone']
-        ];
-        if ($user['is_admin'])
-        {
-            $role = new Role();
-            $user['roles'] = $role->roles($userId);
-        }
-        else
-        {
-            $user['roles'] = [];
-        }
-
-        $transformer = new UserTransformer();
-
-        return $this->resOK($transformer->refresh($user));
     }
 
     /**
@@ -924,7 +767,7 @@ class DoorController extends Controller
 
         User::where('phone', $access)
             ->update([
-                'password' => bcrypt($request->get('secret')),
+                'password' => Crypt::encrypt($request->get('secret')),
                 'password_change_at' => $time,
                 'remember_token' => $remember_token
             ]);
@@ -932,60 +775,9 @@ class DoorController extends Controller
         return $this->resOK('密码重置成功');
     }
 
-    // 创建营销号
-    public function createFaker(Request $request)
-    {
-        $nickname = $request->get('nickname');
-        $phone = $request->get('phone');
-        $password = '$2y$10$zMAtJKR6iQyKyCJVItFBI.lJiVw/EN.nkvMawnFjMz2TOaW5gDSry';
-        $zone = $this->createUserZone($nickname);
-
-        $user = User::create([
-            'nickname' => $nickname,
-            'phone' => $phone,
-            'password' => $password,
-            'zone' => $zone,
-            'faker' => 1
-        ]);
-
-        $userRepository = new UserRepository();
-        $userRepository->migrateSearchIndex('C', $user->id);
-
-        return $this->resCreated($user);
-    }
-
     private function accessIsNew($method, $access)
     {
         return User::withTrashed()->where($method, $access)->count() === 0;
-    }
-
-    private function createUserZone($name)
-    {
-        $pinyin = strtolower(Overtrue::permalink($name));
-
-        $tail = UserZone::where('name', $pinyin)->pluck('count')->first();
-
-        // 如果用户的昵称是中文加数字，生成的拼音会有可能被占用，从而注册的时候就失败了
-        // 可以通过一个递归调用 createUserZone 来解决，但是太危险了，先不修复这个问题
-
-        if ($tail)
-        {
-            UserZone::where('name', $pinyin)->increment('count');
-            return $pinyin . '-' . implode('-', str_split(($tail), 2));
-        }
-        else
-        {
-            UserZone::create(['name' => $pinyin]);
-
-            return $pinyin;
-        }
-    }
-
-    private function responseUser($user)
-    {
-        return JWTAuth::fromUser($user, [
-            'remember' => $user->remember_token
-        ]);
     }
 
     private function createMessageAuthCode($phone, $type)
@@ -1010,12 +802,5 @@ class DoorController extends Controller
 
         Redis::DEL($key);
         return intval($value) === intval($token);
-    }
-
-    protected function getNickname($nickname)
-    {
-        preg_match_all('/([a-zA-Z]+|[0-9]+|[\x{4e00}-\x{9fa5}]+)*/u', $nickname, $matches);
-
-        return implode('', $matches[0]) ?: 'zero';
     }
 }
