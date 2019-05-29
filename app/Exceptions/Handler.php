@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
         {
             return $e->getResponse();
         }
-        else if ($e instanceof ModelNotFoundException)
+        else if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException)
         {
             return response([
                 'code' => 404,
