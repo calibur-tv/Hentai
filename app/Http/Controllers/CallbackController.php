@@ -24,7 +24,7 @@ class CallbackController extends Controller
      */
     public function qqAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('config.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
         return $socialite
             ->driver('qq')
@@ -34,7 +34,7 @@ class CallbackController extends Controller
     // 微信开放平台登录 - PC
     public function wechatAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('config.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
         return $socialite
             ->driver('wechat')
@@ -50,7 +50,7 @@ class CallbackController extends Controller
      */
     public function weixinAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('config.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
         return $socialite
             ->driver('weixin')
@@ -68,7 +68,7 @@ class CallbackController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('config.oauth2', []));
+            $socialite = new SocialiteManager(config('app.oauth2', []));
 
             $user = $socialite
                 ->driver('qq')
@@ -170,7 +170,7 @@ class CallbackController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('config.oauth2', []));
+            $socialite = new SocialiteManager(config('app.oauth2', []));
 
             $user = $socialite
                 ->driver('wechat')
@@ -267,7 +267,7 @@ class CallbackController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('config.oauth2', []));
+            $socialite = new SocialiteManager(config('app.oauth2', []));
 
             $user = $socialite
                 ->driver('weixin')
