@@ -59,6 +59,14 @@ class Controller extends BaseController
         ], 403);
     }
 
+    protected function resErrServiceUnavailable($message = null)
+    {
+        return response([
+            'code' => 503,
+            'message' => $message ?: '服务升级暂不可用'
+        ], 503);
+    }
+
     protected function slug2id($slug)
     {
         return floor(base_convert($slug, 36, 10) / 1000);
