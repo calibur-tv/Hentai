@@ -31,6 +31,8 @@ $app->configure('cors');
 
 $app->configure('permission');
 
+$app->configure('sentry');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
