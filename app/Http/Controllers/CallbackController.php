@@ -205,8 +205,8 @@ class CallbackController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'qq_open_id' => $openId,
-                'qq_unique_id' => $uniqueId,
+                'wechat_open_id' => $openId,
+                'wechat_unique_id' => $uniqueId,
                 'password' => Crypt::encrypt(time())
             ];
 
@@ -291,8 +291,8 @@ class CallbackController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'qq_open_id' => $openId,
-                'qq_unique_id' => $uniqueId,
+                'wechat_open_id' => $openId,
+                'wechat_unique_id' => $uniqueId,
                 'password' => Crypt::encrypt(time())
             ];
 
