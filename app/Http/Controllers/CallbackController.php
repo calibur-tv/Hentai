@@ -154,7 +154,7 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         $user = $socialite
             ->driver('wechat')
