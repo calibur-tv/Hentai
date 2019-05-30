@@ -24,7 +24,7 @@ class CallbackController extends Controller
      */
     public function qqAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         return $socialite
             ->driver('qq')
@@ -34,7 +34,7 @@ class CallbackController extends Controller
     // 微信开放平台登录 - PC
     public function wechatAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         return $socialite
             ->driver('wechat')
@@ -50,7 +50,7 @@ class CallbackController extends Controller
      */
     public function weixinAuthEntry(Request $request)
     {
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         return $socialite
             ->driver('weixin')
@@ -66,7 +66,7 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         $user = $socialite
             ->driver('qq')
@@ -237,7 +237,7 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
         $user = $socialite
             ->driver('weixin')

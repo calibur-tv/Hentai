@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
+use App\Services\Socialite\AccessToken;
+use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -313,7 +315,7 @@ class DoorController extends Controller
             return $this->resErrBad('请求参数错误');
         }
 
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
         $accessToken = new AccessToken([
             'access_token' => $code
         ]);
@@ -422,7 +424,7 @@ class DoorController extends Controller
             return $this->resErrBad();
         }
 
-        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []), $request);
         $accessToken = new AccessToken([
             'access_token' => $code,
             'openid' => $open_id
