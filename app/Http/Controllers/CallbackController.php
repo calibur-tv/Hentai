@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Qiniu\Qshell;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -107,8 +108,11 @@ class CallbackController extends Controller
 
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
@@ -195,8 +199,11 @@ class CallbackController extends Controller
 
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
@@ -278,8 +285,11 @@ class CallbackController extends Controller
 
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,

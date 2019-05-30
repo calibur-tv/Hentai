@@ -9,57 +9,38 @@
 namespace App\Services\Qiniu;
 
 
+use App\Services\Qiniu\Storage\BucketManager;
+
 class Qshell
 {
-    // 抓取大文件
-    public function sync($srcResUrl, $fileName = '')
-    {
-        $now = time();
-        $str = $this->str_rand();
-        $target = $fileName ? $fileName : "user/qshell/upload/video/{$now}-{$str}.mp4";
-        $commends = [
-            "qshell sync {$srcResUrl} video -k {$target}"
-        ];
-
-        foreach ($commends as $script)
-        {
-            exec($script);
-        }
-
-        return $target;
-    }
-
     // 抓取小文件
     public function fetch($srcResUrl, $fileName = '')
     {
+        $auth = new \App\Services\Qiniu\Auth();
+        $bucketManager = new BucketManager($auth);
+
         $now = time();
         $str = $this->str_rand();
         $tail = explode('?', $srcResUrl)[0];
         $tail = explode('.', $tail);
-        if (count($tail) == 2)
+        if (count($tail) >= 2)
         {
-            $tail = ".{$tail[1]}";
+            $tail = "." . last($tail);
         }
         else
         {
             $tail = '';
         }
-        $target = $fileName ? $fileName : "user/qshell/upload/image/{$now}-{$str}{$tail}";
-        $commends = [
-            "qshell fetch {$srcResUrl} clannader -k {$target}"
-        ];
+        $target = $fileName ? $fileName : "fetch/{$now}/{$str}{$tail}";
 
-        if (config('app.env') !== 'production')
+        list($ret, $err) = $bucketManager->fetch($srcResUrl, config('app.qiniu.bucket'), $target);
+
+        if ($err !== null)
         {
-            $commends = [$commends[1]];
+            return '';
         }
 
-        foreach ($commends as $script)
-        {
-            exec($script);
-        }
-
-        return $target;
+        return $ret['key'];
     }
 
     private function str_rand($length = 8, $char = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')

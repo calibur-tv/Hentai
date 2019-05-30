@@ -199,8 +199,8 @@ final class BucketManager
      */
     public function changeMime($bucket, $key, $mime)
     {
-        $resource = \App\Services\Qiniu\entry($bucket, $key);
-        $encode_mime = \App\Services\Qiniu\base64_urlSafeEncode($mime);
+        $resource = $this->entry($bucket, $key);
+        $encode_mime = $this->base64_urlSafeEncode($mime);
         $path = '/chgm/' . $resource . '/mime/' . $encode_mime;
         list(, $error) = $this->rsPost($path);
         return $error;
@@ -250,9 +250,8 @@ final class BucketManager
      */
     public function fetch($url, $bucket, $key = null)
     {
-
-        $resource = \App\Services\Qiniu\base64_urlSafeEncode($url);
-        $to = \App\Services\Qiniu\entry($bucket, $key);
+        $resource = $this->base64_urlSafeEncode($url);
+        $to = $this->entry($bucket, $key);
         $path = '/fetch/' . $resource . '/to/' . $to;
 
         $ak = $this->auth->getAccessKey();
@@ -318,7 +317,7 @@ final class BucketManager
      */
     public function deleteAfterDays($bucket, $key, $days)
     {
-        $entry = \App\Services\Qiniu\entry($bucket, $key);
+        $entry = $this->entry($bucket, $key);
         $path = "/deleteAfterDays/$entry/$days";
         list(, $error) = $this->rsPost($path);
         return $error;
@@ -471,5 +470,21 @@ final class BucketManager
             array_push($data, $operation . '/' . $from . '/' . $to . "/force/" . $forceOp);
         }
         return $data;
+    }
+
+    private function entry($bucket, $key)
+    {
+        $en = $bucket;
+        if (!empty($key)) {
+            $en = $bucket . ':' . $key;
+        }
+        return $this->base64_urlSafeEncode($en);
+    }
+
+    private function base64_urlSafeEncode($data)
+    {
+        $find = array('+', '/');
+        $replace = array('-', '_');
+        return str_replace($find, $replace, base64_encode($data));
     }
 }

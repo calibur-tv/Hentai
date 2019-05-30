@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\User\UserAuthResource;
+use App\Services\Qiniu\Qshell;
 use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
 use App\Services\Socialite\AccessToken;
@@ -359,8 +360,11 @@ class DoorController extends Controller
 
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
@@ -469,8 +473,11 @@ class DoorController extends Controller
 
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
@@ -611,7 +618,11 @@ class DoorController extends Controller
         $isNewUser = $this->accessIsNew('wechat_unique_id', $uniqueId);
         if ($isNewUser)
         {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
+            // signUp
             $data = [
+                'avatar' => $avatar,
                 'nickname' => $user['nickName'],
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
