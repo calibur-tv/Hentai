@@ -172,20 +172,20 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        try
-        {
+//        try
+//        {
             $socialite = new SocialiteManager(config('app.oauth2', []));
 
             $user = $socialite
                 ->driver('wechat')
                 ->user();
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
-        }
+//        }
+//        catch (\Exception $e)
+//        {
+//            app('sentry')->captureException($e);
+//
+//            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
+//        }
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
