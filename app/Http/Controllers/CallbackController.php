@@ -68,7 +68,7 @@ class CallbackController extends Controller
 
         try
         {
-            $socialite = new SocialiteManager(config('app.oauth2', []));
+            $socialiteSms = new SocialiteManager(config('app.oauth2', []));
 
             $user = $socialite
                 ->driver('qq')
@@ -76,6 +76,8 @@ class CallbackController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
         }
 
@@ -140,6 +142,8 @@ class CallbackController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改QQ昵称后重试');
             }
         }
@@ -178,6 +182,8 @@ class CallbackController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
         }
 
@@ -242,6 +248,8 @@ class CallbackController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改微信昵称后重试');
             }
         }
@@ -275,6 +283,8 @@ class CallbackController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
         }
 
@@ -339,6 +349,8 @@ class CallbackController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改微信昵称后重试');
             }
         }

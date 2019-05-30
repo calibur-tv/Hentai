@@ -13,6 +13,7 @@
         "mews/purifier": "^2.1",
         "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-follow": "^1.1",
+        "sentry/sentry-laravel": "1.0.2",
         "spatie/laravel-permission": "^2.37",
         "vlucas/phpdotenv": "^3.3"
     },

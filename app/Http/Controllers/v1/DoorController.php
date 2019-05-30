@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\User\UserAuthResource;
+use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
 use App\User;
 use Illuminate\Http\Request;
@@ -181,6 +182,8 @@ class DoorController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return $this->resErrBad('未知错误，注册失败');
         }
 
@@ -332,6 +335,8 @@ class DoorController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return $this->resErrServiceUnavailable('登录失败了~');
         }
 
@@ -388,6 +393,8 @@ class DoorController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return $this->resErrServiceUnavailable('未知错误，注册失败');
             }
         }
@@ -456,6 +463,8 @@ class DoorController extends Controller
         }
         catch (\Exception $e)
         {
+            app('sentry')->captureException($e);
+
             return $this->resErrServiceUnavailable('登录失败了~');
         }
 
@@ -512,6 +521,8 @@ class DoorController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return $this->resErrServiceUnavailable('请修改微信昵称后重试');
             }
         }
@@ -660,6 +671,8 @@ class DoorController extends Controller
             }
             catch (\Exception $e)
             {
+                app('sentry')->captureException($e);
+
                 return $this->resErrServiceUnavailable('请修改微信昵称后重试');
             }
         }
