@@ -16,7 +16,16 @@ class Message
 
     public function __construct()
     {
-        $this->sms = new EasySms($this->config());
+        $this->sms = new EasySms([
+            'timeout' => 5.0,
+            'default' => [
+                'strategy' => \Overtrue\EasySms\Strategies\OrderStrategy::class,
+                'gateways' => ['aliyun'],
+            ],
+            'gateways' => [
+                'aliyun' => config('app.aliyun.sms')
+            ]
+        ]);
     }
 
     public function register($phone, $code)

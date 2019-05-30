@@ -124,6 +124,14 @@ return [
         'key' => env('GEETEST_KEY')
     ],
 
+    'aliyun' => [
+        'sms' => [
+            'access_key_id' => env('ALIYUN_SMS_ID'),
+            'access_key_secret' => env('ALIYUN_SMS_SECRET'),
+            'sign_name' => '上海十六夜'
+        ]
+    ],
+
     'oauth2' => [
         // QQ 登录
         'qq' => [

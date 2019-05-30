@@ -10,8 +10,10 @@ use App\Services\Socialite\AccessToken;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\Rule;
 use App\Services\Qiniu\Http\Client;
 
 class DoorController extends Controller
@@ -154,11 +156,6 @@ class DoorController extends Controller
             return $this->resErrParams($validator);
         }
 
-        if (!preg_match('/^([a-zA-Z]+|[0-9]+|[\x{4e00}-\x{9fa5}]+)*$/u', $request->get('nickname')))
-        {
-            return $this->resErrBad('昵称只能包含汉字、数字和字母');
-        }
-
         $access = $request->get('access');
 
         if (!$this->checkMessageAuthCode($access, 'sign_up', $request->get('authCode')))
@@ -172,6 +169,7 @@ class DoorController extends Controller
         }
 
         $nickname = $request->get('nickname');
+        // 昵称过敏感词
         $data = [
             'nickname' => $nickname,
             'password' => Crypt::encrypt($request->get('secret')),

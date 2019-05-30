@@ -14,6 +14,14 @@ class Controller extends BaseController
         ], 200);
     }
 
+    protected function resCreated($data)
+    {
+        return response([
+            'code' => 0,
+            'data' => $data
+        ], 201);
+    }
+
     protected function resErrBad($message = null)
     {
         return response([

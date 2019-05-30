@@ -112,10 +112,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $token;
     }
 
-    public function createUser($data)
+    public static function createUser($data)
     {
-        $user = $this->create($data);
-        $slug = $this->id2slug($user->id);
+        $user = self::create($data);
+        $slug = $user->id2slug($user->id);
         $user->update([
             'slug' => $slug
         ]);
