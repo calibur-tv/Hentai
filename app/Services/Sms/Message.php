@@ -60,8 +60,6 @@ class Message
         }
         catch (\Exception $e)
         {
-            app('sentry')->captureException($e);
-
             return false;
         }
     }

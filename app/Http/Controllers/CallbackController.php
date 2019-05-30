@@ -66,20 +66,11 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        try
-        {
-            $socialiteSms = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
-            $user = $socialite
-                ->driver('qq')
-                ->user();
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
-        }
+        $user = $socialite
+            ->driver('qq')
+            ->user();
 
         $openId = $user['id'];
         $uniqueId = $user['unionid'];
@@ -124,9 +115,7 @@ class CallbackController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUserUser($data);
+            $user = User::createUserUser($data);
 //                $newUserId = $user->id;
 //                $invite = $request->get('invite');
 //                if ($invite)
@@ -139,13 +128,6 @@ class CallbackController extends Controller
 //                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
 //                    }
 //                }
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改QQ昵称后重试');
-            }
         }
         else
         {
@@ -172,20 +154,11 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-//        try
-//        {
-            $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
-            $user = $socialite
-                ->driver('wechat')
-                ->user();
-//        }
-//        catch (\Exception $e)
-//        {
-//            app('sentry')->captureException($e);
-//
-//            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
-//        }
+        $user = $socialite
+            ->driver('wechat')
+            ->user();
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -230,9 +203,7 @@ class CallbackController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUser($data);
+            $user = User::createUser($data);
 //                $newUserId = $user->id;
 //                $invite = $request->get('invite');
 //                if ($invite)
@@ -245,13 +216,6 @@ class CallbackController extends Controller
 //                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
 //                    }
 //                }
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改微信昵称后重试');
-            }
         }
         else
         {
@@ -273,20 +237,11 @@ class CallbackController extends Controller
             return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请求参数错误');
         }
 
-        try
-        {
-            $socialite = new SocialiteManager(config('app.oauth2', []));
+        $socialite = new SocialiteManager(config('app.oauth2', []));
 
-            $user = $socialite
-                ->driver('weixin')
-                ->user();
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '登录失败了~');
-        }
+        $user = $socialite
+            ->driver('weixin')
+            ->user();
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -331,9 +286,7 @@ class CallbackController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUser($data);
+            $user = User::createUser($data);
 //                $newUserId = $user->id;
 //                $invite = $request->get('invite');
 //                if ($invite)
@@ -346,13 +299,6 @@ class CallbackController extends Controller
 //                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
 //                    }
 //                }
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return redirect('https://www.calibur.tv/callback/auth-error?message=' . '请修改微信昵称后重试');
-            }
         }
         else
         {

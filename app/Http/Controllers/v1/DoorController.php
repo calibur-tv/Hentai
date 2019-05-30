@@ -176,16 +176,7 @@ class DoorController extends Controller
             'phone' => $access
         ];
 
-        try
-        {
-            $user = User::createUser($data);
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return $this->resErrBad('未知错误，注册失败');
-        }
+        $user = User::createUser($data);
 
 //        $userId = $user->id;
 //        $UserIpAddress = new UserIpAddress();
@@ -322,23 +313,14 @@ class DoorController extends Controller
             return $this->resErrBad('请求参数错误');
         }
 
-        try
-        {
-            $socialite = new SocialiteManager(config('app.oauth2', []));
-            $accessToken = new AccessToken([
-                'access_token' => $code
-            ]);
+        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $accessToken = new AccessToken([
+            'access_token' => $code
+        ]);
 
-            $user = $socialite
-                ->driver('qq')
-                ->user($accessToken);
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return $this->resErrServiceUnavailable('登录失败了~');
-        }
+        $user = $socialite
+            ->driver('qq')
+            ->user($accessToken);
 
         $openId = $user['id'];
         $uniqueId = $user['unionid'];
@@ -385,18 +367,9 @@ class DoorController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUser($data);
-                $userRepository = new UserRepository();
-                $userRepository->migrateSearchIndex('C', $user->id);
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return $this->resErrServiceUnavailable('未知错误，注册失败');
-            }
+            $user = User::createUser($data);
+//                $userRepository = new UserRepository();
+//                $userRepository->migrateSearchIndex('C', $user->id);
         }
         else
         {
@@ -449,24 +422,15 @@ class DoorController extends Controller
             return $this->resErrBad();
         }
 
-        try
-        {
-            $socialite = new SocialiteManager(config('app.oauth2', []));
-            $accessToken = new AccessToken([
-                'access_token' => $code,
-                'openid' => $open_id
-            ]);
+        $socialite = new SocialiteManager(config('app.oauth2', []));
+        $accessToken = new AccessToken([
+            'access_token' => $code,
+            'openid' => $open_id
+        ]);
 
-            $user = $socialite
-                ->driver('weixin')
-                ->user($accessToken);
-        }
-        catch (\Exception $e)
-        {
-            app('sentry')->captureException($e);
-
-            return $this->resErrServiceUnavailable('登录失败了~');
-        }
+        $user = $socialite
+            ->driver('weixin')
+            ->user($accessToken);
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -513,18 +477,9 @@ class DoorController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUser($data);
+            $user = User::createUser($data);
 //                $userRepository = new UserRepository();
 //                $userRepository->migrateSearchIndex('C', $user->id);
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return $this->resErrServiceUnavailable('请修改微信昵称后重试');
-            }
         }
         else
         {
@@ -663,18 +618,9 @@ class DoorController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            try
-            {
-                $user = User::createUser($data);
+            $user = User::createUser($data);
 //                $userRepository = new UserRepository();
 //                $userRepository->migrateSearchIndex('C', $user->id);
-            }
-            catch (\Exception $e)
-            {
-                app('sentry')->captureException($e);
-
-                return $this->resErrServiceUnavailable('请修改微信昵称后重试');
-            }
         }
         else
         {

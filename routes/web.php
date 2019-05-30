@@ -2,6 +2,8 @@
 
 $route->get('/', 'WebController@index');
 
+$route->get('/sentry-debug', 'WebController@sentry');
+
 $route->group(['prefix' => '/callback'], function () use ($route)
 {
     $route->group(['prefix' => '/auth'], function () use ($route)

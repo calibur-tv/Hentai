@@ -31,8 +31,6 @@ $app->configure('cors');
 
 $app->configure('permission');
 
-$app->configure('sentry');
-
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -101,7 +99,6 @@ $app->register(Overtrue\LaravelFollow\FollowServiceProvider::class);
 $app->register(App\Providers\QueryLogServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
-$app->register(Sentry\Laravel\ServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
