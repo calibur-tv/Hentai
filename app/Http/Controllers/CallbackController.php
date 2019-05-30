@@ -100,7 +100,7 @@ class CallbackController extends Controller
                     'qq_unique_id' => $uniqueId
                 ]);
 
-            Redis::DEL('user-' . $userId);
+            // Redis::DEL('user-' . $userId);
 
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定QQ号');
         }
@@ -115,7 +115,7 @@ class CallbackController extends Controller
                 'password' => Crypt::encrypt(time())
             ];
 
-            $user = User::createUserUser($data);
+            $user = User::createUser($data);
 //                $newUserId = $user->id;
 //                $invite = $request->get('invite');
 //                if ($invite)
@@ -142,7 +142,7 @@ class CallbackController extends Controller
             }
         }
 
-        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token);
+        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token . '&redirect=' . $request->get('redirect'));
     }
 
     public function wechatAuthRedirect(Request $request)
@@ -188,7 +188,7 @@ class CallbackController extends Controller
                     'wechat_unique_id' => $uniqueId
                 ]);
 
-            Redis::DEL('user-' . $userId);
+            // Redis::DEL('user-' . $userId);
 
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定微信号');
         }
@@ -225,7 +225,7 @@ class CallbackController extends Controller
                 ->first();
         }
 
-        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token);
+        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token . '&redirect=' . $request->get('redirect'));
     }
 
     public function weixinAuthRedirect(Request $request)
@@ -271,7 +271,7 @@ class CallbackController extends Controller
                     'wechat_unique_id' => $uniqueId
                 ]);
 
-            Redis::DEL('user-' . $userId);
+            // Redis::DEL('user-' . $userId);
 
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定微信号');
         }
@@ -308,7 +308,7 @@ class CallbackController extends Controller
                 ->first();
         }
 
-        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token);
+        return redirect('https://www.calibur.tv/callback/auth-redirect?message=登录成功&token=' . $user->api_token . '&redirect=' . $request->get('redirect'));
     }
 
     private function accessIsNew($method, $access)
