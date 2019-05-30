@@ -33,7 +33,7 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Exception $e)
     {
         if (app()->bound('sentry') && $this->shouldReport($e))
         {
