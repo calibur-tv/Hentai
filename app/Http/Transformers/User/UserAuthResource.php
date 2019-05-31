@@ -24,6 +24,7 @@ class UserAuthResource extends JsonResource
             'sex' => $this->sex,
             'sex_secret' => $this->sex_secret,
             'signature' => $this->signature,
+            'roles' => $this->getRoleNames(),
             'providers' => [
                 'bind_qq' => !!$this->qq_unique_id,
                 'bind_wechat' => !!$this->wechat_unique_id,
