@@ -29,7 +29,8 @@ class UserAuthResource extends JsonResource
                 'bind_qq' => !!$this->qq_unique_id,
                 'bind_wechat' => !!$this->wechat_unique_id,
                 'bind_phone' => !!$this->phone
-            ]
+            ],
+            'level' => 0,
         ];
     }
 }

@@ -10,13 +10,14 @@ namespace App\Http\Repositorys\v1;
 
 
 use App\Http\Repositories\Repository;
+use App\Http\Transformers\User\UserHomeResource;
 use App\User;
 
 class UserRepository extends Repository
 {
     public function item($slug)
     {
-        $result = $this->Cache($this->tag_cache_key($slug), function () use ($slug)
+        $result = $this->Cache($this->item_cache_key($slug), function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -27,7 +28,7 @@ class UserRepository extends Repository
                 return 'nil';
             }
 
-            return $user;
+            return new UserHomeResource($user);
         });
 
         if ($result === 'nil')
@@ -38,7 +39,7 @@ class UserRepository extends Repository
         return $result;
     }
 
-    public function tag_cache_key($slug)
+    public function item_cache_key($slug)
     {
         return "user-{$slug}";
     }

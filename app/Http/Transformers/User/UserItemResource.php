@@ -6,11 +6,11 @@
  * Time: 08:53
  */
 
-namespace App\Http\Transformers;
+namespace App\Http\Transformers\User;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class UserItemResource extends JsonResource
 {
     public function toArray($request)
     {

@@ -12,7 +12,7 @@ namespace App\Http\Repositorys\v1;
 use App\Http\Repositories\Repository;
 use App\Http\Transformers\PinResource;
 use App\Http\Transformers\Tag\TagItemResource;
-use App\Http\Transformers\UserResource;
+use App\Http\Transformers\User\UserItemResource;
 use App\Models\Pin;
 use App\Models\Tag;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +42,7 @@ class PinRepository extends Repository
                 return 'nil';
             }
 
-            $pin->author = new UserResource($tempUser);
+            $pin->author = new UserItemResource($tempUser);
 
             $tagTemp = $pin
                 ->tags()

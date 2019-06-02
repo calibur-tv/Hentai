@@ -9,6 +9,7 @@ use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Mews\Purifier\Facades\Purifier;
 
 class TagController extends Controller
@@ -29,6 +30,33 @@ class TagController extends Controller
         }
 
         return $this->resOK($data);
+    }
+
+
+    /**
+     * 获取用户可投稿的范围
+     */
+    public function contribution(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'type' => [
+                'required',
+                Rule::in(['simple', 'cosplay', 'atfield'])
+            ]
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+    }
+
+    /**
+     * 设置班长
+     */
+    public function toggle_master(Request $request)
+    {
+
     }
 
     /**

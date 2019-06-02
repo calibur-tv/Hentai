@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Mews\Purifier\Facades\Purifier;
 
@@ -63,6 +64,9 @@ class UserController extends Controller
                 'birthday' => $birthday,
                 'birth_secret' => $request->get('birth_secret')
             ]);
+
+        $userRepository = new UserRepository();
+        Redis::DEL($userRepository->item_cache_key($userId));
 
         return $this->resOK();
     }
