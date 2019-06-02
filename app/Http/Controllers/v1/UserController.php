@@ -47,13 +47,13 @@ class UserController extends Controller
         }
 
         $user = $request->user();
-        $userId = $user->id;
+        $slug = $user->slug;
         $birthday = $request->get('birthday') ? date('Y-m-d H:m:s', (int)$request->get('birthday')) : null;
         $avatar = $request->get('avatar');
         $banner = $request->get('banner');
 
         User
-            ::where('id', $userId)
+            ::where('slug', $slug)
             ->update([
                 'nickname' => $request->get('nickname'),
                 'signature' => Purifier::clean($request->get('signature')),
@@ -66,7 +66,7 @@ class UserController extends Controller
             ]);
 
         $userRepository = new UserRepository();
-        Redis::DEL($userRepository->item_cache_key($userId));
+        Redis::DEL($userRepository->item_cache_key($slug));
 
         return $this->resOK();
     }
