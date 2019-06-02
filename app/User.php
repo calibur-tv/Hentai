@@ -60,6 +60,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'api_token'
     ];
 
+    protected $casts = [
+        'sex' => 'integer',
+        'exp' => 'integer',
+        'sex_secret' => 'boolean',
+        'birth_secret' => 'boolean',
+    ];
+
     public function getAvatarAttribute($avatar)
     {
         return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-avatar');
