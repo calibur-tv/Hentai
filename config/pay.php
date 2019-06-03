@@ -26,7 +26,7 @@ return [
         ],
 
         // optional，设置此参数，将进入沙箱模式
-        'mode' => 'dev',
+        'mode' => env('APP_DEBUG') ? 'dev' : 'normal',
     ],
 
     'wechat' => [
