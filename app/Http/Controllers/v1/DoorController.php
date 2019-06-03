@@ -64,6 +64,11 @@ class DoorController extends Controller
         $phone = $request->get('phone_number');
         $type = $request->get('type');
 
+        if ($this->checkMessageThrottle($phone))
+        {
+            return $this->resErrThrottle('一分钟内只能发送一次');
+        }
+
         if ($type === 'sign_up')
         {
             $museNew = true;
@@ -93,11 +98,6 @@ class DoorController extends Controller
         if ($mustOld && $this->accessIsNew('phone', $phone))
         {
             return $this->resErrBad('未注册的手机号');
-        }
-
-        if ($this->checkMessageThrottle($phone))
-        {
-            return $this->resErrThrottle('一分钟内只能发送一次');
         }
 
         $authCode = $this->createMessageAuthCode($phone, $type);
