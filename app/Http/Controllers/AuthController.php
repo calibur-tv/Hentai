@@ -14,7 +14,7 @@ use App\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 
-class CallbackController extends Controller
+class AuthController extends Controller
 {
     /**
      * QQ第三方登录调用授权

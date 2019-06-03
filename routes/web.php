@@ -6,21 +6,28 @@ $route->get('/sentry-debug', 'WebController@sentry');
 
 $route->group(['prefix' => '/callback'], function () use ($route)
 {
+    $route->group(['prefix' => '/alipay'], function () use ($route)
+    {
+        $route->get('/create_order', 'PayController@createAlipayOrder');
+
+        $route->get('/pay_v1', 'PayController@alipayCallback');
+    });
+
     $route->group(['prefix' => '/auth'], function () use ($route)
     {
-        $route->get('/qq', 'CallbackController@qqAuthRedirect');
+        $route->get('/qq', 'AuthController@qqAuthRedirect');
 
-        $route->get('/wechat', 'CallbackController@wechatAuthRedirect');
+        $route->get('/wechat', 'AuthController@wechatAuthRedirect');
 
-        $route->get('/weixin', 'CallbackController@weixinAuthRedirect');
+        $route->get('/weixin', 'AuthController@weixinAuthRedirect');
     });
 
     $route->group(['prefix' => '/oauth2'], function () use ($route)
     {
-        $route->get('/qq', 'CallbackController@qqAuthEntry');
+        $route->get('/qq', 'AuthController@qqAuthEntry');
 
-        $route->get('/wechat', 'CallbackController@wechatAuthEntry');
+        $route->get('/wechat', 'AuthController@wechatAuthEntry');
 
-        $route->get('/weixin', 'CallbackController@weixinAuthEntry');
+        $route->get('/weixin', 'AuthController@weixinAuthEntry');
     });
 });

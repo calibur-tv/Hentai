@@ -9,7 +9,7 @@ return [
         'notify_url' => '',
 
         // 支付成功后同步通知地址
-        'return_url' => '',
+        'return_url' => 'https://api.calibur.tv/callback/alipay/pay_v1',
 
         // 阿里公共密钥，验证签名时使用
         'ali_public_key' => env('ALI_PUBLIC_KEY', ''),
@@ -26,7 +26,7 @@ return [
         ],
 
         // optional，设置此参数，将进入沙箱模式
-        // 'mode' => 'dev',
+        'mode' => 'dev',
     ],
 
     'wechat' => [
