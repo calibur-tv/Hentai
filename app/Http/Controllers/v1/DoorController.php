@@ -95,6 +95,11 @@ class DoorController extends Controller
             return $this->resErrBad('未注册的手机号');
         }
 
+        if ($this->checkMessageThrottle($phone))
+        {
+            return $this->resErrThrottle('一分钟内只能发送一次');
+        }
+
         $authCode = $this->createMessageAuthCode($phone, $type);
         $sms = new Message();
 
@@ -353,8 +358,6 @@ class DoorController extends Controller
                     'qq_unique_id' => $uniqueId
                 ]);
 
-            Redis::DEL('user_' . $userId);
-
             return $this->resOK();
         }
 
@@ -465,8 +468,6 @@ class DoorController extends Controller
                     'wechat_open_id' => $openId,
                     'wechat_unique_id' => $uniqueId
                 ]);
-
-            Redis::DEL('user_' . $userId);
 
             return $this->resOK();
         }
@@ -772,5 +773,19 @@ class DoorController extends Controller
 
         Redis::DEL($key);
         return intval($value) === intval($token);
+    }
+
+    private function checkMessageThrottle($phone)
+    {
+        $cacheKey = 'phone_message_throttle:' . $phone;
+        if (Redis::EXISTS($cacheKey))
+        {
+            return true;
+        }
+
+        Redis::SET($cacheKey, 1);
+        Redis::EXPIRE($cacheKey, 60);
+
+        return false;
     }
 }

@@ -16,7 +16,7 @@ use App\Models\Tag;
 
 class TagRepository extends Repository
 {
-    public function item($slug)
+    public function item($slug, $refresh = false)
     {
         $result = $this->Cache($this->tag_cache_key($slug), function () use ($slug)
         {
@@ -30,7 +30,7 @@ class TagRepository extends Repository
             }
 
             return new TagItemResource($tag);
-        });
+        }, $refresh);
 
         if ($result === 'nil')
         {
@@ -58,7 +58,7 @@ class TagRepository extends Repository
                 'parent' => $tag->parent_slug ? new TagItemResource($tag->parent()->first()) : null,
                 'children' => TagItemResource::collection($tag->children()->get())
             ];
-        }, 'd', true);
+        },true);
 
         if ($result === 'nil')
         {
@@ -70,11 +70,11 @@ class TagRepository extends Repository
 
     public function tag_cache_key($slug)
     {
-        return "tag-{$slug}";
+        return "tag:{$slug}";
     }
 
     public function category_tags_cache_key($slug)
     {
-        return "tag-category-{$slug}";
+        return "tag-category:{$slug}";
     }
 }

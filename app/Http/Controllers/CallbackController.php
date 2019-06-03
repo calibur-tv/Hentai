@@ -101,8 +101,6 @@ class CallbackController extends Controller
                     'qq_unique_id' => $uniqueId
                 ]);
 
-            // Redis::DEL('user-' . $userId);
-
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定QQ号');
         }
 
@@ -192,8 +190,6 @@ class CallbackController extends Controller
                     'wechat_unique_id' => $uniqueId
                 ]);
 
-            // Redis::DEL('user-' . $userId);
-
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定微信号');
         }
 
@@ -277,8 +273,6 @@ class CallbackController extends Controller
                     'wechat_open_id' => $openId,
                     'wechat_unique_id' => $uniqueId
                 ]);
-
-            // Redis::DEL('user-' . $userId);
 
             return redirect('https://www.calibur.tv/callback/auth-success?message=' . '已成功绑定微信号');
         }

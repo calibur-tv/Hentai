@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Mews\Purifier\Facades\Purifier;
 
@@ -66,7 +65,7 @@ class UserController extends Controller
             ]);
 
         $userRepository = new UserRepository();
-        Redis::DEL($userRepository->item_cache_key($slug));
+        $userRepository->item($slug, true);
 
         return $this->resOK();
     }

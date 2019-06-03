@@ -51,6 +51,14 @@ class Controller extends BaseController
         ], 423);
     }
 
+    protected function resErrThrottle($message)
+    {
+        return response([
+            'code' => 429,
+            'message' => $message ?: '请勿灌水'
+        ], 429);
+    }
+
     protected function resErrParams($validator)
     {
         return response([

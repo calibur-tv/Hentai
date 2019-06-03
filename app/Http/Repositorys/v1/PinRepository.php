@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 
 class PinRepository extends Repository
 {
-    public function item($slug)
+    public function item($slug, $refresh = false)
     {
         $result = $this->Cache($this->item_cache_key($slug), function () use ($slug)
         {
@@ -78,7 +78,7 @@ class PinRepository extends Repository
             $pin->tags = $tags;
 
             return new PinResource($pin);
-        }, 'd', true);
+        }, $refresh);
 
         if ($result === 'nil')
         {
@@ -90,6 +90,6 @@ class PinRepository extends Repository
 
     public function item_cache_key($slug)
     {
-        return "pin_{$slug}";
+        return "pin:{$slug}";
     }
 }

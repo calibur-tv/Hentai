@@ -122,9 +122,9 @@ class Repository
         return $cache;
     }
 
-    public function Cache($key, $func, $exp = 'd', $force = false)
+    public function Cache($key, $func, $refresh = false, $exp = 'd')
     {
-        if ($force)
+        if ($refresh)
         {
             $result = $func();
             Cache::put($key, $result, $this->expiredAt($exp));

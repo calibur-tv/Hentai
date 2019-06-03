@@ -15,7 +15,7 @@ use App\User;
 
 class UserRepository extends Repository
 {
-    public function item($slug)
+    public function item($slug, $refresh = false)
     {
         $result = $this->Cache($this->item_cache_key($slug), function () use ($slug)
         {
@@ -29,7 +29,7 @@ class UserRepository extends Repository
             }
 
             return new UserHomeResource($user);
-        });
+        }, $refresh);
 
         if ($result === 'nil')
         {
@@ -41,6 +41,6 @@ class UserRepository extends Repository
 
     public function item_cache_key($slug)
     {
-        return "user-{$slug}";
+        return "user:{$slug}";
     }
 }
