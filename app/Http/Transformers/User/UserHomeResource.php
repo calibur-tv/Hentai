@@ -19,7 +19,7 @@ class UserHomeResource extends JsonResource
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
             'banner' => $this->banner,
-            'level' => 0,
+            'level' => $this->level,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'signature' => $this->signature,

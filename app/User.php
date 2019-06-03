@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Services\Relation\Traits\CanBeFollowed;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
@@ -21,7 +22,8 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, SoftDeletes, HasRoles,
-        CanFollow, CanLike, CanBookmark, CanFavorite, CanVote, CanSubscribe;
+        CanFollow, CanLike, CanBookmark, CanFavorite, CanVote, CanSubscribe,
+        CanBeFollowed;
 
     protected $guard_name = 'api';
     /**
@@ -40,13 +42,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'sex',
         'sex_secret',
         'signature',
-        'exp',
+        'level',
         'password',
         'api_token',
         'qq_open_id',
         'qq_unique_id',
         'wechat_unique_id',
         'wechat_open_id',
+        'virtual_coin',
+        'money_coin',
+        'banned_to',
         'migration_state',
     ];
 
@@ -62,7 +67,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     protected $casts = [
         'sex' => 'integer',
-        'exp' => 'integer',
         'sex_secret' => 'boolean',
         'birth_secret' => 'boolean',
     ];
