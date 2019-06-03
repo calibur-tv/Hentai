@@ -24,7 +24,7 @@ class PayController extends Controller
 
         $alipay = Pay::alipay()->web($order);
 
-        return $alipay;
+        return $this->resOK($alipay->getTargetUrl());
     }
 
     public function alipayCallback(Request $request)
