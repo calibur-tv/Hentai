@@ -31,6 +31,7 @@ $app->configure('cors');
 
 $app->configure('permission');
 
+$app->configure('pay');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -99,6 +100,7 @@ $app->register(Overtrue\LaravelFollow\FollowServiceProvider::class);
 $app->register(App\Providers\QueryLogServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->register(Yansongda\LaravelPay\PayServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

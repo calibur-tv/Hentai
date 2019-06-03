@@ -15,7 +15,8 @@
         "overtrue/laravel-follow": "^1.1",
         "sentry/sentry-laravel": "1.0.2",
         "spatie/laravel-permission": "^2.37",
-        "vlucas/phpdotenv": "^3.3"
+        "vlucas/phpdotenv": "^3.3",
+        "yansongda/laravel-pay": "^2.0"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.4",
