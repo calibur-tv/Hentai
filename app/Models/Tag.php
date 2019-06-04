@@ -71,13 +71,29 @@ class Tag extends Model
         return $this->morphOne('App\Models\Content', 'contentable');
     }
 
-    public function updateExtra($data)
+    public static function createTag(array $data, array $extra)
     {
-        $extra = $this->extra()->pluck('text');
-        $extra = json_decode(json_decode($extra)[0], true);
-
-        $this->extra()->update([
-            'text' => json_encode(array_merge($extra, $data))
+        $tag = self::create($data);
+        $slug = $tag->id2slug($tag->id);
+        $tag->update([
+            'slug' => $slug
         ]);
+        $tag->extra()->createJSON($extra);
+
+        return $tag;
+    }
+
+    public function updateTag(array $data, array $extra)
+    {
+        $this->update($data);
+
+        $this->extra()->updateJSON($extra);
+
+        return $this;
+    }
+
+    protected function id2slug($id)
+    {
+        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
     }
 }

@@ -98,23 +98,18 @@ class TagController extends Controller
             return $this->resErrBad();
         }
 
-        $tag = Tag::create([
-            'name' => $name,
-            'parent_slug' => $parentSlug,
-            'deep' => $parentTag->deep + 1,
-            'creator_id' => 1 // TODO
-        ]);
-
-        $tag->extra()->create([
-            'text' => json_encode([
+        $tag = Tag::createTag(
+            [
+                'name' => $name,
+                'parent_slug' => $parentSlug,
+                'deep' => $parentTag->deep + 1,
+                'creator_id' => 1 // TODO
+            ],
+            [
                 'alias' => $name,
                 'intro' => ''
-            ])
-        ]);
-
-        $tag->update([
-            'slug' => $this->id2slug($tag->id)
-        ]);
+            ]
+        );
 
         // TODO 操作缓存
 
@@ -154,15 +149,16 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        $tag->update([
-            'avatar' => $this->convertImagePath($request->get('avatar')),
-            'name' => Purifier::clean($request->get('name'))
-        ]);
-
-        $tag->updateExtra([
-            'intro' => Purifier::clean($request->get('intro')),
-            'alias' => Purifier::clean($request->get('alias'))
-        ]);
+        $tag->updateTag(
+            [
+                'avatar' => $this->convertImagePath($request->get('avatar')),
+                'name' => Purifier::clean($request->get('name'))
+            ],
+            [
+                'intro' => Purifier::clean($request->get('intro')),
+                'alias' => Purifier::clean($request->get('alias'))
+            ]
+        );
 
         // TODO 敏感词检测
         // TODO 操作缓存

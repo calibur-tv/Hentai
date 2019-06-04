@@ -32,25 +32,24 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
 
-        $user = User
+        $userSlug = User
             ::where('api_token', $request->get['token'])
-            ->first();
-        if (is_null($user))
+            ->pluck('slug');
+        if (!$userSlug)
         {
             return;
         }
 
-        $userId = $user->id;
-
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
         app('swoole')
             ->wsTable
-            ->set('uid:' . $userId, ['value' => $request->fd]);
+            ->set('uid:' . $userSlug, ['value' => $request->fd]);
         // 记录这个 table 是为了在 onClose 的时候找到当前用户的 uid
         app('swoole')
             ->wsTable
-            ->set('fd:' . $request->fd, ['value' => $userId]);
+            ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
+        // TODO：返回用户的未读消息和未读通知的数量
         $server->push($request->fd, json_encode([
             'hola' => 'Welcome to calibur.tv'
         ]));
@@ -62,11 +61,33 @@ class WebSocketService implements WebSocketHandlerInterface
         // 信息发送者的 fd 用 frame->fd 可以知道
         // 但是接收者的 fd 不知道，只知道接受者的 uid
         // 要根据接受者 uid 找到他的 fd
+        // onMessage 好像拿不到 request，所以需要把 token 带到 frame->data 里
         $data = json_decode($frame->data, true);
-        $targetUid = $data['target_id'];
+        $token = $data['token'];
+        if (!$token)
+        {
+            return;
+        }
+        $fromUserSlug = User
+            ::where('api_token', $request->get['token'])
+            ->pluck('slug');
+        if (!$fromUserSlug)
+        {
+            return;
+        }
+
+        $toUserSlug = $data['to_user_slug'];
+        if ($fromUserSlug === $toUserSlug)
+        {
+            return;
+        }
+
+        // 关系认证，是否可发送消息
+        // 消息入库，如何做缓存？
+
         $targetFd = app('swoole')
             ->wsTable
-            ->get('uid:' . $targetUid);
+            ->get('uid:' . $toUserSlug);
         if ($targetFd === false)
         {
             return;
@@ -93,6 +114,7 @@ class WebSocketService implements WebSocketHandlerInterface
     }
 
     /* https://wiki.swoole.com/wiki/page/397.html
+    // 但是 laravel-s 好像没有继承这个方法
     public function onRequest(Request $request, Response $response)
     {
 
