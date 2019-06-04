@@ -34,7 +34,8 @@ class WebSocketService implements WebSocketHandlerInterface
 
         $userSlug = User
             ::where('api_token', $request->get['token'])
-            ->pluck('slug');
+            ->pluck('slug')
+            ->first();
         if (!$userSlug)
         {
             return;
@@ -70,7 +71,8 @@ class WebSocketService implements WebSocketHandlerInterface
         }
         $fromUserSlug = User
             ::where('api_token', $request->get['token'])
-            ->pluck('slug');
+            ->pluck('slug')
+            ->first();
         if (!$fromUserSlug)
         {
             return;
