@@ -92,10 +92,10 @@ class Controller extends BaseController
 //    {
 //        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
 //    }
-
-    protected function convertImagePath($url)
-    {
-        $arr = explode('calibur.tv/', $url);
-        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
-    }
+//
+//    protected function convertImagePath($url)
+//    {
+//        $arr = explode('calibur.tv/', $url);
+//        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+//    }
 }

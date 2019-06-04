@@ -98,7 +98,7 @@ class PinController extends Controller
             'images.width' => 'required|integer',
             'images.height' => 'required|integer',
             'images.size' => 'required|integer',
-            'images.type' => 'required|string',
+            'images.mime' => 'required|string',
             'title' => 'present|string|max:20',
             'content' => 'present|string',
             'origin_url' => 'required|url|max:30',

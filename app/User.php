@@ -71,6 +71,20 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'birth_secret' => 'boolean',
     ];
 
+    public function setAvatarAttribute($url)
+    {
+        $arr = explode('calibur.tv/', $url);
+
+        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+    }
+
+    public function setBannerAttribute($url)
+    {
+        $arr = explode('calibur.tv/', $url);
+
+        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+    }
+
     public function getAvatarAttribute($avatar)
     {
         return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-avatar');

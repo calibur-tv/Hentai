@@ -57,8 +57,8 @@ class UserController extends Controller
                 'nickname' => $request->get('nickname'),
                 'signature' => Purifier::clean($request->get('signature')),
                 'sex' => $request->get('sex'),
-                'avatar' => $this->convertImagePath($avatar),
-                'banner' => $this->convertImagePath($banner),
+                'avatar' => $avatar,
+                'banner' => $banner,
                 'sex_secret' => $request->get('sex_secret'),
                 'birthday' => $birthday,
                 'birth_secret' => $request->get('birth_secret')

@@ -42,7 +42,7 @@ class ImageController extends Controller
                 "data": {
                     "height": $(imageInfo.height),
                     "width": $(imageInfo.width),
-                    "type": "$(mimeType)",
+                    "mime": "$(mimeType)",
                     "size": $(fsize),
                     "url": "$(key)"
                 }

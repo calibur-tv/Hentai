@@ -31,6 +31,13 @@ class Tag extends Model
         'parent_slug',
     ];
 
+    public function setAvatarAttribute($url)
+    {
+        $arr = explode('calibur.tv/', $url);
+
+        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+    }
+
     public function getAvatarAttribute($avatar)
     {
         return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-poster');
@@ -88,6 +95,15 @@ class Tag extends Model
         $this->update($data);
 
         $this->extra()->updateJSON($extra);
+
+        return $this;
+    }
+
+    public function deleteTag()
+    {
+        $this->delete();
+
+        $this->extra()->delete();
 
         return $this;
     }

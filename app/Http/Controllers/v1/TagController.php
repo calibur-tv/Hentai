@@ -151,7 +151,7 @@ class TagController extends Controller
 
         $tag->updateTag(
             [
-                'avatar' => $this->convertImagePath($request->get('avatar')),
+                'avatar' => $request->get('avatar'),
                 'name' => Purifier::clean($request->get('name'))
             ],
             [
@@ -202,7 +202,7 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        $tag->delete();
+        $tag->deleteTag();
 
         Tag
             ::where('parent_slug', $slug)
