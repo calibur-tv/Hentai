@@ -6,7 +6,7 @@ namespace App\Http\Modules\Counter;
 
 use App\Models\MessageMenu;
 
-class UnReadMessageCounter extends MigrationCounter
+class UnReadMessageCounter extends AsyncCounter
 {
     protected $from_user_id;
     protected $message_type;
@@ -31,9 +31,8 @@ class UnReadMessageCounter extends MigrationCounter
 
     protected function readDB($toUserId)
     {
-        return MessageMenu
-            ::where('from_user_id', $this->from_user_id)
-            ->where('to_user_id', $toUserId)
+        return (int)MessageMenu
+            ::where('to_user_id', $toUserId)
             ->pluck('count')
             ->first();
     }

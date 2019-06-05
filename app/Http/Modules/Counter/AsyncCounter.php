@@ -6,7 +6,7 @@ namespace App\Http\Modules\Counter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
-class MigrationCounter
+class AsyncCounter
 {
     protected $table;
     protected $field;
