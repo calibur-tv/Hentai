@@ -38,13 +38,13 @@ class AsyncCounter
                 $this->set($id, $result);
             }
 
-            return $result;
+            return (int)$result;
         }
         $value = $this->readDB($id);
         $result = $value + $num;
         $result = Redis::SET($cacheKey, $result);
 
-        return $result;
+        return (int)$result;
     }
 
     public function get($id)
@@ -53,7 +53,7 @@ class AsyncCounter
         $value = Redis::GET($cacheKey);
         if (null !== $value)
         {
-            return $value;
+            return (int)$value;
         }
 
         $count = $this->readDB($id);
@@ -73,7 +73,7 @@ class AsyncCounter
     {
         foreach ($list as $i => $item)
         {
-            $list[$i][$key] = (int)$this->get($item['id']);
+            $list[$i][$key] = $this->get($item['id']);
         }
         return $list;
     }
@@ -99,7 +99,7 @@ class AsyncCounter
 
     protected function readDB($id)
     {
-        return DB
+        return (int)DB
             ::table($this->table)
             ->where('id', $id)
             ->pluck($this->field)
