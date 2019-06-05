@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
@@ -61,9 +62,16 @@ class Handler extends ExceptionHandler
         else if ($e instanceof AuthorizationException)
         {
             return response([
-                'code' => 403,
+                'code' => 401,
                 'message' => '用户认证错误'
-            ], 403);
+            ], 401);
+        }
+        else if ($e instanceof MethodNotAllowedHttpException)
+        {
+            return response([
+                'code' => 405,
+                'message' => '错误的请求方法'
+            ], 405);
         }
         else if ($e instanceof ValidationException && $e->getResponse())
         {

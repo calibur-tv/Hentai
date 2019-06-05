@@ -33,14 +33,12 @@ class Tag extends Model
 
     public function setAvatarAttribute($url)
     {
-        $arr = explode('calibur.tv/', $url);
-
-        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+        $this->attributes['avatar'] = trimImage($url);
     }
 
     public function getAvatarAttribute($avatar)
     {
-        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-poster');
+        return patchImage($avatar, 'default-poster');
     }
 
     public function parent()
@@ -81,11 +79,13 @@ class Tag extends Model
     public static function createTag(array $data, array $extra)
     {
         $tag = self::create($data);
-        $slug = $tag->id2slug($tag->id);
+        $slug = id2slug($tag->id);
         $tag->update([
             'slug' => $slug
         ]);
-        $tag->extra()->createJSON($extra);
+        $tag->extra()->create([
+            'text' => json_encode($extra)
+        ]);
 
         return $tag;
     }
@@ -94,7 +94,11 @@ class Tag extends Model
     {
         $this->update($data);
 
-        $this->extra()->updateJSON($extra);
+        $text = $this->extra()->pluck('text');
+        $text = json_decode($text, true);
+        $this->extra()->update([
+            'text' => json_encode(array_merge($extra, $text))
+        ]);
 
         return $this;
     }
@@ -106,10 +110,5 @@ class Tag extends Model
         $this->extra()->delete();
 
         return $this;
-    }
-
-    protected function id2slug($id)
-    {
-        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
     }
 }

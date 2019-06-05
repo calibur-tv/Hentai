@@ -10,12 +10,45 @@ namespace App\Http\Repositories;
 
 
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Cache;
-use Mews\Purifier\Facades\Purifier;
 
 class Repository
 {
-    public function RedisList($key, $func, $exp = 'd', $force = false)
+    public function RedisItem($key, $func, $force = false, $exp = 'd')
+    {
+        $cache = $force ? null : Redis::GET($key);
+        if (!is_null($cache))
+        {
+            return starts_with($cache, '{"') ? json_decode($cache) : $cache;
+        }
+
+        $cache = $func();
+        if (is_null($cache))
+        {
+            return null;
+        }
+
+        $type = gettype($cache);
+        $encodeCache = $cache;
+        if ($type === 'object' || $type === 'array')
+        {
+            $encodeCache = json_encode($cache);
+        }
+
+        if (Redis::SETNX('lock_'.$key, 1))
+        {
+            Redis::pipeline(function ($pipe) use ($key, $encodeCache, $exp)
+            {
+                $pipe->EXPIRE('lock_'.$key, 10);
+                $pipe->SET($key, $encodeCache);
+                $pipe->EXPIREAT($key, $this->expire($exp));
+                $pipe->DEL('lock_'.$key);
+            });
+        }
+
+        return $cache;
+    }
+
+    public function RedisList($key, $func, $force = false, $exp = 'd')
     {
         $cache = $force ? [] : Redis::LRANGE($key, 0, -1);
 
@@ -92,49 +125,6 @@ class Repository
         }
 
         return $opts['with_score'] ? $cache : array_keys($cache);
-    }
-
-    public function RedisItem($key, $func, $exp = 'd', $force = false)
-    {
-        $cache = $force ? null : Redis::GET($key);
-        if (!is_null($cache))
-        {
-            return $cache;
-        }
-
-        $cache = $func();
-        if (is_null($cache))
-        {
-            return null;
-        }
-
-        if (Redis::SETNX('lock_'.$key, 1))
-        {
-            Redis::pipeline(function ($pipe) use ($key, $cache, $exp)
-            {
-                $pipe->EXPIRE('lock_'.$key, 10);
-                $pipe->SET($key, $cache);
-                $pipe->EXPIREAT($key, $this->expire($exp));
-                $pipe->DEL('lock_'.$key);
-            });
-        }
-
-        return $cache;
-    }
-
-    public function Cache($key, $func, $refresh = false, $exp = 'd')
-    {
-        if ($refresh)
-        {
-            $result = $func();
-            Cache::put($key, $result, $this->expiredAt($exp));
-
-            return $result;
-        }
-        return Cache::remember($key, $this->expiredAt($exp), function () use ($func)
-        {
-            return $func();
-        });
     }
 
     public function ListInsertBefore($key, $value)
@@ -264,28 +254,6 @@ class Repository
             'total' => $total,
             'no_more' => $total - ($page + 1) * $take <= 0
         ];
-    }
-
-    private function expiredAt($type = 'd')
-    {
-        if ($type === 'd')
-        {
-            return 86400;
-        }
-        else if ($type === 'h')
-        {
-            return 3600;
-        }
-        else if ($type === 'm')
-        {
-            return 300;
-        }
-        if (gettype($type) === 'integer')
-        {
-            return $type;
-        }
-
-        return 86400;
     }
 
     private function expire($type = 'd')

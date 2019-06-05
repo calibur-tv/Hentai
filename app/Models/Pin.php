@@ -67,9 +67,4 @@ class Pin extends Model
     {
         return $this->morphMany('App\Models\Report', 'reportable');
     }
-
-    protected function id2slug($id)
-    {
-        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
-    }
 }

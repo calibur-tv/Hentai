@@ -2,7 +2,7 @@
 
 $route->get('/', 'WebController@index');
 
-$route->get('/sentry-debug', 'WebController@sentry');
+$route->post('/test', 'WebController@test');
 
 $route->group(['prefix' => '/callback'], function () use ($route)
 {

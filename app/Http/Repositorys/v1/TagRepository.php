@@ -18,7 +18,7 @@ class TagRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
-        $result = $this->Cache($this->tag_cache_key($slug), function () use ($slug)
+        $result = $this->RedisItem($this->tag_cache_key($slug), function () use ($slug)
         {
             $tag = Tag
                 ::where('slug', $slug)
@@ -42,7 +42,7 @@ class TagRepository extends Repository
 
     public function relation_item($slug)
     {
-        $result = $this->Cache($this->category_tags_cache_key($slug), function () use ($slug)
+        $result = $this->RedisItem($this->category_tags_cache_key($slug), function () use ($slug)
         {
             $tag = Tag
                 ::where('slug', $slug)
@@ -58,7 +58,7 @@ class TagRepository extends Repository
                 'parent' => $tag->parent_slug ? new TagItemResource($tag->parent()->first()) : null,
                 'children' => TagItemResource::collection($tag->children()->get())
             ];
-        },true);
+        });
 
         if ($result === 'nil')
         {

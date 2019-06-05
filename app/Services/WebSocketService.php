@@ -5,8 +5,13 @@
 
 namespace App\Services;
 
+use App\Http\Modules\RichContentService;
+use App\Http\Transformers\User\UserItemResource;
+use App\Models\Message;
 use App\User;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
@@ -64,28 +69,51 @@ class WebSocketService implements WebSocketHandlerInterface
         // 要根据接受者 uid 找到他的 fd
         // onMessage 好像拿不到 request，所以需要把 token 带到 frame->data 里
         $data = json_decode($frame->data, true);
-        $token = $data['token'];
-        if (!$token)
+        $validator = Validator::make($data, [
+            'message_type' => [
+                'required',
+                Rule::in([0, 1, 2]),
+            ],
+            'from_user_token' => 'required|string',
+            'to_user_slug' => 'present|string',
+            'content' => 'required|array'
+        ]);
+        if ($validator->fails())
         {
             return;
         }
-        $fromUserSlug = User
-            ::where('api_token', $request->get['token'])
-            ->pluck('slug')
+
+        $fromUser = User
+            ::where('api_token', $data['from_user_token'])
             ->first();
-        if (!$fromUserSlug)
+        if (is_null($fromUser))
         {
             return;
         }
 
+        $messageType = $data['message_type'];
+        /**
+         *  type 消息种类判定
+         * 0. 私聊
+         * 1. 群发
+         * 2. 广播
+         */
+
+        $fromUserSlug = $fromUser->slug;
         $toUserSlug = $data['to_user_slug'];
-        if ($fromUserSlug === $toUserSlug)
-        {
-            return;
-        }
+//        if ($messageType === 0 && $fromUserSlug === $toUserSlug)
+//        {
+//            return;
+//        }
 
+        // XSS过滤，敏感词查询
         // 关系认证，是否可发送消息
         // 消息入库，如何做缓存？
+        $message = Message::createMessage([
+            'from_user_slug' => $fromUserSlug,
+            'to_user_slug' => $toUserSlug,
+            'type' => $messageType
+        ], $data['content']);
 
         $targetFd = app('swoole')
             ->wsTable
@@ -95,7 +123,18 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
 
-        $server->push($targetFd['value'], json_encode($data));
+        $richContentService = new RichContentService();
+        $result = [
+            'message_type' => $messageType,
+            'from_user' => [
+                'slug' => $fromUserSlug,
+                'nickname' => $fromUser->nickname,
+                'avatar' => $fromUser->avatar
+            ],
+            'message' => $richContentService->parseRichContent($message->content->text)
+        ];
+
+        $server->push($targetFd['value'], json_encode($result));
     }
 
     public function onClose(Server $server, $fd, $reactorId)

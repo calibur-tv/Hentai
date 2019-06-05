@@ -17,7 +17,9 @@ class UserItemResource extends JsonResource
         return [
             'slug' => $this->slug,
             'nickname' => $this->nickname,
-            'avatar' => $this->avatar
+            'avatar' => $this->avatar,
+            'roles' => $this->getRoleNames(),
+            'level' => $this->level
         ];
     }
 }

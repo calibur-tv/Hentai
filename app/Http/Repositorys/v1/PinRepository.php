@@ -21,7 +21,7 @@ class PinRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
-        $result = $this->Cache($this->item_cache_key($slug), function () use ($slug)
+        $result = $this->RedisItem($this->item_cache_key($slug), function () use ($slug)
         {
             $pin = Pin
                 ::withTrashed()

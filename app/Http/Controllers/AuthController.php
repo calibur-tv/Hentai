@@ -11,7 +11,6 @@ namespace App\Http\Controllers;
 use App\Services\Qiniu\Qshell;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -114,7 +113,7 @@ class AuthController extends Controller
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);
@@ -203,7 +202,7 @@ class AuthController extends Controller
                 'nickname' => $user['nickname'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);
@@ -287,7 +286,7 @@ class AuthController extends Controller
                 'nickname' => $user['nickname'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);

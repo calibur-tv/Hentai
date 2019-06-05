@@ -13,7 +13,6 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use App\Services\Qiniu\Http\Client;
 
@@ -178,7 +177,7 @@ class DoorController extends Controller
         // 昵称过敏感词
         $data = [
             'nickname' => $nickname,
-            'password' => Crypt::encrypt($request->get('secret')),
+            'password' => $request->get('secret'),
             'phone' => $access
         ];
 
@@ -371,7 +370,7 @@ class DoorController extends Controller
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);
@@ -482,7 +481,7 @@ class DoorController extends Controller
                 'nickname' => $user['nickname'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);
@@ -579,7 +578,7 @@ class DoorController extends Controller
         User::where('id', $userId)
             ->update([
                 'phone' => $phone,
-                'password' => Crypt::encrypt($request->get('password'))
+                'password' => $request->get('password')
             ]);
 
         return $this->resOK('手机号绑定成功');
@@ -627,7 +626,7 @@ class DoorController extends Controller
                 'nickname' => $user['nickName'],
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
-                'password' => Crypt::encrypt(time())
+                'password' => time()
             ];
 
             $user = User::createUser($data);
@@ -733,15 +732,19 @@ class DoorController extends Controller
             return $this->resErrBad('短信验证码过期，请重新获取');
         }
 
-        $time = time();
-        $remember_token = md5($time);
+        $user = User
+            ::where('phone', $access)
+            ->first();
+        if (is_null($user))
+        {
+            return $this->resErrNotFound();
+        }
 
-        User::where('phone', $access)
-            ->update([
-                'password' => Crypt::encrypt($request->get('secret')),
-                'password_change_at' => $time,
-                'remember_token' => $remember_token
+        $user->update([
+                'password' => $request->get('secret')
             ]);
+
+        $user->createApiToken();
 
         return $this->resOK('密码重置成功');
     }

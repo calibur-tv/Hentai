@@ -32,7 +32,7 @@ class Image extends Model
 
     public function setMimeAttribute($mineStr)
     {
-        return array_search($mineStr, $this->mimeArr);
+        $this->attributes['mime'] = array_search($mineStr, $this->mimeArr);
     }
 
     public function getMimeAttribute($mimeInt)
@@ -42,18 +42,11 @@ class Image extends Model
 
     public function setUrlAttribute($url)
     {
-        $arr = explode('calibur.tv/', $url);
-
-        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+        $this->attributes['url'] = trimImage($url);
     }
 
     public function getUrlAttribute($url)
     {
-        if (preg_match('/http/', $url))
-        {
-            return $url;
-        }
-
-        return config('app.image-cdn')[array_rand(config('app.image-cdn'))] . $url;
+        return patchImage($url);
     }
 }

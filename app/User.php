@@ -26,11 +26,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         CanBeFollowed;
 
     protected $guard_name = 'api';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     protected $fillable = [
         'slug',
         'nickname',
@@ -55,11 +51,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'migration_state',
     ];
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'api_token'
@@ -73,26 +64,38 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function setAvatarAttribute($url)
     {
-        $arr = explode('calibur.tv/', $url);
-
-        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+        $this->attributes['avatar'] = trimImage($url);
     }
 
     public function setBannerAttribute($url)
     {
-        $arr = explode('calibur.tv/', $url);
-
-        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
+        $this->attributes['banner'] = trimImage($url);
     }
+
+    public function setPasswordAttribute($pwd)
+    {
+        $this->attributes['password'] = Hash::make($pwd);
+    }
+
 
     public function getAvatarAttribute($avatar)
     {
-        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($avatar ?: 'default-avatar');
+        return patchImage($avatar, 'default-avatar');
     }
 
     public function getBannerAttribute($banner)
     {
-        return config('app.image-cdn')[array_rand(config('app.image-cdn'))]. ($banner ?: 'default-banner');
+        return patchImage($banner, 'default-banner');
+    }
+
+    public function getNicknameAttribute($name)
+    {
+        return $name ? trim($name) : '空白';
+    }
+
+    public function getSignatureAttribute($text)
+    {
+        return $text ? trim($text) : '这个人还很神秘...';
     }
 
     public function pins()
@@ -140,7 +143,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public static function createUser($data)
     {
         $user = self::create($data);
-        $slug = $user->id2slug($user->id);
+        $slug = id2slug($user->id);
         $user->update([
             'slug' => $slug
         ]);
@@ -148,10 +151,5 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->api_token = $user->createApiToken();
 
         return $user;
-    }
-
-    protected function id2slug($id)
-    {
-        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
     }
 }
