@@ -11,6 +11,7 @@ namespace App\Http\Repositorys\v1;
 
 use App\Http\Repositories\Repository;
 use App\Http\Transformers\User\UserHomeResource;
+use App\Http\Transformers\User\UserItemResource;
 use App\User;
 
 class UserRepository extends Repository
@@ -39,8 +40,37 @@ class UserRepository extends Repository
         return $result;
     }
 
+    public function itemById($id, $refresh = false)
+    {
+        $result = $this->RedisItem($this->item_id_cache_key($id), function () use ($id)
+        {
+            $user = User
+                ::where('id', $id)
+                ->first();
+
+            if (is_null($user))
+            {
+                return 'nil';
+            }
+
+            return new UserItemResource($user);
+        }, $refresh);
+
+        if ($result === 'nil')
+        {
+            return null;
+        }
+
+        return $result;
+    }
+
     public function item_cache_key($slug)
     {
         return "user:{$slug}";
+    }
+
+    public function item_id_cache_key($id)
+    {
+        return "user-id:{$id}";
     }
 }

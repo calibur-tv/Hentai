@@ -41,6 +41,13 @@ $route->group(['prefix' => 'user'], function () use ($route)
     });
 });
 
+$route->group(['prefix' => 'message', 'middleware' => 'auth'], function () use ($route)
+{
+    $route->get('menu', 'MessageController@getMessageMenu');
+
+    $route->get('history', 'MessageController@getChatHistory');
+});
+
 $route->group(['prefix' => 'image'], function () use ($route)
 {
     $route->get('captcha', 'ImageController@captcha');
