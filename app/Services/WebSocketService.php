@@ -5,6 +5,7 @@
 
 namespace App\Services;
 
+use App\Http\Modules\Counter\UnReadMessageCounter;
 use App\Http\Modules\RichContentService;
 use App\Http\Transformers\User\UserItemResource;
 use App\Models\Message;
@@ -37,11 +38,11 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
 
-        $userSlug = User
+        $userId = User
             ::where('api_token', $request->get['token'])
-            ->pluck('slug')
+            ->pluck('id')
             ->first();
-        if (!$userSlug)
+        if (!$userId)
         {
             return;
         }
@@ -49,15 +50,16 @@ class WebSocketService implements WebSocketHandlerInterface
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
         app('swoole')
             ->wsTable
-            ->set('uid:' . $userSlug, ['value' => $request->fd]);
+            ->set('uid:' . $userId, ['value' => $request->fd]);
         // 记录这个 table 是为了在 onClose 的时候找到当前用户的 uid
         app('swoole')
             ->wsTable
-            ->set('fd:' . $request->fd, ['value' => $userSlug]);
+            ->set('fd:' . $request->fd, ['value' => $userId]);
 
-        // TODO：返回用户的未读消息和未读通知的数量
+        $unReadMessageCounter = new UnReadMessageCounter();
         $server->push($request->fd, json_encode([
-            'hola' => 'Welcome to calibur.tv'
+            'unread_message_total' => $unReadMessageCounter->get($userId),
+            'unread_notice_total' => 0
         ]));
     }
 
@@ -99,25 +101,28 @@ class WebSocketService implements WebSocketHandlerInterface
          * 2. 广播
          */
 
-        $fromUserSlug = $fromUser->slug;
-        $toUserSlug = $data['to_user_slug'];
-//        if ($messageType === 0 && $fromUserSlug === $toUserSlug)
-//        {
-//            return;
-//        }
+        $fromUserId = $fromUser->id;
+        $toUserId = User
+            ::where('slug', $data['to_user_slug'])
+            ->pluck('id')
+            ->first();
+        if ($messageType === 0 && $fromUserId === $toUserId)
+        {
+            return;
+        }
 
         // XSS过滤，敏感词查询
         // 关系认证，是否可发送消息
         // 消息入库，如何做缓存？
         $message = Message::createMessage([
-            'from_user_slug' => $fromUserSlug,
-            'to_user_slug' => $toUserSlug,
+            'from_user_id' => $fromUserId,
+            'to_user_id' => $toUserId,
             'type' => $messageType
         ], $data['content']);
 
         $targetFd = app('swoole')
             ->wsTable
-            ->get('uid:' . $toUserSlug);
+            ->get('uid:' . $toUserId);
         if ($targetFd === false)
         {
             return;
@@ -127,7 +132,7 @@ class WebSocketService implements WebSocketHandlerInterface
         $result = [
             'message_type' => $messageType,
             'from_user' => [
-                'slug' => $fromUserSlug,
+                'slug' => $fromUser->slug,
                 'nickname' => $fromUser->nickname,
                 'avatar' => $fromUser->avatar
             ],
