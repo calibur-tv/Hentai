@@ -113,7 +113,8 @@ class AuthController extends Controller
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
-                'password' => time()
+                'sex' => $user['gender'] === '男' ? 1 : ($user['gender'] === '女' ? 2 : 0),
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);
@@ -200,9 +201,10 @@ class AuthController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
+                'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => time()
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);
@@ -284,9 +286,10 @@ class AuthController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
+                'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => time()
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);

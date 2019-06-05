@@ -370,7 +370,8 @@ class DoorController extends Controller
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
-                'password' => time()
+                'sex' => $user['gender'] === '男' ? 1 : ($user['gender'] === '女' ? 2 : 0),
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);
@@ -479,9 +480,10 @@ class DoorController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
+                'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
-                'password' => time()
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);
@@ -623,10 +625,11 @@ class DoorController extends Controller
             // signUp
             $data = [
                 'avatar' => $avatar,
-                'nickname' => $user['nickName'],
+                'nickname' => $user['nickname'],
+                'sex' => $user['sex'],
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
-                'password' => time()
+                'password' => str_rand()
             ];
 
             $user = User::createUser($data);
