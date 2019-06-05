@@ -134,7 +134,8 @@ class WebSocketService implements WebSocketHandlerInterface
             'from_user' => [
                 'slug' => $fromUser->slug,
                 'nickname' => $fromUser->nickname,
-                'avatar' => $fromUser->avatar
+                'avatar' => $fromUser->avatar,
+                'sex' => $fromUser->sex
             ],
             'message' => $richContentService->parseRichContent($message->content->text),
             'created_at' => $message->created_at
