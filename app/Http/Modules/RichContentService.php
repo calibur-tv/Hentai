@@ -16,7 +16,7 @@ class RichContentService
         {
             if ($row['type'] === 'txt')
             {
-                $content = Purifier::clean($row['text']);
+                $content = Purifier::clean($row['content']);
                 while (preg_match('/\n\n\n/', $content))
                 {
                     $content = str_replace("\n\n\n", "\n\n", $content);

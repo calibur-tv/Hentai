@@ -137,7 +137,7 @@ class WebSocketService implements WebSocketHandlerInterface
                 'avatar' => $fromUser->avatar,
                 'sex' => $fromUser->sex
             ],
-            'message' => $richContentService->parseRichContent($message->content->text),
+            'content' => $richContentService->parseRichContent($message->content->text),
             'created_at' => $message->created_at
         ];
 
@@ -161,8 +161,9 @@ class WebSocketService implements WebSocketHandlerInterface
             ->del('fd:' . $fd);
     }
 
-    /* https://wiki.swoole.com/wiki/page/397.html
-    // 但是 laravel-s 好像没有继承这个方法
+    /*
+    // https://wiki.swoole.com/wiki/page/397.html
+    // https://github.com/hhxsv5/laravel-s/issues/127
     public function onRequest(Request $request, Response $response)
     {
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Modules\Counter\UnReadMessageCounter;
 use App\Http\Modules\RichContentService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,8 @@ class Message extends Model
             'type' => $data['type']
         ]);
         $messageMenu->increment('count');
+        $unReadMessageCounter = new UnReadMessageCounter();
+        $unReadMessageCounter->add($data['to_user_id']);
 
         return $message;
     }
