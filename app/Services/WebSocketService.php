@@ -58,6 +58,7 @@ class WebSocketService implements WebSocketHandlerInterface
 
         $unReadMessageCounter = new UnReadMessageCounter();
         $server->push($request->fd, json_encode([
+            'channel' => 0,
             'unread_message_total' => $unReadMessageCounter->get($userId),
             'unread_notice_total' => 0
         ]));
@@ -74,7 +75,7 @@ class WebSocketService implements WebSocketHandlerInterface
         $validator = Validator::make($data, [
             'message_type' => [
                 'required',
-                Rule::in([0, 1, 2]),
+                Rule::in([1, 2, 3]),
             ],
             'from_user_token' => 'required|string',
             'to_user_slug' => 'present|string',
@@ -96,17 +97,16 @@ class WebSocketService implements WebSocketHandlerInterface
         $messageType = $data['message_type'];
         /**
          *  type 消息种类判定
-         * 0. 私聊
-         * 1. 群发
-         * 2. 广播
+         * 1. 私聊
+         * 2. 群发
+         * 3. 广播
          */
-
         $fromUserId = $fromUser->id;
         $toUserId = User
             ::where('slug', $data['to_user_slug'])
             ->pluck('id')
             ->first();
-        if ($messageType === 0 && $fromUserId === $toUserId)
+        if ($messageType === 1 && $fromUserId === $toUserId)
         {
             return;
         }
@@ -130,13 +130,14 @@ class WebSocketService implements WebSocketHandlerInterface
 
         $richContentService = new RichContentService();
         $result = [
-            'message_type' => $messageType,
+            'channel' => $messageType,
             'from_user' => [
                 'slug' => $fromUser->slug,
                 'nickname' => $fromUser->nickname,
                 'avatar' => $fromUser->avatar
             ],
-            'message' => $richContentService->parseRichContent($message->content->text)
+            'message' => $richContentService->parseRichContent($message->content->text),
+            'created_at' => $message->created_at
         ];
 
         $server->push($targetFd['value'], json_encode($result));
