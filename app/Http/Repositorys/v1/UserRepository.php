@@ -11,14 +11,13 @@ namespace App\Http\Repositorys\v1;
 
 use App\Http\Repositories\Repository;
 use App\Http\Transformers\User\UserHomeResource;
-use App\Http\Transformers\User\UserItemResource;
 use App\User;
 
 class UserRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
-        $result = $this->RedisItem($this->item_cache_key($slug), function () use ($slug)
+        $result = $this->RedisItem("user:{$slug}", function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -40,8 +39,11 @@ class UserRepository extends Repository
         return $result;
     }
 
-    public function item_cache_key($slug)
+    public function userRoleNames($user, $refresh = false)
     {
-        return "user:{$slug}";
+        return $this->RedisItem("user-roles:{$user->slug}", function () use ($user)
+        {
+            return $user->getRoleNames();
+        }, $refresh);
     }
 }

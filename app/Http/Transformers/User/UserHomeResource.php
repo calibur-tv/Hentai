@@ -9,6 +9,7 @@
 namespace App\Http\Transformers\User;
 
 use App\Http\Modules\DailyRecord\UserDailySign;
+use App\Http\Repositorys\v1\UserRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserHomeResource extends JsonResource
@@ -16,6 +17,7 @@ class UserHomeResource extends JsonResource
     public function toArray($request)
     {
         $userDailySign = new UserDailySign();
+        $userRepository = new UserRepository();
 
         return [
             'slug' => $this->slug,
@@ -24,10 +26,10 @@ class UserHomeResource extends JsonResource
             'banner' => $this->banner,
             'level' => $this->level,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
-            'daily_signed' => $userDailySign->sign($this->id),
+            'daily_signed' => $userDailySign->check($this->id),
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'signature' => $this->signature,
-            'roles' => $this->getRoleNames()
+            'roles' => $userRepository->userRoleNames($this)
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Qiniu\Qshell;
 use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
@@ -267,15 +266,19 @@ class DoorController extends Controller
 
     public function getUserInfo(Request $request)
     {
-        $user = $request->user();
-
         $role = $request->get('role');
-        if ($role && $user->cant($role))
+        if (!$role)
+        {
+            return $this->resErrBad('请使用 socket 登录');
+        }
+
+        $user = $request->user();
+        if ($user->cant($role))
         {
             return $this->resErrRole();
         }
 
-        return $this->resOK(new UserAuthResource($user));
+        return $this->resOK($user);
     }
 
     /**

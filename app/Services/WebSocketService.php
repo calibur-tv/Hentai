@@ -6,7 +6,9 @@
 namespace App\Services;
 
 use App\Http\Modules\Counter\UnReadMessageCounter;
+use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\RichContentService;
+use App\Http\Repositorys\v1\UserRepository;
 use App\Http\Transformers\User\UserItemResource;
 use App\Models\Message;
 use App\User;
@@ -35,17 +37,22 @@ class WebSocketService implements WebSocketHandlerInterface
         $token = $request->get['token'];
         if (!$token)
         {
-            return;
+            return $server->push($request->fd, json_encode([
+                'channel' => 0,
+            ]));
         }
 
-        $userSlug = User
+        $user = User
             ::where('api_token', $request->get['token'])
-            ->pluck('slug')
             ->first();
-        if (!$userSlug)
+        if (is_null($user))
         {
-            return;
+            return $server->push($request->fd, json_encode([
+                'channel' => 0,
+            ]));
         }
+
+        $userSlug = $user->slug;
 
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
         app('swoole')
@@ -57,8 +64,28 @@ class WebSocketService implements WebSocketHandlerInterface
             ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
         $unReadMessageCounter = new UnReadMessageCounter();
+        $userDailySign = new UserDailySign();
+        $userRepository = new UserRepository();
+
         $server->push($request->fd, json_encode([
             'channel' => 0,
+            'slug' => $user->slug,
+            'nickname' => $user->nickname,
+            'avatar' => $user->avatar,
+            'banner' => $user->banner,
+            'birthday' => $user->birthday,
+            'birth_secret' => $user->birth_secret,
+            'sex' => $user->sex,
+            'sex_secret' => $user->sex_secret,
+            'signature' => $user->signature,
+            'roles' => $userRepository->userRoleNames($user),
+            'daily_signed' => $userDailySign->check($user->id),
+            'providers' => [
+                'bind_qq' => !!$user->qq_unique_id,
+                'bind_wechat' => !!$user->wechat_unique_id,
+                'bind_phone' => !!$user->phone
+            ],
+            'level' => $user->level,
             'unread_message_total' => $unReadMessageCounter->get($userSlug),
             'unread_notice_total' => 0
         ]));
