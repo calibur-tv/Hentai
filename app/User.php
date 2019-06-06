@@ -147,7 +147,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public static function createUser($data)
     {
         $user = self::create($data);
-        $slug = id2slug($user->id);
+        $slug = 'cc-' . id2slug($user->id);
         $user->update([
             'slug' => $slug
         ]);

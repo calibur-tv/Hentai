@@ -2,6 +2,7 @@
 
 namespace App\Console\Jobs;
 
+use App\User;
 use Illuminate\Console\Command;
 
 class Test extends Command
@@ -25,6 +26,25 @@ class Test extends Command
      */
     public function handle()
     {
+        $users = User
+            ::where('migration_state', '<>', 10)
+            ->withTrashed()
+            ->take(3000)
+            ->get();
+
+        if (empty($users))
+        {
+            return true;
+        }
+
+        foreach ($users as $user)
+        {
+            $user->createApiToken();
+            $user->update([
+                'migration_state' => 10
+            ]);
+        }
+
         return true;
     }
 }

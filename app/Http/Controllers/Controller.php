@@ -82,20 +82,4 @@ class Controller extends BaseController
             'message' => $message ?: '服务升级暂不可用'
         ], 503);
     }
-
-//    protected function slug2id($slug)
-//    {
-//        return floor(base_convert($slug, 36, 10) / 1000);
-//    }
-//
-//    protected function id2slug($id)
-//    {
-//        return base_convert(($id * 1000 + rand(0, 999)), 10, 36);
-//    }
-//
-//    protected function convertImagePath($url)
-//    {
-//        $arr = explode('calibur.tv/', $url);
-//        return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
-//    }
 }
