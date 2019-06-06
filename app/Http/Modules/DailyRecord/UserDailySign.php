@@ -4,7 +4,7 @@
 namespace App\Http\Modules\DailyRecord;
 
 
-use App\Http\Repositorys\v1\UserRepository;
+use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;

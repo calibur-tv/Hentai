@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
-use App\Http\Repositorys\v1\UserRepository;
+use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

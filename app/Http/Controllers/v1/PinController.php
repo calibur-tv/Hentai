@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositorys\v1\PinRepository;
-use App\Http\Repositorys\v1\TagRepository;
+use App\Http\Repositories\PinRepository;
+use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

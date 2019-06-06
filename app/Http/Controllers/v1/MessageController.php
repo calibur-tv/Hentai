@@ -4,7 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\RichContentService;
-use App\Http\Repositorys\v1\UserRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;

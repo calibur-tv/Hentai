@@ -9,7 +9,7 @@
 namespace App\Http\Transformers\User;
 
 use App\Http\Modules\DailyRecord\UserDailySign;
-use App\Http\Repositorys\v1\UserRepository;
+use App\Http\Repositories\UserRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserHomeResource extends JsonResource

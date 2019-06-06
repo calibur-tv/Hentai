@@ -8,7 +8,7 @@ namespace App\Services;
 use App\Http\Modules\Counter\UnReadMessageCounter;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\RichContentService;
-use App\Http\Repositorys\v1\UserRepository;
+use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserItemResource;
 use App\Models\Message;
 use App\User;

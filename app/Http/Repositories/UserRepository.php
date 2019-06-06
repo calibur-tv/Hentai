@@ -6,10 +6,9 @@
  * Time: 08:31
  */
 
-namespace App\Http\Repositorys\v1;
+namespace App\Http\Repositories;
 
 
-use App\Http\Repositories\Repository;
 use App\Http\Transformers\User\UserHomeResource;
 use App\User;
 

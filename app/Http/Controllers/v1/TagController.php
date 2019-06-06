@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositorys\v1\TagRepository;
+use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
