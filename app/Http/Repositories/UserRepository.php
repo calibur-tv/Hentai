@@ -40,7 +40,7 @@ class UserRepository extends Repository
 
     public function userRoleNames($user, $refresh = false)
     {
-        return $this->RedisItem("user-roles:{$user->slug}", function () use ($user)
+        return $this->RedisList("user-roles:{$user->slug}", function () use ($user)
         {
             return $user->getRoleNames();
         }, $refresh);

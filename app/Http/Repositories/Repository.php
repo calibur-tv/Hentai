@@ -18,7 +18,7 @@ class Repository
         $cache = $force ? null : Redis::GET($key);
         if (!is_null($cache))
         {
-            return starts_with($cache, '{"') ? json_decode($cache) : $cache;
+            return preg_match('/^({"|\[\\\\")/', $cache) ? json_decode($cache) : $cache;
         }
 
         $cache = $func();
@@ -31,7 +31,7 @@ class Repository
         $encodeCache = $cache;
         if ($type === 'object' || $type === 'array')
         {
-            $encodeCache = json_encode($cache);
+            $encodeCache = json_encode($cache, JSON_UNESCAPED_UNICODE);
         }
 
         if (Redis::SETNX('lock_'.$key, 1))
@@ -58,6 +58,7 @@ class Repository
         }
 
         $cache = $func();
+        $cache = gettype($cache) === 'array' ? $cache : $cache->toArray();
 
         if (empty($cache))
         {
@@ -98,6 +99,7 @@ class Repository
         }
 
         $cache = $func();
+        $cache = gettype($cache) === 'array' ? $cache : $cache->toArray();
 
         if (empty($cache))
         {
