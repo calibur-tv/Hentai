@@ -267,7 +267,7 @@ class Repository
          * h：缓存一小时
          * m：缓存五分钟
          */
-        $day = strtotime(date('Y-m-d'), time()) + 86400 + rand(3600, 10800);
+        $day = daily_cache_expire();
         $hour = time() + 3600;
         $minute = time() + 300;
 

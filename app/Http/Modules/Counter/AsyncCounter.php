@@ -60,7 +60,7 @@ class AsyncCounter
 
         $valueKey = $this->cacheKey($id);
         Redis::SET($valueKey, $count);
-        Redis::EXPIRE($valueKey, strtotime(date('Y-m-d'), time()) + 86400 + rand(3600, 10800));
+        Redis::EXPIRE($valueKey, daily_cache_expire());
 
         $timeoutKey = $this->writeKey($id);
         Redis::SET($timeoutKey, time());

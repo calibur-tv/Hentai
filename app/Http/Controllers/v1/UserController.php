@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class UserController extends Controller
     /**
      * 更新用户信息
      */
-    public function update_info(Request $request)
+    public function updateProfile(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'sex' => 'required',
@@ -68,6 +69,27 @@ class UserController extends Controller
         $userRepository->item($slug, true);
 
         return $this->resOK();
+    }
+
+    /**
+     * 每日签到
+     */
+    public function dailySign(Request $request)
+    {
+        $user = $request->user();
+
+        $userDailySign = new UserDailySign();
+        $result = $userDailySign->sign($user);
+
+        if (!$result)
+        {
+            return $this->resErrBad('今天已经签过到了');
+        }
+
+        return $this->resOK([
+            'message' => '签到成功，团子+1',
+            'coin_count' => 1
+        ]);
     }
 
     /**

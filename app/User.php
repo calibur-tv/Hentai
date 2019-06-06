@@ -48,6 +48,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'virtual_coin',
         'money_coin',
         'banned_to',
+        'continuous_sign_count',        // 连续签到次数
+        'total_sign_count',             // 总签到次数
+        'latest_signed_at',
         'migration_state',
     ];
 

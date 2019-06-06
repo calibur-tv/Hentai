@@ -52,3 +52,8 @@ function str_rand($length = 8, $char = '0123456789abcdefghijklmnopqrstuvwxyzABCD
     }
     return $string;
 }
+
+function daily_cache_expire()
+{
+    return strtotime(date('Y-m-d'), time()) + 86400 + rand(3600, 10800);
+}

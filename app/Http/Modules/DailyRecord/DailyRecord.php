@@ -15,6 +15,7 @@ class DailyRecord
     {
         $this->record_type = $record_type;
         /**
+         * 0. 每日签到
          * 1. 用户的活跃度
          * 2. 用户的曝光量
          * 3. 标签的发文量
