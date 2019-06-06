@@ -32,7 +32,7 @@ function trimImage($url)
 
 function patchImage($url, $default = '')
 {
-    if (preg_match('/http/', $url))
+    if (preg_match('/^http/', $url))
     {
         return $url;
     }

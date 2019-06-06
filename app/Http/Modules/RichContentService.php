@@ -5,6 +5,8 @@ namespace App\Http\Modules;
 
 
 use App\Models\Image;
+use App\Services\Trial\ImageFilter;
+use App\Services\Trial\WordsFilter;
 use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
@@ -57,5 +59,71 @@ class RichContentService
         }
 
         return $array;
+    }
+
+    public function detectContentRisk($data)
+    {
+        if (gettype($data) === 'string')
+        {
+            $data = $this->parseRichContent($data);
+        }
+
+        $wordsFilter = new WordsFilter();
+        $imageFilter = new ImageFilter();
+
+        $content = [];
+        $riskWords = [];
+        $riskImage = [];
+        $riskScore = 0;
+
+        foreach($data as $row)
+        {
+            if ($row['type'] === 'txt')
+            {
+                $filter = $wordsFilter->filter($row['content']);
+                $riskWords = array_merge($riskWords, $filter['words']);
+                $content[] = [
+                    'type' => 'txt',
+                    'content' => $filter['text']
+                ];
+                if ($filter['delete'])
+                {
+                    $riskScore++;
+                }
+            }
+            else if ($row['type'] === 'img')
+            {
+                $imageBlock = $row['content'];
+                $filter = $wordsFilter->filter($imageBlock['text']);
+                $riskWords = array_merge($riskWords, $filter['words']);
+                $detect = $imageFilter->check($imageBlock['url']);
+                $content[] = [
+                    'type' => 'img',
+                    'content' => array_merge($imageBlock, [
+                        'text' => $filter['words'],
+                        'detect' => $detect
+                    ])
+                ];
+                if ($detect['review'] || $detect['delete'])
+                {
+                    $riskImage[] = $imageBlock['url'];
+                }
+                if ($detect['delete'])
+                {
+                    $riskScore++;
+                }
+                if ($filter['delete'])
+                {
+                    $riskScore++;
+                }
+            }
+        }
+
+        return [
+            'content' => $content,
+            'risk_words' => array_unique($riskWords),
+            'risk_image' => array_unique($riskImage),
+            'risk_score' => $riskScore
+        ];
     }
 }

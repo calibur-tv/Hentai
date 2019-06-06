@@ -85,19 +85,31 @@ class WordsFilter
         {
             return [
                 'text' => '',
-                'words' => []
+                'words' => [],
+                'delete' => false,
+                'review' => false
             ];
         }
 
         $this->loadWords();
         $words = [];
+        $review = false;
+        $delete = false;
 
         $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_1, $text);
+        if (count($arrRet))
+        {
+            $review = true;
+        }
         for ($k = 0; $k < count($arrRet); $k++)
         {
             $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
         }
         $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
+        if (count($arrRet))
+        {
+            $delete = true;
+        }
         for ($k = 0; $k < count($arrRet); $k++)
         {
             $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
@@ -110,7 +122,9 @@ class WordsFilter
 
         return [
             'text' => $text,
-            'words' => array_unique($words)
+            'words' => array_unique($words),
+            'delete' => $delete,
+            'review' => $review
         ];
     }
 

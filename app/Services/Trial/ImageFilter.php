@@ -95,11 +95,7 @@ class ImageFilter
         $request_method = 'POST';
         $request_url = 'http://ai.qiniuapi.com/v3/image/censor';
         $content_type = 'application/json';
-        $regex = '/^(http|https):\/\//';
-        if (!preg_match($regex, $src))
-        {
-            $src = config('app.image-cdn')[0] . $src;
-        }
+        $src = patchImage($src);
 
         $body = json_encode([
             'data' => [
