@@ -40,37 +40,8 @@ class UserRepository extends Repository
         return $result;
     }
 
-    public function itemById($id, $refresh = false)
-    {
-        $result = $this->RedisItem($this->item_id_cache_key($id), function () use ($id)
-        {
-            $user = User
-                ::where('id', $id)
-                ->first();
-
-            if (is_null($user))
-            {
-                return 'nil';
-            }
-
-            return new UserItemResource($user);
-        }, $refresh);
-
-        if ($result === 'nil')
-        {
-            return null;
-        }
-
-        return $result;
-    }
-
     public function item_cache_key($slug)
     {
         return "user:{$slug}";
-    }
-
-    public function item_id_cache_key($id)
-    {
-        return "user-id:{$id}";
     }
 }

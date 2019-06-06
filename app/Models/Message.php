@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     protected $fillable = [
-        'from_user_id', // 触发消息的用户id
-        'to_user_id',   // 接受消息的用户id
-        'type',         // 消息的类型
+        'from_user_slug', // 触发消息的用户slug
+        'to_user_slug',   // 接受消息的用户slug
+        'type',           // 消息的类型
     ];
 
     public function content()
@@ -27,13 +27,13 @@ class Message extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
         $messageMenu = MessageMenu::firstOrCreate([
-            'from_user_id' => $data['from_user_id'],
-            'to_user_id' => $data['to_user_id'],
+            'from_user_slug' => $data['from_user_slug'],
+            'to_user_slug' => $data['to_user_slug'],
             'type' => $data['type']
         ]);
         $messageMenu->increment('count');
         $unReadMessageCounter = new UnReadMessageCounter();
-        $unReadMessageCounter->add($data['to_user_id']);
+        $unReadMessageCounter->add($data['to_user_slug']);
 
         return $message;
     }

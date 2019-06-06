@@ -38,11 +38,11 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
 
-        $userId = User
+        $userSlug = User
             ::where('api_token', $request->get['token'])
-            ->pluck('id')
+            ->pluck('slug')
             ->first();
-        if (!$userId)
+        if (!$userSlug)
         {
             return;
         }
@@ -50,16 +50,16 @@ class WebSocketService implements WebSocketHandlerInterface
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
         app('swoole')
             ->wsTable
-            ->set('uid:' . $userId, ['value' => $request->fd]);
+            ->set('uid:' . $userSlug, ['value' => $request->fd]);
         // 记录这个 table 是为了在 onClose 的时候找到当前用户的 uid
         app('swoole')
             ->wsTable
-            ->set('fd:' . $request->fd, ['value' => $userId]);
+            ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
         $unReadMessageCounter = new UnReadMessageCounter();
         $server->push($request->fd, json_encode([
             'channel' => 0,
-            'unread_message_total' => $unReadMessageCounter->get($userId),
+            'unread_message_total' => $unReadMessageCounter->get($userSlug),
             'unread_notice_total' => 0
         ]));
     }
@@ -101,12 +101,9 @@ class WebSocketService implements WebSocketHandlerInterface
          * 2. 群发
          * 3. 广播
          */
-        $fromUserId = $fromUser->id;
-        $toUserId = User
-            ::where('slug', $data['to_user_slug'])
-            ->pluck('id')
-            ->first();
-        if ($messageType === 1 && $fromUserId === $toUserId)
+        $fromUserSlug = $fromUser->slug;
+        $toUserSlug = $data['to_user_slug'];
+        if ($messageType === 1 && $fromUserSlug === $toUserSlug)
         {
             return;
         }
@@ -115,14 +112,14 @@ class WebSocketService implements WebSocketHandlerInterface
         // 关系认证，是否可发送消息
         // 消息入库，如何做缓存？
         $message = Message::createMessage([
-            'from_user_id' => $fromUserId,
-            'to_user_id' => $toUserId,
+            'from_user_slug' => $fromUserSlug,
+            'to_user_slug' => $toUserSlug,
             'type' => $messageType
         ], $data['content']);
 
         $targetFd = app('swoole')
             ->wsTable
-            ->get('uid:' . $toUserId);
+            ->get('uid:' . $toUserSlug);
         if ($targetFd === false)
         {
             return;

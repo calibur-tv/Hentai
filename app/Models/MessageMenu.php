@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class MessageMenu extends Model
 {
     protected $fillable = [
-        'from_user_id', // 触发消息的用户id
-        'to_user_id',   // 接受消息的用户id
-        'count',        // 未读消息的条数
-        'type',         // 消息的类型
+        'from_user_slug', // 触发消息的用户slug
+        'to_user_slug',   // 接受消息的用户slug
+        'count',          // 未读消息的条数
+        'type',           // 消息的类型
     ];
 }
