@@ -42,8 +42,10 @@ class WebSocketService implements WebSocketHandlerInterface
             ]));
         }
 
+        $maskId = explode(':', $token)[0];
+
         $user = User
-            ::where('api_token', $request->get['token'])
+            ::where('id', slug2id($maskId))
             ->first();
         if (is_null($user))
         {

@@ -36,8 +36,9 @@ class AuthServiceProvider extends ServiceProvider
             {
                 return null;
             }
+            $maskId = explode(':', $token)[0];
 
-            return User::where('api_token', $token)->first();
+            return User::where('id', slug2id($maskId))->first();
         });
     }
 

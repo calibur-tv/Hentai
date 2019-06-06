@@ -135,6 +135,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function createApiToken()
     {
         $token = Crypt::encrypt($this->slug . time());
+        $token = id2slug($this->id) . ':' . str_replace(':', '-', $token);
 
         $this->update([
             'api_token' => $token
