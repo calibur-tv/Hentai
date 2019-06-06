@@ -18,6 +18,8 @@ class UserDailySign
     public function sign($user)
     {
         $userId = $user->id;
+        $userSlug = $user->slug;
+
         $signed = $this->check($userId);
         if ($signed)
         {
@@ -66,13 +68,13 @@ class UserDailySign
 
         // 修改用户的活跃度
         $userActivity = new UserActivity();
-        $userActivity->set($userId, 3);
+        $userActivity->set($userSlug, 3);
 
         // TODO：给用户发团子
 
         // 刷新用户缓存
         $userRepository = new UserRepository();
-        $userRepository->item($user->slug, true);
+        $userRepository->item($userSlug, true);
 
         return true;
     }

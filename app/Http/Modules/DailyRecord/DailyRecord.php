@@ -68,6 +68,11 @@ class DailyRecord
         return $result;
     }
 
+    public function trend($id)
+    {
+        return $this->get($id) - $this->get($id, 1);
+    }
+
     public function migrate($id)
     {
         $timeSeed = date('Y-m-d', strtotime('-1 day'));

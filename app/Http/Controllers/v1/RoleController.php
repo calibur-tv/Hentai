@@ -10,6 +10,7 @@ namespace App\Http\Controllers\v1;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -90,12 +91,12 @@ class RoleController extends Controller
             return $this->resErrRole();
         }
 
-        $userId = $request->get('user_id');
+        $userSlug = $request->get('user_id');
         $roleId = $request->get('role_id');
         $isDelete = $request->get('is_delete');
 
         $user = User
-            ::where('slug', $userId)
+            ::where('slug', $userSlug)
             ->first();
 
         $role = Role::findById($roleId);
@@ -108,6 +109,9 @@ class RoleController extends Controller
         $isDelete
             ? $user->removeRole($role)
             : $user->assignRole($role);
+
+        $userRepository = new UserRepository();
+        $userRepository->item($userSlug, true);
 
         return $this->resOK($user);
     }

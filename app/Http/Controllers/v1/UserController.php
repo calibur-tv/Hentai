@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
+use App\Http\Modules\DailyRecord\UserExposure;
 use App\Http\Repositorys\v1\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
@@ -25,6 +27,31 @@ class UserController extends Controller
 
         return $this->resOK($user);
     }
+
+    /**
+     * 用户访问的数据补丁
+     * 关联关系和用户的动态数据，关注数，粉丝数
+     */
+    public function patch(Request $request)
+    {
+        $visitor = $request->user();
+        $masterSlug = $request->get('slug');
+        if ($visitor->slug === $masterSlug)
+        {
+            return $this->resOK([
+                'relation' => 'self'
+            ]);
+        }
+
+        $userActivity = new UserActivity();
+        $userExposure = new UserExposure();
+
+        $userActivity->set($visitor->slug);
+        $userExposure->set($masterSlug);
+
+        // todo
+    }
+
     /**
      * 更新用户信息
      */
