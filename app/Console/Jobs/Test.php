@@ -27,7 +27,7 @@ class Test extends Command
     public function handle()
     {
         $users = User
-            ::where('migration_state', '<>', 10)
+            ::where('migration_state', '<>', 1)
             ->withTrashed()
             ->take(3000)
             ->get();
@@ -39,9 +39,9 @@ class Test extends Command
 
         foreach ($users as $user)
         {
-            $user->createApiToken();
             $user->update([
-                'migration_state' => 10
+                'slug' => 'cc-' . id2slug($user->id),
+                'migration_state' => 1
             ]);
         }
 
