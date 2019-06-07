@@ -9,12 +9,19 @@
 namespace App\Http\Controllers;
 
 
+use App\User;
 use Illuminate\Http\Request;
 
 class WebController extends Controller
 {
     public function index()
     {
+        $from = User::find(1);
+        $to = User::find(2);
+
+        $result = $to->isFollowing($from);
+
+        return $this->resOK($result);
         return response('<html lang="en" class="">
 <head>
     <meta charset="UTF-8">

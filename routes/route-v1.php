@@ -37,9 +37,13 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
+        $route->get('patch', 'UserController@patch');
+
         $route->post('update_info', 'UserController@updateProfile');
 
         $route->post('daily_sign', 'UserController@dailySign');
+
+        $route->post('toggle_follow', 'UserController@toggleFollow');
     });
 });
 

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\UserBeFollowedCounter;
+use App\Http\Modules\Counter\UserFollowingCounter;
+use App\Http\Modules\Counter\UserFriendCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
@@ -35,21 +38,44 @@ class UserController extends Controller
     public function patch(Request $request)
     {
         $visitor = $request->user();
-        $masterSlug = $request->get('slug');
-        if ($visitor->slug === $masterSlug)
+        $targetSlug = $request->get('slug');
+        if (!$targetSlug)
+        {
+            return $this->resErrBad();
+        }
+
+        $visitorSlug = $visitor->slug;
+
+        $userBeFollowedCounter = new UserBeFollowedCounter();
+        $userFollowingCounter = new UserFollowingCounter();
+
+        $followers_count = $userBeFollowedCounter->get($targetSlug);
+        $following_count = $userFollowingCounter->get($targetSlug);
+        if ($visitorSlug === $targetSlug)
         {
             return $this->resOK([
+                'followers_count' => $followers_count,
+                'following_count' => $following_count,
                 'relation' => 'self'
             ]);
         }
 
-        $userActivity = new UserActivity();
-        $userExposure = new UserExposure();
+        $target = User
+            ::where('slug', $targetSlug)
+            ->first();
 
-        $userActivity->set($visitor->slug);
-        $userExposure->set($masterSlug);
+        if (is_null($target))
+        {
+            return $this->resErrNotFound();
+        }
 
-        // todo
+        $relation = $this->convertUserRelation($visitor->isFollowing($target), $target->isFollowing($visitor));
+
+        return $this->resOK([
+            'followers_count' => $followers_count,
+            'following_count' => $following_count,
+            'relation' => $relation
+        ]);
     }
 
     /**
@@ -117,6 +143,72 @@ class UserController extends Controller
     }
 
     /**
+     * 用户关注
+     */
+    public function toggleFollow(Request $request)
+    {
+        $user = $request->user();
+        $targetSlug = $request->get('slug');
+        $mineSlug = $user->slug;
+
+        $target = User
+            ::where('slug', $targetSlug)
+            ->first();
+
+        if (is_null($target))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $userFollowingCounter = new UserFollowingCounter();
+
+        $isFollowing = $user->isFollowing($target);
+
+        if (!$isFollowing) // 如果未关注
+        {
+            $hasFollowingCount = $userFollowingCounter->get($mineSlug);
+            // 100人是关注的上限
+            if ($hasFollowingCount >= 100)
+            {
+                return $this->resErrRole('最多关注100个人');
+            }
+
+            $user->follow($target);
+            $userFollowingCounter->add($mineSlug);
+        }
+        else // 如果已关注
+        {
+            $user->unfollow($target);
+            $userFollowingCounter->add($mineSlug, -1);
+        }
+
+        $isFollowing = !$isFollowing; // 我关注的结果
+        $isFollowMe = $target->isFollowing($user); // TA 是否关注了我
+
+        $userRepository = new UserRepository();
+        if ($isFollowMe)
+        {
+            // 无论我是否取消关注，都刷新彼此朋友列表的缓存
+            $userRepository->friends($targetSlug, true);
+            $userRepository->friends($mineSlug, true);
+
+            $userFriendCounter = new UserFriendCounter();
+            $num = $isFollowing ? 1 : -1;
+            // 改变彼此朋友的个数
+            $userFriendCounter->add($targetSlug, $num);
+            $userFriendCounter->add($mineSlug, $num);
+        }
+        // 刷新TA的粉丝列表
+        $userRepository->fans($targetSlug, true);
+        // 刷新我的关注列表
+        $userRepository->followings($mineSlug, true);
+        // 返回彼此的关系
+        $result = $this->convertUserRelation($isFollowing, $isFollowMe);
+
+        return $this->resOK($result);
+    }
+
+    /**
      * 审核中的用户（修改用户数据的时候有可能进审核）
      */
     public function trials(Request $request)
@@ -138,5 +230,28 @@ class UserController extends Controller
     public function reject(Request $request)
     {
 
+    }
+
+    protected function convertUserRelation($currentFollowTarget, $targetFollowCurrent)
+    {
+        // 'friends', 'followed', 'following', 'stranger'
+        if ($currentFollowTarget && $targetFollowCurrent)
+        {
+            $result = 'friends';
+        }
+        else if ($currentFollowTarget && !$targetFollowCurrent)
+        {
+            $result = 'following';
+        }
+        else if (!$currentFollowTarget && $targetFollowCurrent)
+        {
+            $result = 'followed';
+        }
+        else
+        {
+            $result = 'stranger';
+        }
+
+        return $result;
     }
 }

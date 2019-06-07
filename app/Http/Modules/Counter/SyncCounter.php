@@ -37,7 +37,7 @@ class SyncCounter extends Repository
     {
         return (int)$this->RedisItem($this->cacheKey($id), function () use ($id)
         {
-            return $this->migration($id);
+            return $this->readDB($id);
         });
     }
 
@@ -55,7 +55,7 @@ class SyncCounter extends Repository
         Redis::DEL($this->cacheKey($id));
     }
 
-    protected function migration($id)
+    protected function readDB($id)
     {
         return DB::table($this->table)
             ->where($this->field, $id)
