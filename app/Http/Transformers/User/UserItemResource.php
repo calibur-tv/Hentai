@@ -8,20 +8,17 @@
 
 namespace App\Http\Transformers\User;
 
-use App\Http\Repositories\UserRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserItemResource extends JsonResource
 {
     public function toArray($request)
     {
-        $userRepository = new UserRepository();
-
         return [
             'slug' => $this->slug,
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
-            'roles' => $userRepository->userRoleNames($this),
+            'title' => $this->title,
             'level' => $this->level
         ];
     }
