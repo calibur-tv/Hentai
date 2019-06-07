@@ -24,14 +24,14 @@ class DailyRecord
          */
     }
 
-    public function set($id, $score = 1)
+    public function set($slug, $score = 1)
     {
-        Redis::INCRBY($this->setCacheKey($id), $score);
+        Redis::INCRBY($this->setCacheKey($slug), $score);
     }
 
-    public function get($id, $delta = 0)
+    public function get($slug, $delta = 0)
     {
-        $cacheKey = $this->getCacheKey($id, $delta);
+        $cacheKey = $this->getCacheKey($slug, $delta);
         $value = Redis::GET($cacheKey);
         if ($value !== null)
         {
@@ -40,7 +40,7 @@ class DailyRecord
 
         $list = DB
             ::table($this->table)
-            ->where('record_id', $id)
+            ->where('record_id', $slug)
             ->where('record_type', $this->record_type)
             ->where('day', '>', Carbon::now()->addDays(-(31 + $delta)))
             ->select('day', 'value')
@@ -68,15 +68,15 @@ class DailyRecord
         return $result;
     }
 
-    public function trend($id)
+    public function trend($slug)
     {
-        return $this->get($id) - $this->get($id, 1);
+        return $this->get($slug) - $this->get($slug, 1);
     }
 
-    public function migrate($id)
+    public function migrate($slug)
     {
         $timeSeed = date('Y-m-d', strtotime('-1 day'));
-        $cacheKey = $this->setCacheKey($id, $timeSeed);
+        $cacheKey = $this->setCacheKey($slug, $timeSeed);
         $value = Redis::GET($cacheKey);
         if ($value === null)
         {
@@ -93,27 +93,27 @@ class DailyRecord
         DB
             ::table($this->table)
             ->insert([
-                'record_id' => $id,
+                'record_slug' => $slug,
                 'record_type' => $this->record_type,
                 'day' => Carbon::now()->yesterday(),
                 'value' => $value,
             ]);
 
-        $this->hook($id, $value);
+        $this->hook($slug, $value);
     }
 
-    protected function hook($id, $score)
+    protected function hook($slug, $score)
     {
 
     }
 
-    protected function getCacheKey($id, $delta)
+    protected function getCacheKey($slug, $delta)
     {
-        return 'daily_record_' . $this->record_type . '_' . $id . '_get_' . $delta . '_' . date('Y-m-d');
+        return 'daily_record_' . $this->record_type . '_' . $slug . '_get_' . $delta . '_' . date('Y-m-d');
     }
 
-    protected function setCacheKey($id, $tail = null)
+    protected function setCacheKey($slug, $tail = null)
     {
-        return 'daily_record_' . $this->record_type . '_' . $id . '_set_' . ($tail ? $tail : date('Y-m-d'));
+        return 'daily_record_' . $this->record_type . '_' . $slug . '_set_' . ($tail ? $tail : date('Y-m-d'));
     }
 }

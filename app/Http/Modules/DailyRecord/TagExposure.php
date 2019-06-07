@@ -11,7 +11,7 @@ class TagExposure extends DailyRecord
         parent::__construct(4);
     }
 
-    protected function hook($userId, $score)
+    protected function hook($tagSlug, $score)
     {
 
     }

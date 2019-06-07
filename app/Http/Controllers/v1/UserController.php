@@ -71,6 +71,11 @@ class UserController extends Controller
 
         $relation = $this->convertUserRelation($visitor->isFollowing($target), $target->isFollowing($visitor));
 
+        $userActivity = new UserActivity();
+        $userExposure = new UserExposure();
+        $userActivity->set($visitorSlug);
+        $userExposure->set($targetSlug);
+
         return $this->resOK([
             'followers_count' => $followers_count,
             'following_count' => $following_count,
@@ -132,7 +137,7 @@ class UserController extends Controller
         $user = $request->user();
 
         $userDailySign = new UserDailySign();
-        $result = $userDailySign->sign($user);
+        $result = $userDailySign->sign($user->slug);
 
         if (false === $result)
         {

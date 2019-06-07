@@ -10,7 +10,7 @@ class PinActivity extends DailyRecord
         parent::__construct(5);
     }
 
-    protected function hook($tagId, $score)
+    protected function hook($tagSlug, $score)
     {
 
     }

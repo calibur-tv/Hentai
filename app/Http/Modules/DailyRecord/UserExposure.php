@@ -12,7 +12,7 @@ class UserExposure extends DailyRecord
         parent::__construct(2);
     }
 
-    protected function hook($userId, $score)
+    protected function hook($userSlug, $score)
     {
 
     }

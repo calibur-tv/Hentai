@@ -11,7 +11,7 @@ class UserActivity extends DailyRecord
         parent::__construct(1);
     }
 
-    protected function hook($userId, $score)
+    protected function hook($userSlug, $score)
     {
 
     }

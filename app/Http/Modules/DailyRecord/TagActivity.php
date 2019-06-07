@@ -10,7 +10,7 @@ class TagActivity extends DailyRecord
         parent::__construct(3);
     }
 
-    protected function hook($tagId, $score)
+    protected function hook($tagSlug, $score)
     {
 
     }

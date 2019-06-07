@@ -22,22 +22,25 @@ class SyncCounter extends Repository
         $this->field = $fieldName;
     }
 
-    public function add($id, $num = 1)
+    public function add($slug, $num = 1)
     {
-        $this->id = $id;
-        $cacheKey = $this->cacheKey($id);
+        $cacheKey = $this->cacheKey($slug);
         if (Redis::EXISTS($cacheKey))
         {
             Redis::INCRBY($cacheKey, $num);
         }
-        return $this->get($id);
+        else
+        {
+            $count = $this->readDB($slug);
+            Redis::SET($cacheKey, $count + $num);
+        }
     }
 
-    public function get($id)
+    public function get($slug)
     {
-        return (int)$this->RedisItem($this->cacheKey($id), function () use ($id)
+        return (int)$this->RedisItem($this->cacheKey($slug), function () use ($slug)
         {
-            return $this->readDB($id);
+            return $this->readDB($slug);
         });
     }
 
@@ -45,25 +48,25 @@ class SyncCounter extends Repository
     {
         foreach ($list as $i => $item)
         {
-            $list[$i][$key] = $this->get($item['id']);
+            $list[$i][$key] = $this->get($item['slug']);
         }
         return $list;
     }
 
-    public function deleteCache($id)
+    public function deleteCache($slug)
     {
-        Redis::DEL($this->cacheKey($id));
+        Redis::DEL($this->cacheKey($slug));
     }
 
-    protected function readDB($id)
+    protected function readDB($slug)
     {
         return DB::table($this->table)
-            ->where($this->field, $id)
+            ->where($this->field, $slug)
             ->count();
     }
 
-    protected function cacheKey($id)
+    protected function cacheKey($slug)
     {
-        return $this->table . '_' . $id . '_' . $this->field  .'_total';
+        return $this->table . '_' . $slug . '_' . $this->field  .'_total';
     }
 }

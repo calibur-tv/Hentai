@@ -22,47 +22,47 @@ class AsyncCounter
         $this->field = $filedName;
     }
 
-    public function add($id, $num = 1)
+    public function add($slug, $num = 1)
     {
-        $cacheKey = $this->cacheKey($id);
+        $cacheKey = $this->cacheKey($slug);
         if (Redis::EXISTS($cacheKey))
         {
             $result = Redis::INCRBY($cacheKey, $num);
-            $writeKey = $this->writeKey($id);
+            $writeKey = $this->writeKey($slug);
             $lastWriteAt = Redis::GET($writeKey);
             if (
                 null === $lastWriteAt ||
                 time() - $lastWriteAt > $this->timeout
             )
             {
-                $this->set($id, $result);
+                $this->set($slug, $result);
             }
 
             return (int)$result;
         }
-        $value = $this->readDB($id);
+        $value = $this->readDB($slug);
         $result = $value + $num;
         $result = Redis::SET($cacheKey, $result);
 
         return (int)$result;
     }
 
-    public function get($id)
+    public function get($slug)
     {
-        $cacheKey = $this->cacheKey($id);
+        $cacheKey = $this->cacheKey($slug);
         $value = Redis::GET($cacheKey);
         if (null !== $value)
         {
             return (int)$value;
         }
 
-        $count = $this->readDB($id);
+        $count = $this->readDB($slug);
 
-        $valueKey = $this->cacheKey($id);
+        $valueKey = $this->cacheKey($slug);
         Redis::SET($valueKey, $count);
         Redis::EXPIRE($valueKey, daily_cache_expire());
 
-        $timeoutKey = $this->writeKey($id);
+        $timeoutKey = $this->writeKey($slug);
         Redis::SET($timeoutKey, time());
         Redis::EXPIRE($timeoutKey, $this->timeout);
 
@@ -73,46 +73,46 @@ class AsyncCounter
     {
         foreach ($list as $i => $item)
         {
-            $list[$i][$key] = $this->get($item['id']);
+            $list[$i][$key] = $this->get($item['slug']);
         }
         return $list;
     }
 
-    protected function set($id, $result)
+    protected function set($slug, $result)
     {
-        $this->setDB($id, $result);
+        $this->setDB($slug, $result);
 
-        $timeoutKey = $this->writeKey($id);
+        $timeoutKey = $this->writeKey($slug);
         Redis::SET($timeoutKey, time());
         Redis::EXPIRE($timeoutKey, $this->timeout);
     }
 
-    protected function setDB($id, $result)
+    protected function setDB($slug, $result)
     {
         DB
             ::table($this->table)
-            ->where('id', $id)
+            ->where('slug', $slug)
             ->update([
                 $this->field => $result
             ]);
     }
 
-    protected function readDB($id)
+    protected function readDB($slug)
     {
         return (int)DB
             ::table($this->table)
-            ->where('id', $id)
+            ->where('slug', $slug)
             ->pluck($this->field)
             ->first();
     }
 
-    protected function cacheKey($id)
+    protected function cacheKey($slug)
     {
-        return $this->table . '_' . $id . '_' . $this->field;
+        return $this->table . '_' . $slug . '_' . $this->field;
     }
 
-    protected function writeKey($id)
+    protected function writeKey($slug)
     {
-        return $this->table . '_' . $id . '_' . $this->field . '_' . 'last_add_at';
+        return $this->table . '_' . $slug . '_' . $this->field . '_' . 'last_add_at';
     }
 }

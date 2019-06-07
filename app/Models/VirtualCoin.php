@@ -46,8 +46,8 @@ class VirtualCoin extends Model
      */
     protected $fillable = [
         'amount',
-        'user_id',
-        'about_user_id',
+        'user_slug',
+        'about_user_slug',
         'channel_type',
         'product_id',
         'message'

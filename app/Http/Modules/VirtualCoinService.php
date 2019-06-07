@@ -33,16 +33,16 @@ class VirtualCoinService
     }
 
     // 用户的收入支出成交额
-    public function getUserBalance($userId)
+    public function getUserBalance($userSlug)
     {
         $get = VirtualCoin
-            ::where('user_id', $userId)
+            ::where('user_slug', $userSlug)
             ->where('amount', '>', 0)
             ->withTrashed()
             ->sum('amount');
 
         $set = VirtualCoin
-            ::where('user_id', $userId)
+            ::where('user_slug', $userSlug)
             ->where('amount', '<', 0)
             ->withTrashed()
             ->sum('amount');
@@ -54,33 +54,33 @@ class VirtualCoinService
     }
 
     // 每日签到送团子
-    public function daySign($userId, $amount = 1)
+    public function daySign($userSlug, $amount = 1)
     {
-        $this->addCoin($userId, $amount, 0, 0, 0);
+        $this->addCoin($userSlug, $amount, 0, 0, 0);
     }
 
     // 邀请用户注册赠送团子
-    public function inviteUser($oldUserId, $newUserId, $amount = 5)
+    public function inviteUser($oldUserSlug, $newUserSlug, $amount = 5)
     {
-        $this->addCoin($oldUserId, $amount, 1, 0, $newUserId);
+        $this->addCoin($oldUserSlug, $amount, 1, 0, $newUserSlug);
     }
 
     // 被邀请注册用户送团子
-    public function invitedNewbieCoinGift($oldUserId, $newUserId, $amount = 2)
+    public function invitedNewbieCoinGift($oldUserSlug, $newUserSlug, $amount = 2)
     {
-        $this->addCoin($newUserId, $amount, 20, 0, $oldUserId);
+        $this->addCoin($newUserSlug, $amount, 20, 0, $oldUserSlug);
     }
 
     // 用户活跃送团子
-    public function userActivityReward($userId)
+    public function userActivityReward($userSlug)
     {
-        $this->addCoin($userId, 1, 2, 0, 0);
+        $this->addCoin($userSlug, 1, 2, 0, 0);
     }
 
     // 管理活跃送光玉
-    public function adminActiveReward($userId)
+    public function adminActiveReward($userSlug)
     {
-        $this->addMoney($userId, 1, 19, 0, 0);
+        $this->addMoney($userSlug, 1, 19, 0, 0);
     }
 
     // 给用户赠送团子
@@ -95,7 +95,7 @@ class VirtualCoinService
         $this->addMoney($toUserId, $amount, 17, 0, 0);
     }
 
-    private function useCoinFirst($userId, $amount, $channel_type, $product_id, $about_user_id)
+    private function useCoinFirst($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
     {
         if ($amount > 0)
         {
@@ -103,7 +103,7 @@ class VirtualCoinService
         }
 
         $balance = User
-            ::where('id', $userId)
+            ::where('slug', $user_slug)
             ->withTrashed()
             ->select('virtual_coin', 'money_coin')
             ->first()
@@ -115,29 +115,29 @@ class VirtualCoinService
         }
 
         VirtualCoin::create([
-            'user_id' => $userId,
+            'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
             'product_id' => $product_id,
-            'about_user_id' => $about_user_id
+            'about_user_slug' => $about_user_slug
         ]);
 
         if ($balance['virtual_coin'] + $amount < 0)
         {
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('virtual_coin', -$balance['virtual_coin']);
 
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('money_coin', $balance['virtual_coin'] + $amount);
         }
         else
         {
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('virtual_coin', $amount);
         }
@@ -145,7 +145,7 @@ class VirtualCoinService
         return true;
     }
 
-    private function useMoneyFirst($userId, $amount, $channel_type, $product_id, $about_user_id)
+    private function useMoneyFirst($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
     {
         if ($amount > 0)
         {
@@ -153,7 +153,7 @@ class VirtualCoinService
         }
 
         $balance = User
-            ::where('id', $userId)
+            ::where('slug', $user_slug)
             ->withTrashed()
             ->select('virtual_coin', 'money_coin')
             ->first()
@@ -165,29 +165,29 @@ class VirtualCoinService
         }
 
         VirtualCoin::create([
-            'user_id' => $userId,
+            'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
             'product_id' => $product_id,
-            'about_user_id' => $about_user_id
+            'about_user_slug' => $about_user_slug
         ]);
 
         if ($balance['money_coin'] + $amount < 0)
         {
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('money_coin', -$balance['money_coin']);
 
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('virtual_coin', $balance['money_coin'] + $amount);
         }
         else
         {
             User
-                ::where('id', $userId)
+                ::where('slug', $user_slug)
                 ->withTrashed()
                 ->increment('money_coin', $amount);
         }
@@ -195,7 +195,7 @@ class VirtualCoinService
         return true;
     }
 
-    private function addCoin($userId, $amount, $channel_type, $product_id, $about_user_id)
+    private function addCoin($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
     {
         if ($amount < 0)
         {
@@ -203,20 +203,20 @@ class VirtualCoinService
         }
 
         VirtualCoin::create([
-            'user_id' => $userId,
+            'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
             'product_id' => $product_id,
-            'about_user_id' => $about_user_id
+            'about_user_slug' => $about_user_slug
         ]);
 
         User
-            ::where('id', $userId)
+            ::where('slug', $user_slug)
             ->withTrashed()
             ->increment('virtual_coin', $amount);
     }
 
-    private function addMoney($userId, $amount, $channel_type, $product_id, $about_user_id)
+    private function addMoney($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
     {
         if ($amount < 0)
         {
@@ -224,15 +224,15 @@ class VirtualCoinService
         }
 
         VirtualCoin::create([
-            'user_id' => $userId,
+            'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
             'product_id' => $product_id,
-            'about_user_id' => $about_user_id
+            'about_user_slug' => $about_user_slug
         ]);
 
         User
-            ::where('id', $userId)
+            ::where('slug', $user_slug)
             ->withTrashed()
             ->increment('money_coin', $amount);
     }
