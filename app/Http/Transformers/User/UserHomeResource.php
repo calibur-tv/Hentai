@@ -22,17 +22,25 @@ class UserHomeResource extends JsonResource
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
             'banner' => $this->banner,
+            'signature' => $this->signature,
+            'title' => $this->title,
             'level' => $this->level,
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
-            'daily_signed' => $userDailySign->check($this->id),
-            'continuous_sign_count' => $this->continuous_sign_count,
-            'total_sign_count' => $this->total_sign_count,
-            'latest_signed_at' => $this->latest_signed_at,
-            'activity_stat' => $this->activity_stat,
-            'exposure_stat' => $this->exposure_stat,
-            'signature' => $this->signature,
-            'title' => $this->title
+            'balance' => [
+                'coin' => sprintf("%.2f", $this->virtual_coin),
+                'money' => sprintf("%.2f", $this->money_coin),
+            ],
+            'sign' => [
+                'daily_signed' => $userDailySign->check($this->id),
+                'continuous_sign_count' => $this->continuous_sign_count,
+                'total_sign_count' => $this->total_sign_count,
+                'latest_signed_at' => $this->latest_signed_at,
+            ],
+            'stat' => [
+                'activity' => $this->activity_stat,
+                'exposure' => $this->exposure_stat,
+            ]
         ];
     }
 }

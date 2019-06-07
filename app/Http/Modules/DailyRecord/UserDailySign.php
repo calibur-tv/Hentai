@@ -83,7 +83,7 @@ class UserDailySign
         return [
             'message' => "签到成功，团子+{$addCoinCount}",
             'add_coin_count' => $addCoinCount,
-            'signed_at' => $now,
+            'sign_at' => $now,
             'continuous_sign_count' => $continuous_sign_count < 0 ? 0 : $continuous_sign_count + 1
         ];
     }
