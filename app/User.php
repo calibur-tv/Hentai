@@ -29,28 +29,28 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     protected $fillable = [
         'slug',
+        'phone',
         'nickname',
         'avatar',
         'banner',
+        'signature',
         'birthday',
         'birth_secret',
-        'phone',
         'sex',
         'sex_secret',
-        'signature',
-        'level',
         'password',
         'api_token',
         'qq_open_id',
         'qq_unique_id',
         'wechat_unique_id',
         'wechat_open_id',
-        'virtual_coin',
-        'money_coin',
-        'banned_to',
+        'level',                        // 等级
+        'virtual_coin',                 // 团子数量
+        'money_coin',                   // 光玉数量
+        'banned_to',                    // 封禁结束时间
         'continuous_sign_count',        // 连续签到次数
         'total_sign_count',             // 总签到次数
-        'latest_signed_at',
+        'latest_signed_at',             // 最后签到时间
         'migration_state',
     ];
 
@@ -79,7 +79,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         $this->attributes['password'] = Hash::make($pwd);
     }
-
 
     public function getAvatarAttribute($avatar)
     {

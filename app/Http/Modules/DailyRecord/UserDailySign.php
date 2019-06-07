@@ -4,6 +4,7 @@
 namespace App\Http\Modules\DailyRecord;
 
 
+use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Support\Carbon;
@@ -66,11 +67,13 @@ class UserDailySign
                 ->increment('continuous_sign_count');
         }
 
-        // 修改用户的活跃度
+        // 修改用户的活跃度，默认 + 3
         $userActivity = new UserActivity();
         $userActivity->set($userSlug, 3);
 
-        // TODO：给用户发团子
+        // 给用户发团子，默认 + 1
+        $virtualCoinService = new VirtualCoinService();
+        $virtualCoinService->daySign($userId);
 
         // 刷新用户缓存
         $userRepository = new UserRepository();
@@ -103,6 +106,6 @@ class UserDailySign
 
     private function sign_cache_key($userId)
     {
-        return 'daily_record_0_' . $userId . '_' . date('Y-m-d');
+        return 'daily_record_' . $this->record_type . '_' . $userId . '_' . date('Y-m-d');
     }
 }

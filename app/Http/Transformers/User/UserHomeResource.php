@@ -25,9 +25,12 @@ class UserHomeResource extends JsonResource
             'avatar' => $this->avatar,
             'banner' => $this->banner,
             'level' => $this->level,
+            'sex' => $this->sex_secret ? -1 : $this->sex,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
             'daily_signed' => $userDailySign->check($this->id),
-            'sex' => $this->sex_secret ? -1 : $this->sex,
+            'continuous_sign_count' => $this->continuous_sign_count,
+            'total_sign_count' => $this->total_sign_count,
+            'latest_signed_at' => $this->latest_signed_at,
             'signature' => $this->signature,
             'roles' => $userRepository->userRoleNames($this)
         ];
