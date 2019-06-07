@@ -7,7 +7,6 @@ namespace App\Services;
 
 use App\Http\Modules\Counter\UnReadMessageCounter;
 use App\Http\Modules\RichContentService;
-use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserItemResource;
 use App\Models\Message;
 use App\User;
@@ -43,17 +42,16 @@ class WebSocketService implements WebSocketHandlerInterface
 
         $maskId = explode(':', $token)[0];
 
-        $user = User
+        $userSlug = User
             ::where('id', slug2id($maskId))
+            ->pluck('slug')
             ->first();
-        if (is_null($user))
+        if (!$userSlug)
         {
             return $server->push($request->fd, json_encode([
                 'channel' => 0,
             ]));
         }
-
-        $userSlug = $user->slug;
 
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
         app('swoole')
@@ -65,28 +63,9 @@ class WebSocketService implements WebSocketHandlerInterface
             ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
         $unReadMessageCounter = new UnReadMessageCounter();
-        $userRepository = new UserRepository();
 
         $server->push($request->fd, json_encode([
             'channel' => 0,
-            'slug' => $user->slug,
-            'nickname' => $user->nickname,
-            'avatar' => $user->avatar,
-            'banner' => $user->banner,
-            'birthday' => $user->birthday,
-            'birth_secret' => $user->birth_secret,
-            'sex' => $user->sex,
-            'sex_secret' => $user->sex_secret,
-            'signature' => $user->signature,
-            'title' => $user->title,
-            'level' => $user->level,
-            'providers' => [
-                'bind_qq' => !!$user->qq_unique_id,
-                'bind_wechat' => !!$user->wechat_unique_id,
-                'bind_phone' => !!$user->phone
-            ],
-            'activity_stat' => $user->activity_stat,
-            'exposure_stat' => $user->exposure_stat,
             'unread_message_total' => $unReadMessageCounter->get($userSlug),
             'unread_notice_total' => 0
         ]));
