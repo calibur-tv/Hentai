@@ -37,12 +37,4 @@ class UserRepository extends Repository
 
         return $result;
     }
-
-    public function userRoleNames($user, $refresh = false)
-    {
-        return $this->RedisList("user-roles:{$user->slug}", function () use ($user)
-        {
-            return $user->getRoleNames();
-        }, $refresh);
-    }
 }

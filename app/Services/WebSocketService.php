@@ -6,7 +6,6 @@
 namespace App\Services;
 
 use App\Http\Modules\Counter\UnReadMessageCounter;
-use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\RichContentService;
 use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserItemResource;
@@ -66,7 +65,6 @@ class WebSocketService implements WebSocketHandlerInterface
             ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
         $unReadMessageCounter = new UnReadMessageCounter();
-        $userDailySign = new UserDailySign();
         $userRepository = new UserRepository();
 
         $server->push($request->fd, json_encode([
@@ -80,14 +78,15 @@ class WebSocketService implements WebSocketHandlerInterface
             'sex' => $user->sex,
             'sex_secret' => $user->sex_secret,
             'signature' => $user->signature,
-            'roles' => $userRepository->userRoleNames($user),
-            'daily_signed' => $userDailySign->check($user->id),
+            'title' => $user->title,
+            'level' => $user->level,
             'providers' => [
                 'bind_qq' => !!$user->qq_unique_id,
                 'bind_wechat' => !!$user->wechat_unique_id,
                 'bind_phone' => !!$user->phone
             ],
-            'level' => $user->level,
+            'activity_stat' => $user->activity_stat,
+            'exposure_stat' => $user->exposure_stat,
             'unread_message_total' => $unReadMessageCounter->get($userSlug),
             'unread_notice_total' => 0
         ]));

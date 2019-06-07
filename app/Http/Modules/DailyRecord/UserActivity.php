@@ -7,6 +7,7 @@ class UserActivity extends DailyRecord
 {
     public function __construct()
     {
+        // 木
         parent::__construct(1);
     }
 

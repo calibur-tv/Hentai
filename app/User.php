@@ -44,6 +44,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'qq_unique_id',
         'wechat_unique_id',
         'wechat_open_id',
+        'title',                        // 头衔
         'level',                        // 等级
         'virtual_coin',                 // 团子数量
         'money_coin',                   // 光玉数量
@@ -51,6 +52,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'continuous_sign_count',        // 连续签到次数
         'total_sign_count',             // 总签到次数
         'latest_signed_at',             // 最后签到时间
+        'activity_stat',                // 活跃度统计
+        'exposure_stat',                // 曝光度统计
         'migration_state',
     ];
 
@@ -93,6 +96,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function getNicknameAttribute($name)
     {
         return $name ? trim($name) : '空白';
+    }
+
+    public function getTitleAttribute($title)
+    {
+        return $title ? json_decode($title) : [];
     }
 
     public function getSignatureAttribute($text)

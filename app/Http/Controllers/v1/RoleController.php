@@ -110,6 +110,14 @@ class RoleController extends Controller
             ? $user->removeRole($role)
             : $user->assignRole($role);
 
+        $target = User
+            ::where('slug', $userSlug)
+            ->first();
+
+        $target->update([
+            'title' => json_encode($target->getRoleNames(), JSON_UNESCAPED_UNICODE)
+        ]);
+
         $userRepository = new UserRepository();
         $userRepository->item($userSlug, true);
 
