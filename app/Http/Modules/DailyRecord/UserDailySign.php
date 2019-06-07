@@ -72,14 +72,20 @@ class UserDailySign
         $userActivity->set($userSlug, 3);
 
         // 给用户发团子，默认 + 1
+        $addCoinCount = 1;
         $virtualCoinService = new VirtualCoinService();
-        $virtualCoinService->daySign($userId);
+        $virtualCoinService->daySign($userId, $addCoinCount);
 
         // 刷新用户缓存
         $userRepository = new UserRepository();
         $userRepository->item($userSlug, true);
 
-        return true;
+        return [
+            'message' => "签到成功，团子+{$addCoinCount}",
+            'add_coin_count' => $addCoinCount,
+            'signed_at' => $now,
+            'continuous_sign_count' => $continuous_sign_count < 0 ? 0 : $continuous_sign_count + 1
+        ];
     }
 
     public function check($userId)

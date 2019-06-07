@@ -108,15 +108,12 @@ class UserController extends Controller
         $userDailySign = new UserDailySign();
         $result = $userDailySign->sign($user);
 
-        if (!$result)
+        if (false === $result)
         {
             return $this->resErrBad('今天已经签过到了');
         }
 
-        return $this->resOK([
-            'message' => '签到成功，团子+1',
-            'coin_count' => 1
-        ]);
+        return $this->resOK($result);
     }
 
     /**
