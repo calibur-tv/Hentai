@@ -166,6 +166,7 @@ class UserController extends Controller
         }
 
         $userFollowingCounter = new UserFollowingCounter();
+        $userBeFollowedCounter = new UserBeFollowedCounter();
 
         $isFollowing = $user->isFollowing($target);
 
@@ -180,11 +181,13 @@ class UserController extends Controller
 
             $user->follow($target);
             $userFollowingCounter->add($mineSlug);
+            $userBeFollowedCounter->add($targetSlug);
         }
         else // 如果已关注
         {
             $user->unfollow($target);
             $userFollowingCounter->add($mineSlug, -1);
+            $userBeFollowedCounter->add($targetSlug, -1);
         }
 
         $isFollowing = !$isFollowing; // 我关注的结果
@@ -209,6 +212,8 @@ class UserController extends Controller
         $userRepository->followings($mineSlug, true);
         // 返回彼此的关系
         $result = $this->convertUserRelation($isFollowing, $isFollowMe);
+
+        // TODO 消息通知
 
         return $this->resOK($result);
     }
