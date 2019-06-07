@@ -26,25 +26,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $users = User
-            ::where('migration_state', '<>', 1)
-            ->withTrashed()
-            ->take(3000)
-            ->get();
-
-        if (empty($users))
-        {
-            return true;
-        }
-
-        foreach ($users as $user)
-        {
-            $user->update([
-                'slug' => 'cc-' . id2slug($user->id),
-                'migration_state' => 1
-            ]);
-        }
-
         return true;
     }
 }

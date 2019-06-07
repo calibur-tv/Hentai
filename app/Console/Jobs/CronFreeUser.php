@@ -10,7 +10,7 @@
 namespace App\Console\Jobs;
 
 use App\Http\Repositories\UserRepository;
-use App\Models\User;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
