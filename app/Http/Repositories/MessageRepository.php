@@ -24,7 +24,7 @@ class MessageRepository extends Repository
                 ::where('type', $type)
                 ->whereRaw('getter_slug = ? and sender_slug = ?', [$senderSlug, $getterSlug])
                 ->orWhereRaw('getter_slug = ? and sender_slug = ?', [$getterSlug, $senderSlug])
-                ->orderBy('created_at', 'DESC')
+                ->orderBy('created_at', 'ASC')
                 ->with(['content', 'sender'])
                 ->get();
 
@@ -51,10 +51,11 @@ class MessageRepository extends Repository
             }
 
             return $result;
-        }, ['with_score' => true]);
-        $format = $this->filterIdsByMaxId($cache, $sinceId, $count, true, $isUp);
+        }, ['with_score' => true, 'desc' => false]);
+
+        $format = $this->filterIdsByMaxId(array_flip($cache), $sinceId, $count, true, $isUp);
         $result = [];
-        foreach ($format['result'] as $item => $id)
+        foreach ($format['result'] as $id => $item)
         {
             $result[] = array_merge(json_decode($item, true), ['id' => $id]);
         }

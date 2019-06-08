@@ -86,12 +86,25 @@ class Repository
             'is_time' => false,
             'with_score' => false,
             'exp' => 'd',
+            'desc' => true,
             'force' => false
         ], $opts);
 
-        $cache = $opts['force'] ? [] : (
-            $opts['with_score'] ? Redis::ZREVRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZREVRANGE($key, 0, -1)
-        );
+        if ($opts['force'])
+        {
+            $cache = [];
+        }
+        else
+        {
+            if ($opts['desc'])
+            {
+                $opts['with_score'] ? Redis::ZREVRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZREVRANGE($key, 0, -1);
+            }
+            else
+            {
+                $opts['with_score'] ? Redis::ZRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZRANGE($key, 0, -1);
+            }
+        }
 
         if (!empty($cache))
         {
