@@ -1,6 +1,6 @@
 <?php
 
-$route->group(['prefix' => '/door'], function () use ($route)
+$route->group(['prefix' => 'door'], function () use ($route)
 {
     $route->post('/message', 'DoorController@sendMessage');
 
@@ -47,11 +47,18 @@ $route->group(['prefix' => 'user'], function () use ($route)
     });
 });
 
-$route->group(['prefix' => 'message', 'middleware' => 'auth'], function () use ($route)
+$route->group(['prefix' => 'message'], function () use ($route)
 {
-    $route->get('menu', 'MessageController@getMessageMenu');
+    $route->get('total', 'MessageController@getMessageTotal');
 
-    $route->get('history', 'MessageController@getChatHistory');
+    $route->group(['middleware' => 'auth'], function () use ($route)
+    {
+        $route->get('menu', 'MessageController@getMessageMenu');
+
+        $route->post('send', 'MessageController@sendMessage');
+
+        $route->get('history', 'MessageController@getChatHistory');
+    });
 });
 
 $route->group(['prefix' => 'image'], function () use ($route)

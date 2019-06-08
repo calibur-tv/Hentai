@@ -5,14 +5,9 @@
 
 namespace App\Services;
 
-use App\Http\Modules\Counter\UnReadMessageCounter;
-use App\Http\Modules\RichContentService;
-use App\Http\Transformers\User\UserItemResource;
-use App\Models\Message;
+use App\Http\Modules\WebSocketPusher;
 use App\User;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
@@ -35,9 +30,7 @@ class WebSocketService implements WebSocketHandlerInterface
         $token = $request->get['token'];
         if (!$token)
         {
-            return $server->push($request->fd, json_encode([
-                'channel' => 0,
-            ]));
+            return;
         }
 
         $maskId = explode(':', $token)[0];
@@ -48,9 +41,7 @@ class WebSocketService implements WebSocketHandlerInterface
             ->first();
         if (!$userSlug)
         {
-            return $server->push($request->fd, json_encode([
-                'channel' => 0,
-            ]));
+            return;
         }
 
         // 记录这个 table 是为在 onMessage 的时候让别人找到当前用户的 fd
@@ -62,13 +53,8 @@ class WebSocketService implements WebSocketHandlerInterface
             ->wsTable
             ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
-        $unReadMessageCounter = new UnReadMessageCounter();
-
-        $server->push($request->fd, json_encode([
-            'channel' => 0,
-            'unread_message_total' => $unReadMessageCounter->get($userSlug),
-            'unread_notice_total' => 0
-        ]));
+        $webSocketPusher = new WebSocketPusher();
+        $webSocketPusher->pushUnReadMessage($userSlug, $server, $request->fd);
     }
 
     public function onMessage(Server $server, Frame $frame)
@@ -78,52 +64,9 @@ class WebSocketService implements WebSocketHandlerInterface
         // 但是接收者的 fd 不知道，只知道接受者的 uid
         // 要根据接受者 uid 找到他的 fd
         // onMessage 好像拿不到 request，所以需要把 token 带到 frame->data 里
+
+        /*
         $data = json_decode($frame->data, true);
-        $validator = Validator::make($data, [
-            'message_type' => [
-                'required',
-                Rule::in([1, 2, 3]),
-            ],
-            'from_user_token' => 'required|string',
-            'to_user_slug' => 'present|string',
-            'content' => 'required|array'
-        ]);
-        if ($validator->fails())
-        {
-            return;
-        }
-
-        $fromUser = User
-            ::where('api_token', $data['from_user_token'])
-            ->first();
-        if (is_null($fromUser))
-        {
-            return;
-        }
-
-        $messageType = $data['message_type'];
-        /**
-         *  type 消息种类判定
-         * 1. 私聊
-         * 2. 群发
-         * 3. 广播
-         */
-        $fromUserSlug = $fromUser->slug;
-        $toUserSlug = $data['to_user_slug'];
-        if ($messageType === 1 && $fromUserSlug === $toUserSlug)
-        {
-            return;
-        }
-
-        // XSS过滤，敏感词查询
-        // 关系认证，是否可发送消息
-        // 消息入库，如何做缓存？
-        $message = Message::createMessage([
-            'from_user_slug' => $fromUserSlug,
-            'to_user_slug' => $toUserSlug,
-            'type' => $messageType
-        ], $data['content']);
-
         $targetFd = app('swoole')
             ->wsTable
             ->get('uid:' . $toUserSlug);
@@ -132,20 +75,10 @@ class WebSocketService implements WebSocketHandlerInterface
             return;
         }
 
-        $richContentService = new RichContentService();
-        $result = [
-            'channel' => $messageType,
-            'from_user' => [
-                'slug' => $fromUser->slug,
-                'nickname' => $fromUser->nickname,
-                'avatar' => $fromUser->avatar,
-                'sex' => $fromUser->sex
-            ],
-            'content' => $richContentService->parseRichContent($message->content->text),
-            'created_at' => $message->created_at
-        ];
-
-        $server->push($targetFd['value'], json_encode($result));
+        $server->push($targetFd['value'], json_encode([
+            'message' => 'ok'
+        ]));
+        */
     }
 
     public function onClose(Server $server, $fd, $reactorId)

@@ -3,17 +3,77 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\UnReadMessageCounter;
 use App\Http\Modules\RichContentService;
+use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class MessageController extends Controller
 {
+    public function getMessageTotal(Request $request)
+    {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
+
+        $unReadMessageCounter = new UnReadMessageCounter();
+
+        return $this->resOK([
+            'unread_message_total' => $unReadMessageCounter->get($userSlug),
+            'unread_notice_total' => 0
+        ]);
+    }
+
+    /**
+     * 发一个消息
+     */
     public function sendMessage(Request $request)
     {
-        // 目前使用 socket 发送
+        $validator = Validator::make($request->all(), [
+            'message_type' => [
+                'required',
+                Rule::in([1, 2, 3]),
+            ],
+            'target_slug' => 'required|string',
+            'content' => 'required|array'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $messageType = $request->get('message_type');
+        $fromUser = $request->user();
+        $fromUserSlug = $fromUser->slug;
+        $targetSlug = $request->get('target_slug');
+        $content = $request->get('content');
+        if ($messageType === 1 && $fromUserSlug === $targetSlug)
+        {
+            return $this->resErrBad();
+        }
+
+        $richContentService = new RichContentService();
+        // TODO 敏感词过滤
+
+        Message::createMessage([
+            'from_user_slug' => $fromUserSlug,
+            'to_user_slug' => $targetSlug,
+            'type' => $messageType,
+            'content' => $richContentService->saveRichContent($content)
+        ]);
+
+        $webSocketPusher = new WebSocketPusher();
+        $webSocketPusher->pushUnReadMessage($targetSlug);
+
+        return $this->resNoContent();
     }
 
     public function getMessageMenu(Request $request)

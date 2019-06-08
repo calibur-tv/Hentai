@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Http\Modules\Counter\UnReadMessageCounter;
-use App\Http\Modules\RichContentService;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
@@ -19,12 +18,15 @@ class Message extends Model
         return $this->morphOne('App\Models\Content', 'contentable');
     }
 
-    public static function createMessage(array $data, array $content)
+    public static function createMessage(array $data)
     {
-        $message = self::create($data);
-        $richContentService = new RichContentService();
+        $message = self::create([
+            'from_user_slug' => $data['from_user_slug'],
+            'to_user_slug' => $data['to_user_slug'],
+            'type' => $data['type']
+        ]);
         $message->content()->create([
-            'text' => $richContentService->saveRichContent($content)
+            'text' => $data['content']
         ]);
         $messageMenu = MessageMenu::firstOrCreate([
             'from_user_slug' => $data['from_user_slug'],
