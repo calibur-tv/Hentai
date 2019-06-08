@@ -2,31 +2,59 @@
 
 namespace App\Models;
 
-use App\Http\Modules\RichContentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redis;
 
 class MessageMenu extends Model
 {
     protected $fillable = [
-        'from_user_slug', // 触发消息的用户slug
-        'to_user_slug',   // 接受消息的用户slug
-        'count',          // 未读消息的条数
-        'type',           // 消息的类型
+        'sender_slug',      // 触发消息的用户slug
+        'getter_slug',      // 接受消息的用户slug
+        'count',            // 未读消息的条数
+        'type',             // 消息的类型
     ];
 
-    public function updateMsgMenu()
+    public function updateGetterMenu()
     {
         $this->increment('count');
-        $cacheKey = $this::cacheKey($this->to_user_slug);
+        $cacheKey = $this->cacheKey($this->getter_slug);
         if (Redis::EXISTS($cacheKey))
         {
             Redis::ZADD(
                 $cacheKey,
-                strtotime($this->updated_at) . '.' . $this->count,
-                $this->type . '#' . $this->from_user_slug
+                $this->generateCacheScore(),
+                $this->type . '#' . $this->sender_slug
             );
         }
+    }
+
+    public function updateSenderMenu()
+    {
+        $this->update([
+            'count' => 0
+        ]);
+        $cacheKey = $this->cacheKey($this->getter_slug);
+        if (Redis::EXISTS($cacheKey))
+        {
+            Redis::ZADD(
+                $cacheKey,
+                $this->generateCacheScore(),
+                $this->type . '#' . $this->sender_slug
+            );
+        }
+    }
+
+    public function generateCacheScore()
+    {
+        if (intval($this->count) > 999)
+        {
+            $msgCount = '999';
+        }
+        else
+        {
+            $msgCount = str_pad($this->count, 3, '0', STR_PAD_LEFT);
+        }
+        return strtotime($this->updated_at) . $msgCount;
     }
 
     public static function cacheKey($slug)

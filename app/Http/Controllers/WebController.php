@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
@@ -17,11 +18,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        $userRepository = new UserRepository();
-
-        $result = $userRepository->messageMenu('cc-1f4');
-
-        return $this->resOK($result);
         return response('<html lang="en" class="">
 <head>
     <meta charset="UTF-8">

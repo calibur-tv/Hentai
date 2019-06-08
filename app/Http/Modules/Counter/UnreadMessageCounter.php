@@ -6,33 +6,33 @@ namespace App\Http\Modules\Counter;
 
 use App\Models\MessageMenu;
 
-class UnReadMessageCounter extends AsyncCounter
+class UnreadMessageCounter extends AsyncCounter
 {
-    protected $from_user_slug;
+    protected $sender_slug;
     protected $message_type;
 
-    public function __construct($fromUserSlug = 0, $messageType = 0)
+    public function __construct($senderSlug = 0, $messageType = 0)
     {
         parent::__construct('message_menus', 'count');
-        $this->from_user_slug = $fromUserSlug;
+        $this->sender_slug = $senderSlug;
         $this->message_type = $messageType;
     }
 
-    protected function setDB($toUserSlug, $result)
+    protected function setDB($getterSlug, $result)
     {
         MessageMenu
-            ::where('from_user_slug', $this->from_user_slug)
-            ->where('to_user_slug', $toUserSlug)
+            ::where('sender_slug', $this->sender_slug)
+            ->where('getter_slug', $getterSlug)
             ->where('type', $this->message_type)
             ->update([
                 'count' => $result
             ]);
     }
 
-    protected function readDB($toUserSlug)
+    protected function readDB($getterSlug)
     {
         return (int)MessageMenu
-            ::where('to_user_slug', $toUserSlug)
+            ::where('getter_slug', $getterSlug)
             ->pluck('count')
             ->first();
     }

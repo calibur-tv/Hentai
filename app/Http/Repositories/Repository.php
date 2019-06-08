@@ -170,12 +170,12 @@ class Repository
         Redis::ZREM($key, $value);
     }
 
-    public function filterIdsByMaxId($ids, $maxId, $take, $withScore = false)
+    public function filterIdsByMaxId($ids, $maxId, $take, $withScore = false, $isUp = false)
     {
         if (empty($ids))
         {
             return [
-                'ids' => [],
+                'result' => [],
                 'total' => 0,
                 'no_more' => true
             ];
@@ -191,12 +191,26 @@ class Repository
         }
 
         $total = count($ids);
-        $result = array_slice($ids, $offset, $take, $withScore);
+        if ($isUp)
+        {
+            if ($offset < $take + 1)
+            {
+                $result = array_slice($ids, 0, $offset - 1, $withScore);
+            }
+            else
+            {
+                $result = array_slice($ids, $offset - 1 - $take, $take, $withScore);
+            }
+        }
+        else
+        {
+            $result = array_slice($ids, $offset, $take, $withScore);
+        }
 
         return [
-            'ids' => $result,
+            'result' => $result,
             'total' => $total,
-            'no_more' => $result > 0 ? ($total - ($offset + $take) <= 0) : true
+            'no_more' => $isUp ? ($offset <= $take + 1) : ($result > 0 ? ($total - ($offset + $take) <= 0) : true)
         ];
     }
 
@@ -205,7 +219,7 @@ class Repository
         if (empty($ids))
         {
             return [
-                'ids' => [],
+                'result' => [],
                 'total' => 0,
                 'no_more' => true
             ];
@@ -229,7 +243,7 @@ class Repository
         }
 
         return [
-            'ids' => $result,
+            'result' => $result,
             'total' => $total,
             'no_more' => empty($seenIds) ? $total <= $take : count($result) < $take
         ];
@@ -242,7 +256,7 @@ class Repository
         if (empty($ids))
         {
             return [
-                'ids' => [],
+                'result' => [],
                 'total' => 0,
                 'no_more' => true
             ];
@@ -252,7 +266,7 @@ class Repository
         $total = count($ids);
 
         return [
-            'ids' => $result,
+            'result' => $result,
             'total' => $total,
             'no_more' => $total - ($page + 1) * $take <= 0
         ];

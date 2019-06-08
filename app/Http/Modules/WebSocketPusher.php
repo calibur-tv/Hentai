@@ -4,11 +4,11 @@
 namespace App\Http\Modules;
 
 
-use App\Http\Modules\Counter\UnReadMessageCounter;
+use App\Http\Modules\Counter\UnreadMessageCounter;
 
 class WebSocketPusher
 {
-    public function pushUnReadMessage($slug, $server = null, $fd = null)
+    public function pushUnreadMessage($slug, $server = null, $fd = null)
     {
         if ($fd)
         {
@@ -28,10 +28,11 @@ class WebSocketPusher
         }
 
         $pusher = $server ?: app('swoole');
-        $unReadMessageCounter = new UnReadMessageCounter();
+        $UnreadMessageCounter = new UnreadMessageCounter();
 
         $pusher->push($targetFd, json_encode([
-            'unread_message_total' => $unReadMessageCounter->get($slug),
+            'channel' => 0,
+            'unread_message_total' => $UnreadMessageCounter->get($slug),
             'unread_notice_total' => 0
         ]));
     }

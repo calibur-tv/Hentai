@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Modules\Counter\UnReadMessageCounter;
-use App\Http\Modules\RichContentService;
+use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\WebSocketPusher;
+use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -22,10 +22,10 @@ class MessageController extends Controller
             return $this->resErrBad();
         }
 
-        $unReadMessageCounter = new UnReadMessageCounter();
+        $UnreadMessageCounter = new UnreadMessageCounter();
 
         return $this->resOK([
-            'unread_message_total' => $unReadMessageCounter->get($slug),
+            'unread_message_total' => $UnreadMessageCounter->get($slug),
             'unread_notice_total' => 0
         ]);
     }
@@ -40,7 +40,7 @@ class MessageController extends Controller
                 'required',
                 Rule::in([1, 2, 3]),
             ],
-            'target_slug' => 'required|string',
+            'getter_slug' => 'required|string',
             'content' => 'required|array'
         ]);
 
@@ -51,26 +51,25 @@ class MessageController extends Controller
 
         $messageType = $request->get('message_type');
         $fromUser = $request->user();
-        $fromUserSlug = $fromUser->slug;
-        $targetSlug = $request->get('target_slug');
+        $senderSlug = $fromUser->slug;
+        $getterSlug = $request->get('getter_slug');
         $content = $request->get('content');
-        if ($messageType === 1 && $fromUserSlug === $targetSlug)
+        if ($messageType === 1 && $senderSlug === $getterSlug)
         {
             return $this->resErrBad();
         }
 
-        $richContentService = new RichContentService();
         // TODO 敏感词过滤
 
         Message::createMessage([
-            'from_user_slug' => $fromUserSlug,
-            'to_user_slug' => $targetSlug,
+            'sender_slug' => $senderSlug,
+            'getter_slug' => $getterSlug,
             'type' => $messageType,
-            'content' => $richContentService->saveRichContent($content)
+            'content' => $content
         ]);
 
         $webSocketPusher = new WebSocketPusher();
-        $webSocketPusher->pushUnReadMessage($targetSlug);
+        $webSocketPusher->pushUnreadMessage($getterSlug);
 
         return $this->resNoContent();
     }
@@ -78,14 +77,15 @@ class MessageController extends Controller
     public function getMessageMenu(Request $request)
     {
         $user = $request->user();
-        $userRepository = new UserRepository();
+        $messageRepository = new MessageRepository();
 
-        $cache = $userRepository->messageMenu($user->slug);
+        $cache = $messageRepository->menu($user->slug);
         if (empty($cache))
         {
             return [];
         }
 
+        $userRepository = new UserRepository();
         foreach ($cache as $i => $item)
         {
             if ($item['type'] == 1)
@@ -101,25 +101,15 @@ class MessageController extends Controller
     {
         $user = $request->user();
         $type = $request->get('message_type');
-        $fromUserSlug = $request->get('from_user_slug');
+        $getterSlug = $request->get('getter_slug');
         $sinceId = intval($request->get('since_id'));
-        $take = $request->get('take') ?: 15;
+        $isUp = (boolean)$request->get('is_up') ?: false;
+        $count = $request->get('count') ?: 15;
 
-        $messages = Message
-            ::where('to_user_slug', $user->slug)
-            ->where('from_user_slug', $fromUserSlug)
-            ->where('type', $type)
-            ->when(!$sinceId, function ($query, $sinceId)
-            {
-                return $query->where('id', '<', $sinceId);
-            })
-            ->orderBy('created_at', 'DESC')
-            ->take($take)
-            ->with('content:text')
-            ->get()
-            ->toArray();
+        $messageRepository = new MessageRepository();
+        $result = $messageRepository->history($type, $getterSlug, $user->slug, $sinceId, $isUp, $count);
 
-        if (empty($messages))
+        if (empty($result))
         {
             return $this->resOK([
                 'total' => 0,
@@ -128,19 +118,6 @@ class MessageController extends Controller
             ]);
         }
 
-        $userRepository = new UserRepository();
-        $richContentService = new RichContentService();
-
-        foreach ($messages as $i => $msg)
-        {
-            $messages[$i]['user'] = $userRepository->item($msg['from_user_slug']);
-            $messages[$i]['content'] = $richContentService->parseRichContent($msg['content']);
-        }
-
-        return $this->resOK([
-            'total' => 0,
-            'no_more' => count($messages) < $take,
-            'result' => $messages
-        ]);
+        return $this->resOK($result);
     }
 }

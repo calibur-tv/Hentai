@@ -54,7 +54,7 @@ class WebSocketService implements WebSocketHandlerInterface
             ->set('fd:' . $request->fd, ['value' => $userSlug]);
 
         $webSocketPusher = new WebSocketPusher();
-        $webSocketPusher->pushUnReadMessage($userSlug, $server, $request->fd);
+        $webSocketPusher->pushUnreadMessage($userSlug, $server, $request->fd);
     }
 
     public function onMessage(Server $server, Frame $frame)
