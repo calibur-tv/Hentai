@@ -28,12 +28,14 @@ class Message extends Model
         $message->content()->create([
             'text' => $data['content']
         ]);
+
         $messageMenu = MessageMenu::firstOrCreate([
             'from_user_slug' => $data['from_user_slug'],
             'to_user_slug' => $data['to_user_slug'],
             'type' => $data['type']
         ]);
-        $messageMenu->increment('count');
+        $messageMenu->updateMsgMenu();
+
         $unReadMessageCounter = new UnReadMessageCounter();
         $unReadMessageCounter->add($data['to_user_slug']);
 

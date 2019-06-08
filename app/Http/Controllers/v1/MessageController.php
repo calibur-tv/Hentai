@@ -8,7 +8,6 @@ use App\Http\Modules\RichContentService;
 use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\UserRepository;
 use App\Models\Message;
-use App\Models\MessageMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -26,7 +25,7 @@ class MessageController extends Controller
         $unReadMessageCounter = new UnReadMessageCounter();
 
         return $this->resOK([
-            'unread_message_total' => $unReadMessageCounter->get($userSlug),
+            'unread_message_total' => $unReadMessageCounter->get($slug),
             'unread_notice_total' => 0
         ]);
     }
@@ -79,29 +78,23 @@ class MessageController extends Controller
     public function getMessageMenu(Request $request)
     {
         $user = $request->user();
-
-        $menus = MessageMenu
-            ::where('to_user_slug', $user->slug)
-            ->orderBy('updated_at', 'DESC')
-            ->select('from_user_slug as user', 'type', 'count')
-            ->get()
-            ->toArray();
-
-        if (empty($menus))
-        {
-            return $this->resOK([]);
-        }
-
         $userRepository = new UserRepository();
 
-        foreach ($menus as $i => $menu)
+        $cache = $userRepository->messageMenu($user->slug);
+        if (empty($cache))
         {
-            $user = $userRepository->item($menu['user']);
-            $menus[$i]['user'] = $user;
-            $menus[$i]['channel'] = $menu['type'] . '-' . $user->slug;
+            return [];
         }
 
-        return $this->resOK($menus);
+        foreach ($cache as $i => $item)
+        {
+            if ($item['type'] == 1)
+            {
+                $cache[$i]['from'] = $userRepository->item($item['slug']);
+            }
+        }
+
+        return $this->resOK($cache);
     }
 
     public function getChatHistory(Request $request)

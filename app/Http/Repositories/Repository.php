@@ -80,7 +80,7 @@ class Repository
         return $cache;
     }
 
-    public function RedisSort($key, $func, array $opts)
+    public function RedisSort($key, $func, array $opts = [])
     {
         $opts = array_merge([
             'is_time' => false,

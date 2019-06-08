@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,9 @@ class WebController extends Controller
 {
     public function index()
     {
-        $from = User::find(1);
-        $to = User::find(2);
+        $userRepository = new UserRepository();
 
-        $result = $to->isFollowing($from);
+        $result = $userRepository->messageMenu('cc-1f4');
 
         return $this->resOK($result);
         return response('<html lang="en" class="">
