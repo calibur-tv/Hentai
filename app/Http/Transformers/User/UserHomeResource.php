@@ -41,7 +41,7 @@ class UserHomeResource extends JsonResource
                 'money' => sprintf("%.2f", $this->money_coin),
             ],
             'sign' => [
-                'daily_signed' => $userDailySign->check($this->id),
+                'daily_signed' => $userDailySign->check($this->slug),
                 'continuous_sign_count' => $this->continuous_sign_count,
                 'total_sign_count' => $this->total_sign_count,
                 'latest_signed_at' => $this->latest_signed_at,
