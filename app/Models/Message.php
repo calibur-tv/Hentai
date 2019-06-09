@@ -87,17 +87,17 @@ class Message extends Model
         {
             if (strnatcmp($getterSlug, $senderSlug) > 0)
             {
-                $tail = "{$getterSlug}-{$senderSlug}";
+                $tail = "{$getterSlug}@{$senderSlug}";
             }
             else
             {
-                $tail = "{$senderSlug}-{$getterSlug}";
+                $tail = "{$senderSlug}@{$getterSlug}";
             }
         }
         else
         {
             $tail = $getterSlug;
         }
-        return "msg-room-{$type}-{$tail}";
+        return "channel@{$type}@{$tail}";
     }
 }

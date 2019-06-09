@@ -42,7 +42,7 @@ class MessageController extends Controller
 
         $sender = $request->user();
         $senderSlug = $sender->slug;
-        $channel = explode('-', $request->get('channel'));
+        $channel = explode('@', $request->get('channel'));
         if (count($channel) < 4)
         {
             return $this->resErrBad();
@@ -101,5 +101,16 @@ class MessageController extends Controller
         $result = $messageRepository->history($type, $getterSlug, $user->slug, $sinceId, $isUp, $count);
 
         return $this->resOK($result);
+    }
+
+    public function getMessageChannel(Request $request)
+    {
+        $user = $request->user();
+        $slug = $request->get('slug');
+        $type = $request->get('type');
+
+        $channel = Message::roomCacheKey($type, $slug, $user->slug);
+
+        return $this->resOK($channel);
     }
 }

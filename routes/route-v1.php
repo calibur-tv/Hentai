@@ -53,11 +53,13 @@ $route->group(['prefix' => 'message'], function () use ($route)
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
-        $route->get('menu', 'MessageController@getMessageMenu');
-
         $route->post('send', 'MessageController@sendMessage');
 
+        $route->get('menu', 'MessageController@getMessageMenu');
+
         $route->get('history', 'MessageController@getChatHistory');
+
+        $route->get('channel', 'MessageController@getMessageChannel');
     });
 });
 
