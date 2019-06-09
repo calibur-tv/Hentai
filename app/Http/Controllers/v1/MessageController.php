@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
-use App\Http\Repositories\UserRepository;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class MessageController extends Controller
 {
@@ -30,17 +28,10 @@ class MessageController extends Controller
         ]);
     }
 
-    /**
-     * 发一个消息
-     */
     public function sendMessage(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'message_type' => [
-                'required',
-                Rule::in([1, 2, 3]),
-            ],
-            'getter_slug' => 'required|string',
+            'channel' => 'required|string',
             'content' => 'required|array'
         ]);
 
@@ -49,10 +40,16 @@ class MessageController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $messageType = $request->get('message_type');
         $sender = $request->user();
         $senderSlug = $sender->slug;
-        $getterSlug = $request->get('getter_slug');
+        $channel = explode('-', $request->get('channel'));
+        if (count($channel) < 4)
+        {
+            return $this->resErrBad();
+        }
+
+        $messageType = $channel[2];
+        $getterSlug = $channel[3];
         $content = $request->get('content');
         if ($messageType === 1 && $senderSlug === $getterSlug)
         {
@@ -71,6 +68,7 @@ class MessageController extends Controller
 
         $webSocketPusher = new WebSocketPusher();
         $webSocketPusher->pushUnreadMessage($getterSlug);
+        $webSocketPusher->pushUserMessageList($getterSlug);
         $webSocketPusher->pushChatMessage($getterSlug, $message);
 
         return $this->resCreated($message);
@@ -87,15 +85,6 @@ class MessageController extends Controller
             return [];
         }
 
-        $userRepository = new UserRepository();
-        foreach ($cache as $i => $item)
-        {
-            if ($item['type'] == 1)
-            {
-                $cache[$i]['from'] = $userRepository->item($item['slug']);
-            }
-        }
-
         return $this->resOK($cache);
     }
 
@@ -110,15 +99,6 @@ class MessageController extends Controller
 
         $messageRepository = new MessageRepository();
         $result = $messageRepository->history($type, $getterSlug, $user->slug, $sinceId, $isUp, $count);
-
-        if (empty($result))
-        {
-            return $this->resOK([
-                'total' => 0,
-                'no_more' => true,
-                'result' => []
-            ]);
-        }
 
         return $this->resOK($result);
     }

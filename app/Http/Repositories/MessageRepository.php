@@ -54,6 +54,15 @@ class MessageRepository extends Repository
             return $result;
         }, ['with_score' => true, 'desc' => false]);
 
+        if (empty($cache))
+        {
+            return [
+                'total' => 0,
+                'result' => [],
+                'no_more' => true
+            ];
+        }
+
         $format = $this->filterIdsByMaxId(array_flip($cache), $sinceId, $count, true, $isUp);
         $result = [];
         foreach ($format['result'] as $id => $item)
@@ -79,9 +88,8 @@ class MessageRepository extends Repository
             $result = [];
             foreach ($menus as $menu)
             {
-                $key = $menu['type'] . '#' . $menu['sender_slug'];
-                $val = $menu->generateCacheScore();
-                $result[$key] = $val;
+                $channel = Message::roomCacheKey($menu['type'], $menu['getter_slug'], $menu['sender_slug']);
+                $result[$channel] = $menu->generateCacheScore();
             }
 
             return $result;
@@ -93,15 +101,12 @@ class MessageRepository extends Repository
         }
 
         $result = [];
-        foreach ($cache as $key => $value)
+        foreach ($cache as $channel => $score)
         {
-            $arr1 = explode('#', $key);
             $result[] = [
-                'channel' => $key,
-                'type' => $arr1[0],
-                'slug' => $arr1[1],
-                'time' => substr($value, 0, -3),
-                'count' => intval(substr($value, -3))
+                'channel' => $channel,
+                'time' => substr($score, 0, -3),
+                'count' => intval(substr($score, -3))
             ];
         }
 

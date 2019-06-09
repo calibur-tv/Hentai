@@ -58,7 +58,7 @@ class Message extends Model
         $senderMenu->updateSenderMenu();
 
         $UnreadMessageCounter = new UnreadMessageCounter();
-        $UnreadMessageCounter->add($data['getter_slug']);
+        $UnreadMessageCounter->add($getterSlug);
 
         $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $messageData = [
@@ -81,22 +81,22 @@ class Message extends Model
         return $messageData;
     }
 
-    public static function roomCacheKey($type, $target_slug, $cur_user_slug)
+    public static function roomCacheKey($type, $getterSlug, $senderSlug)
     {
         if ($type == 1)
         {
-            if (strnatcmp($target_slug, $cur_user_slug) > 0)
+            if (strnatcmp($getterSlug, $senderSlug) > 0)
             {
-                $tail = "{$target_slug}-{$cur_user_slug}";
+                $tail = "{$getterSlug}-{$senderSlug}";
             }
             else
             {
-                $tail = "{$cur_user_slug}-{$target_slug}";
+                $tail = "{$senderSlug}-{$getterSlug}";
             }
         }
         else
         {
-            $tail = $target_slug;
+            $tail = $getterSlug;
         }
         return "msg-room-{$type}-{$tail}";
     }
