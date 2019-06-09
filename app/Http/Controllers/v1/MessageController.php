@@ -50,8 +50,8 @@ class MessageController extends Controller
         }
 
         $messageType = $request->get('message_type');
-        $fromUser = $request->user();
-        $senderSlug = $fromUser->slug;
+        $sender = $request->user();
+        $senderSlug = $sender->slug;
         $getterSlug = $request->get('getter_slug');
         $content = $request->get('content');
         if ($messageType === 1 && $senderSlug === $getterSlug)
@@ -61,17 +61,18 @@ class MessageController extends Controller
 
         // TODO 敏感词过滤
 
-        Message::createMessage([
+        $message = Message::createMessage([
             'sender_slug' => $senderSlug,
             'getter_slug' => $getterSlug,
             'type' => $messageType,
-            'content' => $content
+            'content' => $content,
+            'sender' => $sender
         ]);
 
         $webSocketPusher = new WebSocketPusher();
         $webSocketPusher->pushUnreadMessage($getterSlug);
 
-        return $this->resNoContent();
+        return $this->resCreated($message);
     }
 
     public function getMessageMenu(Request $request)

@@ -32,6 +32,7 @@ class Message extends Model
         $getterSlug = $data['getter_slug'];
         $senderSlug = $data['sender_slug'];
         $messageType = $data['type'];
+        $sender = $data['sender'];
         $message = self::create([
             'sender_slug' => $senderSlug,
             'getter_slug' => $getterSlug,
@@ -41,22 +42,6 @@ class Message extends Model
         $content = $message->content()->create([
             'text' => $richContentService->saveRichContent($data['content'])
         ]);
-
-        $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
-        if (Redis::EXISTS($roomCacheKey))
-        {
-            $sender = $message->sender()->first();
-            Redis::ZADD($roomCacheKey, $message->id, json_encode([
-                'user' => [
-                    'slug' => $sender->slug,
-                    'nickname' => $sender->nickname,
-                    'avatar' => $sender->avatar,
-                    'sex' => $sender->sex
-                ],
-                'content' => $richContentService->parseRichContent($content->text),
-                'created_at' => $message->created_at
-            ]));
-        }
 
         $getterMenu = MessageMenu::firstOrCreate([
             'sender_slug' => $senderSlug,
@@ -75,7 +60,24 @@ class Message extends Model
         $UnreadMessageCounter = new UnreadMessageCounter();
         $UnreadMessageCounter->add($data['getter_slug']);
 
-        return $message;
+        $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
+        $messageData = [
+            'user' => [
+                'slug' => $sender->slug,
+                'nickname' => $sender->nickname,
+                'avatar' => $sender->avatar,
+                'sex' => $sender->sex
+            ],
+            'content' => $richContentService->parseRichContent($content->text),
+            'created_at' => $message->created_at
+        ];
+        if (Redis::EXISTS($roomCacheKey))
+        {
+            Redis::ZADD($roomCacheKey, $message->id, json_encode($messageData));
+        }
+        $messageData['id'] = $message->id;
+
+        return $messageData;
     }
 
     public static function roomCacheKey($type, $target_slug, $cur_user_slug)
