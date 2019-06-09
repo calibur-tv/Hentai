@@ -42,6 +42,7 @@ class MessageRepository extends Repository
                         'slug' => $msg->sender->slug,
                         'avatar' => $msg->sender->avatar,
                         'nickname' => $msg->sender->nickname,
+                        'sex' => $msg->sender->sex
                     ],
                     'content' => $richContentService->parseRichContent($msg->content->text),
                     'created_at' => $msg->created_at

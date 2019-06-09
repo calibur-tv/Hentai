@@ -50,7 +50,8 @@ class Message extends Model
                 'user' => [
                     'slug' => $sender->slug,
                     'nickname' => $sender->nickname,
-                    'avatar' => $sender->avatar
+                    'avatar' => $sender->avatar,
+                    'sex' => $sender->sex
                 ],
                 'content' => $richContentService->parseRichContent($content->text),
                 'created_at' => $message->created_at
