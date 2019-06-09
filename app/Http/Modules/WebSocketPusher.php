@@ -40,4 +40,24 @@ class WebSocketPusher
         }
         catch (\Exception $e) {}
     }
+
+    public function pushChatMessage($slug, $message)
+    {
+        try
+        {
+            $targetFd = app('swoole')
+                ->wsTable
+                ->get('uid:' . $slug);
+
+            if (false === $targetFd)
+            {
+                return;
+            }
+            app('swoole')->push($targetFd['value'], json_encode($message));
+        }
+        catch (\Exception $e)
+        {
+
+        }
+    }
 }

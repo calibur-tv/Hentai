@@ -71,6 +71,7 @@ class MessageController extends Controller
 
         $webSocketPusher = new WebSocketPusher();
         $webSocketPusher->pushUnreadMessage($getterSlug);
+        $webSocketPusher->pushChatMessage($getterSlug, $message);
 
         return $this->resCreated($message);
     }

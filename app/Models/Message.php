@@ -76,6 +76,7 @@ class Message extends Model
             Redis::ZADD($roomCacheKey, $message->id, json_encode($messageData));
         }
         $messageData['id'] = $message->id;
+        $messageData['channel'] = $roomCacheKey;
 
         return $messageData;
     }
