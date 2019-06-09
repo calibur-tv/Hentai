@@ -18,9 +18,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        $messageRepository = new MessageRepository();
-        $result = $messageRepository->history(1, 'cc-j87', 'cc-1f4', 27, false, 15);
-        return $this->resOK($result);
         return response('<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
