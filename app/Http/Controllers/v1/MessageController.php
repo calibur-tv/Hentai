@@ -90,15 +90,21 @@ class MessageController extends Controller
 
     public function getChatHistory(Request $request)
     {
+        $channel = explode('@', $request->get('channel'));
+        if (count($channel) < 4)
+        {
+            return $this->resErrBad();
+        }
+
+        $messageType = $channel[2];
+        $getterSlug = $channel[3];
         $user = $request->user();
-        $type = $request->get('message_type');
-        $getterSlug = $request->get('getter_slug');
         $sinceId = intval($request->get('since_id'));
         $isUp = (boolean)$request->get('is_up') ?: false;
         $count = $request->get('count') ?: 15;
 
         $messageRepository = new MessageRepository();
-        $result = $messageRepository->history($type, $getterSlug, $user->slug, $sinceId, $isUp, $count);
+        $result = $messageRepository->history($messageType, $getterSlug, $user->slug, $sinceId, $isUp, $count);
 
         return $this->resOK($result);
     }
