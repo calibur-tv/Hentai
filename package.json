@@ -1,0 +1,13 @@
+{
+  "name": "Hentai",
+  "version": "1.0.0",
+  "description": "Lumen project",
+  "author": "falstack",
+  "private": true,
+  "scripts": {
+    "deploy": "bash deploy.sh",
+    "test": "echo 1"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
