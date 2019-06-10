@@ -9,5 +9,7 @@
     "test": "echo 1"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "vuepress": "^1.0.0-rc.1"
+  }
 }

@@ -4,3 +4,4 @@
 .env
 .DS_Store
 *.tree
+node_modules/
