@@ -35,6 +35,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 {
     $route->get('show', 'UserController@show');
 
+    $route->get('relation', 'UserController@getUserRelation');
+
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->get('patch', 'UserController@patch');
@@ -59,7 +61,9 @@ $route->group(['prefix' => 'message'], function () use ($route)
 
         $route->get('history', 'MessageController@getChatHistory');
 
-        $route->get('channel', 'MessageController@getMessageChannel');
+        $route->get('get_channel', 'MessageController@getMessageChannel');
+
+        $route->post('delete_channel', 'MessageController@deleteMessageChannel');
     });
 });
 

@@ -14,32 +14,32 @@ class MessageMenu extends Model
         'type',             // 消息的类型
     ];
 
-    public function updateGetterMenu()
+    public function updateGetterMenu($roomKey)
     {
         $this->increment('count');
-        $cacheKey = $this->cacheKey($this->getter_slug);
+        $cacheKey = $this->messageListCacheKey($this->getter_slug);
         if (Redis::EXISTS($cacheKey))
         {
             Redis::ZADD(
                 $cacheKey,
                 $this->generateCacheScore(),
-                $this->type . '#' . $this->sender_slug
+                $roomKey
             );
         }
     }
 
-    public function updateSenderMenu()
+    public function updateSenderMenu($roomKey)
     {
         $this->update([
             'count' => 0
         ]);
-        $cacheKey = $this->cacheKey($this->getter_slug);
+        $cacheKey = $this->messageListCacheKey($this->getter_slug);
         if (Redis::EXISTS($cacheKey))
         {
             Redis::ZADD(
                 $cacheKey,
                 $this->generateCacheScore(),
-                $this->type . '#' . $this->sender_slug
+                $roomKey
             );
         }
     }
@@ -57,7 +57,7 @@ class MessageMenu extends Model
         return strtotime($this->updated_at) . $msgCount;
     }
 
-    public static function cacheKey($slug)
+    public static function messageListCacheKey($slug)
     {
         return "user-msg-menu:{$slug}";
     }

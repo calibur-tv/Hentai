@@ -7,7 +7,9 @@ use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
 use App\Models\Message;
+use App\Models\MessageMenu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class MessageController extends Controller
@@ -85,10 +87,6 @@ class MessageController extends Controller
         $messageRepository = new MessageRepository();
 
         $cache = $messageRepository->menu($user->slug);
-        if (empty($cache))
-        {
-            return [];
-        }
 
         return $this->resOK($cache);
     }
@@ -128,5 +126,40 @@ class MessageController extends Controller
         $channel = Message::roomCacheKey($type, $slug, $user->slug);
 
         return $this->resOK($channel);
+    }
+
+    public function deleteMessageChannel(Request $request)
+    {
+        $channel = explode('@', $request->get('channel'));
+        if (count($channel) < 4)
+        {
+            return $this->resErrBad();
+        }
+
+        $user = $request->user();
+        $messageType = $channel[1];
+        $senderSlug = $channel[2];
+        $getterSlug = $user->slug;
+        if ($senderSlug === $getterSlug)
+        {
+            $senderSlug = $channel[3];
+        }
+
+        MessageMenu
+            ::where('type', $messageType)
+            ->where('sender_slug', $senderSlug)
+            ->where('getter_slug', $getterSlug)
+            ->delete();
+
+        $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
+        if (Redis::EXISTS($cacheKey))
+        {
+            Redis::ZREM(
+                $cacheKey,
+                Message::roomCacheKey($messageType, $getterSlug, $senderSlug)
+            );
+        }
+
+        return $this->resNoContent();
     }
 }

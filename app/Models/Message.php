@@ -43,24 +43,25 @@ class Message extends Model
             'text' => $richContentService->saveRichContent($data['content'])
         ]);
 
+        $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
+
         $getterMenu = MessageMenu::firstOrCreate([
             'sender_slug' => $senderSlug,
             'getter_slug' => $getterSlug,
             'type' => $messageType
         ]);
-        $getterMenu->updateGetterMenu();
+        $getterMenu->updateGetterMenu($roomCacheKey);
 
         $senderMenu = MessageMenu::firstOrCreate([
             'sender_slug' => $getterSlug,
             'getter_slug' => $senderSlug,
             'type' => $messageType
         ]);
-        $senderMenu->updateSenderMenu();
+        $senderMenu->updateSenderMenu($roomCacheKey);
 
         $UnreadMessageCounter = new UnreadMessageCounter();
         $UnreadMessageCounter->add($getterSlug);
 
-        $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
         $messageData = [
             'user' => [
                 'slug' => $sender->slug,

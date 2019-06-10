@@ -38,10 +38,29 @@ class UserRepository extends Repository
         return $result;
     }
 
-    public function fans($slug, $refresh = false, $seenIds = [], $count = 15)
+    public function list($ids)
+    {
+        if (empty($ids))
+        {
+            return [];
+        }
+
+        $result = [];
+        foreach ($ids as $id)
+        {
+            $item = $this->item($id);
+            if ($item)
+            {
+                $result[] = $item;
+            }
+        }
+        return $result;
+    }
+
+    public function followers($slug, $refresh = false, $seenIds = [], $count = 15)
     {
         // 动态有序要分页
-        $ids = $this->RedisSort("user-followings:{$slug}", function () use ($slug)
+        $ids = $this->RedisSort("user-followers:{$slug}", function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -60,13 +79,18 @@ class UserRepository extends Repository
 
         }, ['force' => $refresh, 'is_time' => true]);
 
+        if ($refresh)
+        {
+            return $ids;
+        }
+
         return $this->filterIdsBySeenIds($ids, $seenIds, $count);
     }
 
     public function followings($slug, $refresh = false)
     {
         // 动态有序不分页
-        return $this->RedisList("user-followings:{$slug}", function () use ($slug)
+        $ids = $this->RedisList("user-followings:{$slug}", function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -83,12 +107,18 @@ class UserRepository extends Repository
                 ->pluck('slug')
                 ->toArray();
         }, $refresh);
+
+        return [
+            'result' => $ids,
+            'total' => count($ids),
+            'no_more' => true
+        ];
     }
 
     public function friends($slug, $refresh = false)
     {
         // 动态有序不分页
-        return $this->RedisList("user-friends:{$slug}", function () use ($slug)
+        $ids = $this->RedisList("user-friends:{$slug}", function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -99,10 +129,16 @@ class UserRepository extends Repository
                 return [];
             }
 
-            $userFollowers = $this->fans($slug);
+            $userFollowers = $this->followers($slug, true);
             $userFollowings = $this->followings($slug);
 
             return array_intersect($userFollowers, $userFollowings);
         }, $refresh);
+
+        return [
+            'result' => $ids,
+            'total' => count($ids),
+            'no_more' => true
+        ];
     }
 }

@@ -77,7 +77,7 @@ class MessageRepository extends Repository
 
     public function menu($slug)
     {
-        $cacheKey = MessageMenu::cacheKey($slug);
+        $cacheKey = MessageMenu::messageListCacheKey($slug);
         $cache = $this->RedisSort($cacheKey, function () use ($slug)
         {
             $menus = MessageMenu

@@ -218,6 +218,46 @@ class UserController extends Controller
         return $this->resOK($result);
     }
 
+
+    /**
+     * 用户关系
+     */
+    public function getUserRelation(Request $request)
+    {
+        $slug = $request->get('slug');
+        $take = $request->get('count') ?: 15;
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        $relation = $request->get('relation');
+
+        $userRepository = new UserRepository();
+        $user = $userRepository->item($slug);
+        if (is_null($user))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($relation === 'followers')
+        {
+            $idsObj = $userRepository->followers($slug, false, $seenIds, $take);
+        }
+        else if ($relation === 'followings')
+        {
+            $idsObj = $userRepository->followings($slug);
+        }
+        else if ($relation === 'friends')
+        {
+            $idsObj = $userRepository->friends($slug);
+        }
+        else
+        {
+            return $this->resErrBad();
+        }
+
+        $idsObj['result'] = $userRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
+
     /**
      * 审核中的用户（修改用户数据的时候有可能进审核）
      */
