@@ -48,14 +48,19 @@ class MessageController extends Controller
             return $this->resErrBad();
         }
 
-        $messageType = $channel[2];
-        $getterSlug = $channel[3];
-        $content = $request->get('content');
+        $messageType = $channel[1];
+        $getterSlug = $channel[2];
+        if ($getterSlug === $senderSlug)
+        {
+            $getterSlug = $channel[3];
+        }
+
         if ($messageType === 1 && $senderSlug === $getterSlug)
         {
             return $this->resErrBad();
         }
 
+        $content = $request->get('content');
         // TODO 敏感词过滤
 
         $message = Message::createMessage([
@@ -95,16 +100,21 @@ class MessageController extends Controller
         {
             return $this->resErrBad();
         }
-
-        $messageType = $channel[2];
-        $getterSlug = $channel[3];
         $user = $request->user();
+
+        $messageType = $channel[1];
+        $getterSlug = $channel[2];
+        $senderSlug = $user->slug;
+        if ($getterSlug === $senderSlug)
+        {
+            $getterSlug = $channel[3];
+        }
         $sinceId = intval($request->get('since_id'));
         $isUp = (boolean)$request->get('is_up') ?: false;
         $count = $request->get('count') ?: 15;
 
         $messageRepository = new MessageRepository();
-        $result = $messageRepository->history($messageType, $getterSlug, $user->slug, $sinceId, $isUp, $count);
+        $result = $messageRepository->history($messageType, $getterSlug, $senderSlug, $sinceId, $isUp, $count);
 
         return $this->resOK($result);
     }
