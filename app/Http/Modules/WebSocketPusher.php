@@ -34,7 +34,7 @@ class WebSocketPusher
             $UnreadMessageCounter = new UnreadMessageCounter();
 
             $pusher->push($targetFd, json_encode([
-                'channel' => 0,
+                'channel' => 'unread_total',
                 'unread_message_total' => $UnreadMessageCounter->get($slug),
                 'unread_notice_total' => 0
             ]));
