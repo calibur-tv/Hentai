@@ -64,6 +64,8 @@ $route->group(['prefix' => 'message'], function () use ($route)
         $route->get('get_channel', 'MessageController@getMessageChannel');
 
         $route->post('delete_channel', 'MessageController@deleteMessageChannel');
+
+        $route->post('clear_channel', 'MessageController@clearMessageChannel');
     });
 });
 
