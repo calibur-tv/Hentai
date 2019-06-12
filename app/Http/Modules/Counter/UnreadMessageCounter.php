@@ -13,7 +13,7 @@ class UnreadMessageCounter extends AsyncCounter
 
     public function __construct($senderSlug = 0, $messageType = 0)
     {
-        parent::__construct('message_menus', 'count');
+        parent::__construct('message_menus_message', 'count');
         $this->sender_slug = $senderSlug;
         $this->message_type = $messageType;
     }

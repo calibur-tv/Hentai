@@ -22,11 +22,11 @@ class MessageController extends Controller
             return $this->resErrBad();
         }
 
-        $UnreadMessageCounter = new UnreadMessageCounter();
+        $unreadMessageCounter = new UnreadMessageCounter();
 
         return $this->resOK([
             'channel' => 'unread_total',
-            'unread_message_total' => $UnreadMessageCounter->get($slug),
+            'unread_message_total' => $unreadMessageCounter->get($slug),
             'unread_notice_total' => 0
         ]);
     }
@@ -160,6 +160,61 @@ class MessageController extends Controller
                 Message::roomCacheKey($messageType, $getterSlug, $senderSlug)
             );
         }
+
+        return $this->resNoContent();
+    }
+
+    public function clearMessageChannel(Request $request)
+    {
+        $channel = explode('@', $request->get('channel'));
+        if (count($channel) < 4)
+        {
+            return $this->resErrBad();
+        }
+
+        $user = $request->user();
+        $messageType = $channel[1];
+        $senderSlug = $channel[2];
+        $getterSlug = $user->slug;
+        if ($senderSlug === $getterSlug)
+        {
+            $senderSlug = $channel[3];
+        }
+
+        $menu = MessageMenu
+            ::where('type', $messageType)
+            ->where('sender_slug', $senderSlug)
+            ->where('getter_slug', $getterSlug)
+            ->first();
+
+        if (is_null($menu))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (!$menu->count)
+        {
+            return $this->resNoContent();
+        }
+
+        $menu->update([
+            'count' => 0,
+            'updated_at' => $menu->updated_at
+        ]);
+
+        $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
+        if (Redis::EXISTS($cacheKey))
+        {
+            Redis::ZADD(
+                $cacheKey,
+                $menu->generateCacheScore(),
+                Message::roomCacheKey($messageType, $getterSlug, $senderSlug)
+            );
+        }
+
+        $unreadMessageCounter = new UnreadMessageCounter();
+        $count = $unreadMessageCounter->get($getterSlug);
+        $unreadMessageCounter->add($getterSlug, -$count);
 
         return $this->resNoContent();
     }
