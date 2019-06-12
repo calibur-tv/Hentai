@@ -194,13 +194,21 @@ class Repository
             ];
         }
 
-        if ($withScore)
+        $list = $withScore ? array_keys($ids) : $ids;
+        if ($maxId)
         {
-            $offset = $maxId ? array_search($maxId, array_keys($ids)) + 1 : 0;
+            if (array_last($list) < $maxId)
+            {
+                $offset = count($list) + 1;
+            }
+            else
+            {
+                $offset = array_search($maxId, $list) + 1;
+            }
         }
         else
         {
-            $offset = $maxId ? array_search($maxId, $ids) + 1 : 0;
+            $offset = 0;
         }
 
         $total = count($ids);

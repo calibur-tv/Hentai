@@ -25,6 +25,7 @@ class MessageController extends Controller
         $UnreadMessageCounter = new UnreadMessageCounter();
 
         return $this->resOK([
+            'channel' => 'unread_total',
             'unread_message_total' => $UnreadMessageCounter->get($slug),
             'unread_notice_total' => 0
         ]);

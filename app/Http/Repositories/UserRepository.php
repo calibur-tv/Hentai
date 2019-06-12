@@ -79,11 +79,6 @@ class UserRepository extends Repository
 
         }, ['force' => $refresh, 'is_time' => true]);
 
-        if ($refresh)
-        {
-            return $ids;
-        }
-
         return $this->filterIdsBySeenIds($ids, $seenIds, $count);
     }
 
@@ -129,10 +124,10 @@ class UserRepository extends Repository
                 return [];
             }
 
-            $userFollowers = $this->followers($slug, true);
+            $userFollowers = $this->followers($slug, false, [], 99999);
             $userFollowings = $this->followings($slug);
 
-            return array_intersect($userFollowers, $userFollowings);
+            return array_intersect($userFollowers['result'], $userFollowings['result']);
         }, $refresh);
 
         return [
