@@ -72,7 +72,7 @@ class UserRepository extends Repository
             }
 
             return $user
-                ->followings()
+                ->followers()
                 ->orderBy('created_at', 'DESC')
                 ->pluck('created_at', 'slug')
                 ->toArray();

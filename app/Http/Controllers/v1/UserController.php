@@ -168,7 +168,8 @@ class UserController extends Controller
         $userFollowingCounter = new UserFollowingCounter();
         $userBeFollowedCounter = new UserBeFollowedCounter();
 
-        $isFollowing = $user->isFollowing($target);
+        $isFollowing = $user->isFollowing($target); // 我是否关注了 TA
+        $isFollowMe = $target->isFollowing($user);  // TA 是否关注了我
 
         if (!$isFollowing) // 如果未关注
         {
@@ -191,7 +192,6 @@ class UserController extends Controller
         }
 
         $isFollowing = !$isFollowing; // 我关注的结果
-        $isFollowMe = $target->isFollowing($user); // TA 是否关注了我
 
         $userRepository = new UserRepository();
         if ($isFollowMe)
@@ -207,7 +207,7 @@ class UserController extends Controller
             $userFriendCounter->add($mineSlug, $num);
         }
         // 刷新TA的粉丝列表
-        $userRepository->fans($targetSlug, true);
+        $userRepository->followers($targetSlug, true);
         // 刷新我的关注列表
         $userRepository->followings($mineSlug, true);
         // 返回彼此的关系
@@ -236,15 +236,15 @@ class UserController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($relation === 'followers')
+        if ($relation === 'follower')
         {
             $idsObj = $userRepository->followers($slug, false, $seenIds, $take);
         }
-        else if ($relation === 'followings')
+        else if ($relation === 'following')
         {
             $idsObj = $userRepository->followings($slug);
         }
-        else if ($relation === 'friends')
+        else if ($relation === 'friend')
         {
             $idsObj = $userRepository->friends($slug);
         }
@@ -284,10 +284,10 @@ class UserController extends Controller
 
     protected function convertUserRelation($currentFollowTarget, $targetFollowCurrent)
     {
-        // 'friends', 'followed', 'following', 'stranger'
+        // 'friend', 'follower', 'following', 'stranger'
         if ($currentFollowTarget && $targetFollowCurrent)
         {
-            $result = 'friends';
+            $result = 'friend';
         }
         else if ($currentFollowTarget && !$targetFollowCurrent)
         {
@@ -295,7 +295,7 @@ class UserController extends Controller
         }
         else if (!$currentFollowTarget && $targetFollowCurrent)
         {
-            $result = 'followed';
+            $result = 'follower';
         }
         else
         {
