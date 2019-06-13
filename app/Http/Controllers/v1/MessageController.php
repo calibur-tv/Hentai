@@ -121,10 +121,27 @@ class MessageController extends Controller
     public function getMessageChannel(Request $request)
     {
         $user = $request->user();
-        $slug = $request->get('slug');
         $type = $request->get('type');
+        $senderSlug = $request->get('slug');
+        $getterSlug = $user->slug;
 
-        $channel = Message::roomCacheKey($type, $slug, $user->slug);
+        $menu = MessageMenu
+            ::where('type', $type)
+            ->where('sender_slug', $senderSlug)
+            ->where('getter_slug', $getterSlug)
+            ->first();
+
+        $channel = Message::roomCacheKey($type, $getterSlug, $senderSlug);
+
+        $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
+        if (Redis::EXISTS($cacheKey))
+        {
+            Redis::ZADD(
+                $cacheKey,
+                $menu->generateCacheScore(),
+                $channel
+            );
+        }
 
         return $this->resOK($channel);
     }

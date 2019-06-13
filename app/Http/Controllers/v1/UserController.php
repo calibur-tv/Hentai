@@ -206,10 +206,13 @@ class UserController extends Controller
             $userFriendCounter->add($targetSlug, $num);
             $userFriendCounter->add($mineSlug, $num);
         }
-        // 刷新TA的粉丝列表
-        $userRepository->followers($targetSlug, true);
-        // 刷新我的关注列表
-        $userRepository->followings($mineSlug, true);
+        else
+        {
+            // 刷新TA的粉丝列表
+            $userRepository->followers($targetSlug, true);
+            // 刷新我的关注列表
+            $userRepository->followings($mineSlug, true);
+        }
         // 返回彼此的关系
         $result = $this->convertUserRelation($isFollowing, $isFollowMe);
 

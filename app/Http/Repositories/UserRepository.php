@@ -124,8 +124,8 @@ class UserRepository extends Repository
                 return [];
             }
 
-            $userFollowers = $this->followers($slug, false, [], 99999);
-            $userFollowings = $this->followings($slug);
+            $userFollowers = $this->followers($slug, true, [], 99999999);
+            $userFollowings = $this->followings($slug, true);
 
             return array_intersect($userFollowers['result'], $userFollowings['result']);
         }, $refresh);
