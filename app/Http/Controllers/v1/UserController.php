@@ -295,13 +295,13 @@ class UserController extends Controller
             {
                 $result[$item] = 'following';
             }
-            else if (in_array($item, $userFollowers))
-            {
-                $result[$item] = 'follower';
-            }
             else if ($item === $userSlug)
             {
                 $result[$item] = 'self';
+            }
+            else if (in_array($item, $userFollowers))
+            {
+                $result[$item] = 'follower';
             }
             else
             {
