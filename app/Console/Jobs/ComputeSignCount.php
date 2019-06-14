@@ -36,7 +36,9 @@ class ComputeSignCount extends Command
     {
         User
             ::where('latest_signed_at', '<', Carbon::now()->yesterday())
-            ->decrement('continuous_sign_count');
+            ->update([
+                'continuous_sign_count' => 0
+            ]);
 
         return true;
     }

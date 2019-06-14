@@ -261,6 +261,57 @@ class UserController extends Controller
         return $this->resOK($idsObj);
     }
 
+
+    public function detectUserRelation(Request $request)
+    {
+        $user = $request->user();
+        if (!$user)
+        {
+            return $this->resOK([]);
+        }
+
+        $targets = $request->get('targets') ? explode(',', $request->get('targets')) : [];
+        $type = 'user';
+        $userSlug = $user->slug;
+
+        if (empty($targets))
+        {
+            return $this->resErrBad();
+        }
+
+        $userRepository = new UserRepository();
+        $userFollowers = $userRepository->followers($userSlug, false, [], 999999999)['result'];
+        $userFollowings = $userRepository->followings($userSlug)['result'];
+        $userFriends = $userRepository->friends($userSlug)['result'];
+
+        $result = [];
+        foreach ($targets as $item)
+        {
+            if (in_array($item, $userFriends))
+            {
+                $result[$item] = 'friend';
+            }
+            else if (in_array($item, $userFollowings))
+            {
+                $result[$item] = 'following';
+            }
+            else if (in_array($item, $userFollowers))
+            {
+                $result[$item] = 'follower';
+            }
+            else if ($item === $userSlug)
+            {
+                $result[$item] = 'self';
+            }
+            else
+            {
+                $result[$item] = 'stranger';
+            }
+        }
+
+        return $this->resOK($result);
+    }
+
     /**
      * 审核中的用户（修改用户数据的时候有可能进审核）
      */

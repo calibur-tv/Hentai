@@ -37,6 +37,11 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->get('relation', 'UserController@getUserRelation');
 
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('detect_relation', 'UserController@detectUserRelation');
+    });
+
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->get('patch', 'UserController@patch');
