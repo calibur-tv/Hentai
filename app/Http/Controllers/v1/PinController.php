@@ -24,7 +24,7 @@ class PinController extends Controller
 
         if ($validator->fails())
         {
-            return $this->resErrBad();
+            return $this->resErrParams($validator);
         }
 
         $pinRepository = new PinRepository();
@@ -68,45 +68,66 @@ class PinController extends Controller
      */
     public function show_meta(Request $request)
     {
-        $pin = Pin::find(189);
-
-//        $pin->content()->create([
-//            'text' => '123123'
-//        ]);
-        $pin->tags()->attach([
-            1 => ['user_id' => 1],
-            2 => ['user_id' => 2],
-            3 => ['user_id' => 3]
-        ]);
-
-        return $this->resOK([
-            env('DB_PASSWORD'),
-            config('app.locale'),
-            config('app.timezone'),
-            config('purifier.encoding')
-        ]);
+        return $this->resOK('1');
     }
 
     /**
      * 创建帖子
      */
-    public function create(Request $request)
+    public function createDaily(Request $request)
     {
+        $user = $request->user();
+        if (!$user->hasRole('站长'))
+        {
+            return $this->resErrRole();
+        }
+
         $validator = Validator::make($request->all(), [
-            'images' => 'array|required',
-            'images.url' => 'required|string',
-            'images.width' => 'required|integer',
-            'images.height' => 'required|integer',
-            'images.size' => 'required|integer',
-            'images.mime' => 'required|string',
-            'title' => 'present|string|max:20',
-            'content' => 'present|string',
-            'origin_url' => 'required|url|max:30',
-            'is_create' => 'required|boolean',
-            'is_secret' => 'required|boolean',
-            'is_bookmark' => 'required|boolean',
-            'copyright_type' => 'required|integer'
+            'images' => 'array|present',
+            'title' => 'present|string|max:30',
+            'content' => 'required|string|max:10000',
         ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $images = $request->get('images');
+        $formatImages = [];
+        foreach ($images as $img)
+        {
+            $validator = Validator::make($img, [
+                'url' => 'required|string',
+                'width' => 'required|integer',
+                'height' => 'required|integer',
+                'size' => 'required|integer',
+                'mime' => 'required|string',
+            ]);
+
+            if ($validator->fails())
+            {
+                return $this->resErrParams($validator);
+            }
+
+            $formatImages[] = [
+                'type' => 'img',
+                'text' => '',
+                'content' => $img
+            ];
+        }
+
+        $content = array_merge([[
+            'type' => 'txt',
+            'content' => $request->get('content')
+        ]], $formatImages);
+
+        $pin = Pin::createPin([
+            'title' => $request->get('title'),
+            'content' => $content
+        ], $user);
+
+        return $this->resOK($pin);
     }
 
     public function update(Request $request)
@@ -126,7 +147,7 @@ class PinController extends Controller
 
         if ($validator->fails())
         {
-            return $this->resErrBad();
+            return $this->resErrParams($validator);
         }
 
         $pinRepository = new PinRepository();

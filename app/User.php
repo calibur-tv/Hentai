@@ -17,6 +17,7 @@ use App\Services\Relation\Traits\CanBookmark;
 use App\Services\Relation\Traits\CanFavorite;
 use App\Services\Relation\Traits\CanVote;
 use App\Services\Relation\Traits\CanSubscribe;
+use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
@@ -67,6 +68,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'sex_secret' => 'boolean',
         'birth_secret' => 'boolean',
     ];
+
+    public function setNicknameAttribute($name)
+    {
+        $this->attributes['nickname'] = Purifier::clean($name);
+    }
+
+    public function setSignatureAttribute($signature)
+    {
+        $this->attributes['signature'] = Purifier::clean($signature);
+    }
 
     public function setAvatarAttribute($url)
     {

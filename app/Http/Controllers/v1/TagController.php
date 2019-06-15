@@ -10,7 +10,6 @@ use App\Services\Trial\WordsFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Mews\Purifier\Facades\Purifier;
 
 class TagController extends Controller
 {
@@ -80,7 +79,7 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $name = Purifier::clean($request->get('name'));
+        $name = $request->get('name');
         $parentSlug = $request->get('parent_slug');
 
         $parentTag = Tag
@@ -152,11 +151,11 @@ class TagController extends Controller
         $tag->updateTag(
             [
                 'avatar' => $request->get('avatar'),
-                'name' => Purifier::clean($request->get('name'))
+                'name' => $request->get('name')
             ],
             [
-                'intro' => Purifier::clean($request->get('intro')),
-                'alias' => Purifier::clean($request->get('alias'))
+                'intro' => $request->get('intro'),
+                'alias' => $request->get('alias')
             ]
         );
 

@@ -13,7 +13,6 @@ use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Mews\Purifier\Facades\Purifier;
 
 class UserController extends Controller
 {
@@ -114,7 +113,7 @@ class UserController extends Controller
             ::where('slug', $slug)
             ->update([
                 'nickname' => $request->get('nickname'),
-                'signature' => Purifier::clean($request->get('signature')),
+                'signature' => $request->get('signature'),
                 'sex' => $request->get('sex'),
                 'avatar' => $avatar,
                 'banner' => $banner,

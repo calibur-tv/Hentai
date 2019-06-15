@@ -37,7 +37,7 @@ class RichContentService
             }
             else if ($row['type'] === 'img')
             {
-                $id = Image::insertGetId($row);
+                $id = Image::insertGetId($row['content']);
                 $result[] = [
                     'type' => 'img',
                     'content' => [
@@ -59,7 +59,7 @@ class RichContentService
         {
             if ($row['type'] === 'img')
             {
-                $image = Image::find($row['content']['id']);
+                $image = Image::find($row['content']['id'])->toArray();
                 if (is_null($image))
                 {
                     continue;
@@ -82,7 +82,7 @@ class RichContentService
         return $result;
     }
 
-    public function detectContentRisk($data)
+    public function detectContentRisk($data, $withImage = true)
     {
         if (gettype($data) === 'string')
         {
@@ -114,10 +114,14 @@ class RichContentService
             }
             else if ($row['type'] === 'img')
             {
+                if (!$withImage)
+                {
+                    continue;
+                }
                 $imageBlock = $row['content'];
-                $filter = $wordsFilter->filter($imageBlock['text']);
+                $filter = $wordsFilter->filter($row['text']);
                 $riskWords = array_merge($riskWords, $filter['words']);
-                if ($imageBlock['id'])
+                if (isset($imageBlock['id']))
                 {
                     $imageUrl = Image::where('id', $imageBlock['id'])->pluck('url')->first();
                 }

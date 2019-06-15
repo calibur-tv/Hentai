@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
 use App\Services\Relation\Traits\CanLike;
 use App\Services\Relation\Traits\CanFavorite;
+use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
@@ -30,6 +31,11 @@ class Tag extends Model
         'creator_id',
         'parent_slug',
     ];
+
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name'] = Purifier::clean($name);
+    }
 
     public function setAvatarAttribute($url)
     {
@@ -96,8 +102,13 @@ class Tag extends Model
 
         $text = $this->extra()->pluck('text');
         $text = json_decode($text, true);
+        $newData = array_merge($extra, $text);
+        foreach ($newData as $key => $val)
+        {
+            $newData[$key] = Purifier::clean($val);
+        }
         $this->extra()->update([
-            'text' => json_encode(array_merge($extra, $text))
+            'text' => json_encode($newData)
         ]);
 
         return $this;

@@ -89,7 +89,10 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
     $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
     {
-        $route->post('create', 'PinController@create');
+        $route->group(['prefix' => 'create'], function () use ($route)
+        {
+            $route->post('daily', 'PinController@createDaily');
+        });
 
         $route->post('toggle_tag', 'PinController@toggle_tag');
 
