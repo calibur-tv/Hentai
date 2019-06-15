@@ -20,15 +20,27 @@ class TrialController extends Controller
     public function showWords(Request $request)
     {
         $filename = $request->get('filename');
+        $curPage = $request->get('cur_page') ?: 0;
+        $toPage = $request->get('to_page') ?: 1;
+        $take = $request->get('take') ?: 100;
+
         $cacheKey = $this->wordsCacheKey($filename);
 
         if (!Redis::EXISTS($cacheKey))
         {
             $this->writeCacheFromFile($filename);
         }
-        $data = Redis::LRANGE($cacheKey, 0, -1);
 
-        return $this->resOK($data);
+        $start = ($toPage - 1) * $take;
+        $count = ($toPage - $curPage) * $take;
+        $data = Redis::LRANGE($cacheKey, $start, $start + $count);
+        $total = Redis::LLEN($cacheKey);
+
+        return $this->resOK([
+            'result' => $data,
+            'total' => $total,
+            'no_more' => !count($data)
+        ]);
     }
 
     public function addWords(Request $request)

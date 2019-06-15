@@ -86,6 +86,8 @@ class WordsFilter
             return [
                 'text' => '',
                 'words' => [],
+                'words_1' => [],
+                'words_2' => [],
                 'delete' => false,
                 'review' => false
             ];
@@ -105,14 +107,18 @@ class WordsFilter
         {
             $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
         }
+        $words_1 = $words;
         $arrRet = trie_filter_search_all($this::$BAD_WORDS_LEVEL_2, $text);
         if (count($arrRet))
         {
             $delete = true;
         }
+        $words_2 = [];
         for ($k = 0; $k < count($arrRet); $k++)
         {
-            $words[] = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            $one = substr($text, $arrRet[$k][0], $arrRet[$k][1]);
+            $words[] = $one;
+            $words_2[] = $one;
         }
 
         for ($k = 0; $k < count($words); $k++)
@@ -123,6 +129,8 @@ class WordsFilter
         return [
             'text' => $text,
             'words' => array_unique($words),
+            'words_1' => array_unique($words_1),
+            'words_2' => array_unique($words_2),
             'delete' => $delete,
             'review' => $review
         ];
