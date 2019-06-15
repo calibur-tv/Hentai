@@ -63,16 +63,18 @@ class MessageController extends Controller
             return $this->resErrBad();
         }
 
-        $content = $request->get('content');
-        // TODO 敏感词过滤
-
         $message = Message::createMessage([
             'sender_slug' => $senderSlug,
             'getter_slug' => $getterSlug,
             'type' => $messageType,
-            'content' => $content,
+            'content' => $request->get('content'),
             'sender' => $sender
         ]);
+
+        if (is_null($message))
+        {
+            return $this->resErrBad();
+        }
 
         $webSocketPusher = new WebSocketPusher();
         $webSocketPusher->pushUnreadMessage($getterSlug);

@@ -11,6 +11,12 @@ use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
 {
+    /**
+     * 格式：
+     * txt => type, content
+     * img => type, content[id, text]
+     */
+
     public function saveRichContent(array $data)
     {
         $result = [];
@@ -48,17 +54,32 @@ class RichContentService
     public function parseRichContent(string $data)
     {
         $array = json_decode($data, true);
-        foreach ($array as $i => $row)
+        $result = [];
+        foreach ($array as $row)
         {
             if ($row['type'] === 'img')
             {
                 $image = Image::find($row['content']['id']);
+                if (is_null($image))
+                {
+                    continue;
+                }
 
-                $array[$i]['content'] = array_merge($row['content'], $image);
+                $result[] = [
+                    'type' => 'img',
+                    'content' => array_merge($row['content'], $image)
+                ];
+            }
+            else if ($row['type'] == 'txt')
+            {
+                $result[] = [
+                    'type' => 'txt',
+                    'content' => $row['content']
+                ];
             }
         }
 
-        return $array;
+        return $result;
     }
 
     public function detectContentRisk($data)
@@ -96,7 +117,15 @@ class RichContentService
                 $imageBlock = $row['content'];
                 $filter = $wordsFilter->filter($imageBlock['text']);
                 $riskWords = array_merge($riskWords, $filter['words']);
-                $detect = $imageFilter->check($imageBlock['url']);
+                if ($imageBlock['id'])
+                {
+                    $imageUrl = Image::where('id', $imageBlock['id'])->pluck('url')->first();
+                }
+                else
+                {
+                    $imageUrl = $imageBlock['url'];
+                }
+                $detect = $imageFilter->check($imageUrl);
                 $content[] = [
                     'type' => 'img',
                     'content' => array_merge($imageBlock, [

@@ -29,6 +29,13 @@ class Message extends Model
     {
         $richContentService = new RichContentService();
 
+        $content = $data['content'];
+        $risk = $richContentService->detectContentRisk($content);
+        if ($risk['risk_score'] > 0)
+        {
+            return null;
+        }
+
         $getterSlug = $data['getter_slug'];
         $senderSlug = $data['sender_slug'];
         $messageType = $data['type'];
@@ -40,7 +47,7 @@ class Message extends Model
         ]);
 
         $content = $message->content()->create([
-            'text' => $richContentService->saveRichContent($data['content'])
+            'text' => $richContentService->saveRichContent($content)
         ]);
 
         $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
