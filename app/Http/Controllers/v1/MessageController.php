@@ -128,22 +128,20 @@ class MessageController extends Controller
         $getterSlug = $user->slug;
 
         $menu = MessageMenu
-            ::where('type', $type)
-            ->where('sender_slug', $senderSlug)
-            ->where('getter_slug', $getterSlug)
-            ->first();
+            ::firstOrCreate([
+                'sender_slug' => $senderSlug,
+                'getter_slug' => $getterSlug,
+                'type' => $type
+            ]);
 
         $channel = Message::roomCacheKey($type, $getterSlug, $senderSlug);
 
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
-        if (Redis::EXISTS($cacheKey))
-        {
-            Redis::ZADD(
-                $cacheKey,
-                $menu->generateCacheScore(),
-                $channel
-            );
-        }
+        Redis::ZADD(
+            $cacheKey,
+            $menu->generateCacheScore(),
+            $channel
+        );
 
         return $this->resOK($channel);
     }
