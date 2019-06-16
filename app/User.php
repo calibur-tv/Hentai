@@ -166,9 +166,19 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         $user = self::create($data);
         $slug = 'cc-' . id2slug($user->id);
-        $user->update([
-            'slug' => $slug
-        ]);
+        if ($data['nickname'])
+        {
+            $user->update([
+                'slug' => $slug
+            ]);
+        }
+        else
+        {
+            $user->update([
+                'slug' => $slug,
+                'nickname' => $slug
+            ]);
+        }
         $user->slug = $slug;
         $user->api_token = $user->createApiToken();
 

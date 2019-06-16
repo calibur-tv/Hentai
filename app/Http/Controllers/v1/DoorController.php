@@ -137,7 +137,6 @@ class DoorController extends Controller
      * @Parameters({
      *      @Parameter("access", description="手机号", type="number", required=true),
      *      @Parameter("secret", description="`6至16位`的密码", type="string", required=true),
-     *      @Parameter("nickname", description="昵称，只能包含`汉字、数字和字母，2~14个字符组成，1个汉字占2个字符`", type="string", required=true),
      *      @Parameter("authCode", description="6位数字的短信验证码", type="number", required=true),
      *      @Parameter("inviteCode", description="邀请码", type="number", required=false),
      * })
@@ -152,7 +151,6 @@ class DoorController extends Controller
         $validator = Validator::make($request->all(), [
             'access' => 'required|digits:11',
             'secret' => 'required|min:6|max:16',
-            'nickname' => 'required|min:1|max:14',
             'authCode' => 'required|digits:6'
         ]);
 
@@ -173,10 +171,7 @@ class DoorController extends Controller
             return $this->resErrBad('该手机号已绑定另外一个账号');
         }
 
-        $nickname = $request->get('nickname');
-        // 昵称过敏感词
         $data = [
-            'nickname' => $nickname,
             'password' => $request->get('secret'),
             'phone' => $access
         ];
