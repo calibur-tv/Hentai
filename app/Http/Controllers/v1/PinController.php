@@ -110,9 +110,9 @@ class PinController extends Controller
                 return $this->resErrParams($validator);
             }
 
+            $img['text'] = '';
             $formatImages[] = [
                 'type' => 'img',
-                'text' => '',
                 'content' => $img
             ];
         }

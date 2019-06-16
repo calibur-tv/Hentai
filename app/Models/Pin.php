@@ -10,6 +10,7 @@ namespace App\Models;
 
 
 use App\Http\Modules\RichContentService;
+use App\Jobs\Trial\PinTrial;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,15 +30,13 @@ class Pin extends Model
     protected $fillable = [
         'slug',
         'title',
-        'user_id',
-        'trial_type',       // 进入审核池的类型，默认 0 不在审核池
+        'user_slug',
+        'visit_type',       // 访问类型，0 公开，1 私密
+        'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
+        'delete_type',      // 删除的原因，0 未删除，1，自己删除，2 系统审核删除，3 人工审核删除，4 版主删除
         'comment_type',     // 评论权限的类型
-        // 'copyright_type',// 版权授权方式
-        // 'is_create',     // 是否原创
-        'is_locked',        // 审核不通过（已删除）
-        'is_secret',        // 加密的（需要动态密码）
+        'content_type',     // 帖子类型
         'last_top_at',      // 最后置顶时间
-        'published_at',     // 公开时间
         'recommended_at',   // 推荐的时间
     ];
 
@@ -111,8 +110,31 @@ class Pin extends Model
 
         $pin->content = $richContentService->parseRichContent($content->text);
 
-        // TODO：进入图片审核队列
+        $job = (new PinTrial($pin->id, 0));
+        dispatch($job);
 
         return $pin;
+    }
+
+    public function deletePin($type)
+    {
+        $this->update([
+            'delete_type' => $type
+        ]);
+        $this->delete();
+        $this->content()->delete();
+    }
+
+    public function reviewPin($type)
+    {
+        // 进入审核
+        $this->update([
+            'trial_type' => $type
+        ]);
+    }
+
+    public function reflowPin()
+    {
+        // 进入信息流
     }
 }

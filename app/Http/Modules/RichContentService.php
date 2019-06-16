@@ -42,7 +42,7 @@ class RichContentService
                     'type' => 'img',
                     'content' => [
                         'id' => $id,
-                        'text' => Purifier::clean($row['text'])
+                        'text' => Purifier::clean($row['content']['text'])
                     ]
                 ];
             }
@@ -96,6 +96,7 @@ class RichContentService
         $riskWords = [];
         $riskImage = [];
         $riskScore = 0;
+        $useReview = 0;
 
         foreach($data as $row)
         {
@@ -111,6 +112,10 @@ class RichContentService
                 {
                     $riskScore++;
                 }
+                if ($filter['review'])
+                {
+                    $useReview++;
+                }
             }
             else if ($row['type'] === 'img')
             {
@@ -119,7 +124,7 @@ class RichContentService
                     continue;
                 }
                 $imageBlock = $row['content'];
-                $filter = $wordsFilter->filter($row['text']);
+                $filter = $wordsFilter->filter($imageBlock['text']);
                 $riskWords = array_merge($riskWords, $filter['words']);
                 if (isset($imageBlock['id']))
                 {
@@ -149,6 +154,14 @@ class RichContentService
                 {
                     $riskScore++;
                 }
+                if ($detect['review'])
+                {
+                    $useReview++;
+                }
+                if ($filter['review'])
+                {
+                    $useReview++;
+                }
             }
         }
 
@@ -156,7 +169,8 @@ class RichContentService
             'content' => $content,
             'risk_words' => array_unique($riskWords),
             'risk_image' => array_unique($riskImage),
-            'risk_score' => $riskScore
+            'risk_score' => $riskScore,
+            'use_review' => $useReview
         ];
     }
 }

@@ -63,14 +63,15 @@ class ImageFilter
             return $defaultResult;
         }
 
+        $scenes = $response['scenes'];
         if (
-            $response['ads']['suggestion'] === 'pass' &&
-            $response['politician']['suggestion'] === 'pass' &&
-            $response['pulp']['suggestion'] === 'pass' &&
-            $response['terror']['suggestion'] !== 'pass'
+            $scenes['ads']['suggestion'] === 'pass' &&
+            $scenes['politician']['suggestion'] === 'pass' &&
+            $scenes['pulp']['suggestion'] === 'pass' &&
+            $scenes['terror']['suggestion'] !== 'pass'
         )
         {
-            if (preg_match('/anime/', $response['terror']['details']['label']))
+            if (preg_match('/anime/', $scenes['terror']['details']['label']))
             {
                 return $defaultResult;
             }
