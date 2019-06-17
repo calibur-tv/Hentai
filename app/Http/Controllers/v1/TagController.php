@@ -33,68 +33,21 @@ class TagController extends Controller
 
 
     /**
-     * 获取用户可投稿的范围
+     * 获取用户的收藏版区
      */
-    public function contribution(Request $request)
+    public function bookmarks(Request $request)
     {
-        $user = $request->user();
-        if (!$user)
+        $slug = $request->get('slug');
+
+        $tagRepository = new TagRepository();
+        $result = $tagRepository->bookmarks($slug);
+
+        if (is_null($result))
         {
-            return $this->resErrLogin();
+            return $this->resErrNotFound();
         }
 
-        $list = $user
-            ->bookmarks(Tag::class)
-            ->select('slug', 'avatar', 'name', 'parent_slug')
-            ->get()
-            ->toArray();
-
-        if (empty($list))
-        {
-            return [
-                'bangumi' => [],
-                'game' => [],
-                'topic' => []
-            ];
-        }
-
-        $bangumi = [];
-        $game = [];
-        $topic = [];
-
-        $bangumiSlug = config('app.tag.bangumi');
-        $gameSlug = config('app.tag.game');
-        $topicSlug = config('app.tag.topic');
-        foreach ($list as $item)
-        {
-            if ($item['parent_slug'] === $bangumiSlug)
-            {
-                $bangumi[] = [
-                    'value' => $item['slug'],
-                    'label' => $item['name']
-                ];
-            }
-            else if ($item['parent_slug'] === $gameSlug)
-            {
-                $game[] = [
-                    'value' => $item['slug'],
-                    'label' => $item['name']
-                ];
-            }
-            else if ($item['parent_slug'] === $topicSlug)
-            {
-                $topic[] = [
-                    'value' => $item['slug'],
-                    'label' => $item['name']
-                ];
-            }
-        }
-
-        return $this->resOK([
-            'bangumi' => $bangumi,
-            'game' => $game,
-            'topic' => $topic
-        ]);
+        return $this->resOK($result);
     }
 
     /**

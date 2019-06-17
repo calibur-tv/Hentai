@@ -12,6 +12,7 @@ namespace App\Http\Repositories;
 use App\Http\Transformers\Tag\TagBodyResource;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
+use App\User;
 
 class TagRepository extends Repository
 {
@@ -58,6 +59,81 @@ class TagRepository extends Repository
                 'children' => TagItemResource::collection($tag->children()->get())
             ];
         });
+
+        if ($result === 'nil')
+        {
+            return null;
+        }
+
+        return $result;
+    }
+
+    public function bookmarks($slug, $refresh = false)
+    {
+        $result = $this->RedisItem("user-bookmark-tags:{$slug}", function () use ($slug)
+        {
+            $user = User
+                ::where('slug', $slug)
+                ->first();
+
+            if (is_null($user))
+            {
+                return 'nil';
+            }
+
+            $list = $user
+                ->bookmarks(Tag::class)
+                ->select('slug', 'avatar', 'name', 'parent_slug')
+                ->get()
+                ->toArray();
+
+            if (empty($list))
+            {
+                return [
+                    'bangumi' => [],
+                    'game' => [],
+                    'topic' => []
+                ];
+            }
+
+            $bangumi = [];
+            $game = [];
+            $topic = [];
+
+            $bangumiSlug = config('app.tag.bangumi');
+            $gameSlug = config('app.tag.game');
+            $topicSlug = config('app.tag.topic');
+            foreach ($list as $item)
+            {
+                if ($item['parent_slug'] === $bangumiSlug)
+                {
+                    $bangumi[] = [
+                        'value' => $item['slug'],
+                        'label' => $item['name']
+                    ];
+                }
+                else if ($item['parent_slug'] === $gameSlug)
+                {
+                    $game[] = [
+                        'value' => $item['slug'],
+                        'label' => $item['name']
+                    ];
+                }
+                else if ($item['parent_slug'] === $topicSlug)
+                {
+                    $topic[] = [
+                        'value' => $item['slug'],
+                        'label' => $item['name']
+                    ];
+                }
+            }
+
+            return [
+                'bangumi' => $bangumi,
+                'game' => $game,
+                'topic' => $topic
+            ];
+        }, $refresh);
 
         if ($result === 'nil')
         {

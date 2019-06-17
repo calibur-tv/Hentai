@@ -127,10 +127,7 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
 
-    $route->group(['middleware' => ['user']], function () use ($route)
-    {
-        $route->get('contribution', 'TagController@contribution');
-    });
+    $route->get('bookmarks', 'TagController@bookmarks');
 
     $route->group(['middleware' => ['auth']], function () use ($route)
     {
