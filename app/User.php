@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Tag;
 use App\Services\Relation\Traits\CanBeFollowed;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -181,6 +182,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
         $user->slug = $slug;
         $user->api_token = $user->createApiToken();
+
+        $user->bookmark(
+            Tag::where('slug', config('app.tag.newbie'))->first(),
+            Tag::class
+        );
 
         return $user;
     }

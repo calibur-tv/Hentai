@@ -9,16 +9,16 @@
 namespace App\Models;
 
 
+use App\Services\Relation\Traits\CanBeBookmarked;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
-use App\Services\Relation\Traits\CanLike;
 use App\Services\Relation\Traits\CanFavorite;
 use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
 {
-    use CanBeFollowed, CanLike, CanFavorite, HasRoles;
+    use CanBeFollowed, CanBeBookmarked, CanFavorite, HasRoles;
 
     protected $guard_name = 'api';
 

@@ -108,6 +108,14 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'tag' => [
+        'bangumi' => '2he',
+        'game' => '285',
+        'topic' => '3p6',
+        'newbie' => 'ugf6',
+        'trash' => 'fa0'
+    ],
+
     'qiniu' => [
         'driver'     => 'qiniu',
         'access_key' => env('QINIU_ACCESS_KEY'),

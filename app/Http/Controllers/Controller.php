@@ -51,6 +51,14 @@ class Controller extends BaseController
         ], 423);
     }
 
+    protected function resErrLogin($message = null)
+    {
+        return response([
+            'code' => 401,
+            'message' => $message ?: '继续操作前请先登录'
+        ], 401);
+    }
+
     protected function resErrThrottle($message)
     {
         return response([

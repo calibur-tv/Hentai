@@ -7,9 +7,9 @@ use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class TagController extends Controller
 {
@@ -37,17 +37,64 @@ class TagController extends Controller
      */
     public function contribution(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'type' => [
-                'required',
-                Rule::in(['simple', 'cosplay', 'atfield'])
-            ]
-        ]);
-
-        if ($validator->fails())
+        $user = $request->user();
+        if (!$user)
         {
-            return $this->resErrParams($validator);
+            return $this->resErrLogin();
         }
+
+        $list = $user
+            ->bookmarks(Tag::class)
+            ->select('slug', 'avatar', 'name', 'parent_slug')
+            ->get()
+            ->toArray();
+
+        if (empty($list))
+        {
+            return [
+                'bangumi' => [],
+                'game' => [],
+                'topic' => []
+            ];
+        }
+
+        $bangumi = [];
+        $game = [];
+        $topic = [];
+
+        $bangumiSlug = config('app.tag.bangumi');
+        $gameSlug = config('app.tag.game');
+        $topicSlug = config('app.tag.topic');
+        foreach ($list as $item)
+        {
+            if ($item['parent_slug'] === $bangumiSlug)
+            {
+                $bangumi[] = [
+                    'value' => $item['slug'],
+                    'label' => $item['name']
+                ];
+            }
+            else if ($item['parent_slug'] === $gameSlug)
+            {
+                $game[] = [
+                    'value' => $item['slug'],
+                    'label' => $item['name']
+                ];
+            }
+            else if ($item['parent_slug'] === $topicSlug)
+            {
+                $topic[] = [
+                    'value' => $item['slug'],
+                    'label' => $item['name']
+                ];
+            }
+        }
+
+        return $this->resOK([
+            'bangumi' => $bangumi,
+            'game' => $game,
+            'topic' => $topic
+        ]);
     }
 
     /**
