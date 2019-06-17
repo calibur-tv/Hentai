@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -86,11 +87,27 @@ class PinController extends Controller
             'images' => 'array|present',
             'title' => 'present|string|max:30',
             'content' => 'required|string|max:10000',
+            'area' => 'required|string',
         ]);
 
         if ($validator->fails())
         {
             return $this->resErrParams($validator);
+        }
+
+        $area = $request->get('area');
+        $tag = Tag
+            ::where('slug', $area)
+            ->first();
+
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (!$user->hasBookmarked($tag))
+        {
+            return $this->resErrRole();
         }
 
         $images = $request->get('images');
@@ -124,6 +141,7 @@ class PinController extends Controller
 
         $pin = Pin::createPin([
             'title' => $request->get('title'),
+            'tag' => $tag,
             'content' => $content
         ], $user);
 

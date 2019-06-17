@@ -110,6 +110,11 @@ class Pin extends Model
 
         $pin->content = $richContentService->parseRichContent($content->text);
 
+//        $pin->tags->create([
+//            'tag_id' => $form['tag']->id,
+//            'user_id' => $user->id
+//        ]);
+
         $job = (new PinTrial($pin->id, 0));
         dispatch($job);
 
