@@ -7,7 +7,6 @@ use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 

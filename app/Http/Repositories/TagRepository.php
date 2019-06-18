@@ -83,7 +83,7 @@ class TagRepository extends Repository
 
             $list = $user
                 ->bookmarks(Tag::class)
-                ->select('slug', 'avatar', 'name', 'parent_slug')
+                ->with('extra')
                 ->get()
                 ->toArray();
 
@@ -105,26 +105,24 @@ class TagRepository extends Repository
             $topicSlug = config('app.tag.topic');
             foreach ($list as $item)
             {
+                $one = [
+                    'slug' => $item['slug'],
+                    'avatar' => $item['avatar'],
+                    'name' => $item['name'],
+                    'extra' => json_decode($item['extra']['text'], true)
+                ];
+
                 if ($item['parent_slug'] === $bangumiSlug)
                 {
-                    $bangumi[] = [
-                        'value' => $item['slug'],
-                        'label' => $item['name']
-                    ];
+                    $bangumi[] = $one;
                 }
                 else if ($item['parent_slug'] === $gameSlug)
                 {
-                    $game[] = [
-                        'value' => $item['slug'],
-                        'label' => $item['name']
-                    ];
+                    $game[] = $one;
                 }
                 else if ($item['parent_slug'] === $topicSlug)
                 {
-                    $topic[] = [
-                        'value' => $item['slug'],
-                        'label' => $item['name']
-                    ];
+                    $topic[] = $one;
                 }
             }
 

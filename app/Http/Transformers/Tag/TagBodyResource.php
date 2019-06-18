@@ -14,8 +14,8 @@ class TagBodyResource extends JsonResource
 {
     public function toArray($request)
     {
-        $extra = $this->extra()->pluck('text');
-        $extra = json_decode(json_decode($extra)[0], true);
+        $extra = $this->extra()->pluck('text')->first();
+        $extra = json_decode($extra, true);
 
         return [
             'slug' => $this->slug,
