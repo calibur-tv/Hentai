@@ -110,13 +110,13 @@ class Pin extends Model
 
         $pin->content = $richContentService->parseRichContent($content->text);
 
-//        $pin->tags->create([
-//            'tag_id' => $form['tag']->id,
-//            'user_id' => $user->id
-//        ]);
+        $pin->tags()->save($form['tag']);
 
-        $job = (new PinTrial($pin->id, 0));
-        dispatch($job);
+        if ($form['image_count'] > 0)
+        {
+            $job = (new PinTrial($pin->id, 0));
+            dispatch($job);
+        }
 
         return $pin;
     }

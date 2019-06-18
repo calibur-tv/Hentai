@@ -142,7 +142,8 @@ class PinController extends Controller
         $pin = Pin::createPin([
             'title' => $request->get('title'),
             'tag' => $tag,
-            'content' => $content
+            'content' => $content,
+            'image_count' => count($formatImages)
         ], $user);
 
         return $this->resOK($pin);
