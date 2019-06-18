@@ -146,7 +146,12 @@ class PinController extends Controller
             'image_count' => count($formatImages)
         ], $user);
 
-        return $this->resOK($pin);
+        if (is_null($pin))
+        {
+            return $this->resErrBad('请勿发表敏感内容');
+        }
+
+        return $this->resCreated($pin->slug);
     }
 
     public function update(Request $request)
