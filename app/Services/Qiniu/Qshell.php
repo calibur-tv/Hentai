@@ -40,6 +40,6 @@ class Qshell
             return '';
         }
 
-        return $ret;
+        return $ret['key'];
     }
 }

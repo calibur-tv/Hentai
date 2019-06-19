@@ -109,7 +109,7 @@ class AuthController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar['key'],
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
@@ -199,7 +199,7 @@ class AuthController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar['key'],
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
@@ -284,7 +284,7 @@ class AuthController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar['key'],
+                'avatar' => $avatar,
                 'nickname' => $user['nickname'],
                 'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
