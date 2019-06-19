@@ -121,6 +121,13 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
         $route->post('reject', 'PinController@reject');
     });
+
+    $route->group(['prefix' => 'editor'], function () use ($route)
+    {
+        $route->get('fetch_site', 'PinController@fetchSiteMeta');
+
+        $route->get('show_meta', 'PinController@show_meta');
+    });
 });
 
 $route->group(['prefix' => 'tag'], function () use ($route)

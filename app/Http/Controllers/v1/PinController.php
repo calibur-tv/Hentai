@@ -7,6 +7,7 @@ use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
 use App\Models\Tag;
+use App\Services\Spider\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -218,6 +219,28 @@ class PinController extends Controller
         // TODO cache
 
         return $this->resNoContent();
+    }
+
+    public function fetchSiteMeta(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'url' => 'required|url'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $url = $request->get('url');
+
+        $query = new Query();
+        $result = $query->fetchMeta(urldecode($url));
+
+        return response([
+            'success' => 1,
+            'meta' => $result
+        ], 200);
     }
 
     /**

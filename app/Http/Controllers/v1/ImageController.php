@@ -4,7 +4,9 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Services\Geetest\Captcha;
+use App\Services\Qiniu\Qshell;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ImageController extends Controller
 {

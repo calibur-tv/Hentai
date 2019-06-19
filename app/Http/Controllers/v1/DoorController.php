@@ -361,7 +361,7 @@ class DoorController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar,
+                'avatar' => $avatar['key'],
                 'nickname' => $user['nickname'],
                 'qq_open_id' => $openId,
                 'qq_unique_id' => $uniqueId,
@@ -473,7 +473,7 @@ class DoorController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar,
+                'avatar' => $avatar['key'],
                 'nickname' => $user['nickname'],
                 'sex' => $user['sex'],
                 'wechat_open_id' => $openId,
@@ -619,7 +619,7 @@ class DoorController extends Controller
             $avatar = $qshell->fetch($user['avatar']);
             // signUp
             $data = [
-                'avatar' => $avatar,
+                'avatar' => $avatar['key'],
                 'nickname' => $user['nickname'],
                 'sex' => $user['sex'],
                 'wechat_open_id' => $data['openId'],

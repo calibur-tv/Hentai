@@ -9,6 +9,7 @@
         "barryvdh/laravel-cors": "^0.11.3",
         "hhxsv5/laravel-s": "~3.4.0",
         "illuminate/redis": "^5.8",
+        "jaeger/querylist": "^4.1",
         "laravel/lumen-framework": "5.8.*",
         "mews/purifier": "^2.1",
         "overtrue/easy-sms": "^1.1",
