@@ -42,7 +42,7 @@ class AsyncCounter
         }
         $value = $this->readDB($slug);
         $result = $value + $num;
-        $result = Redis::SET($cacheKey, $result);
+        Redis::SET($cacheKey, $result);
 
         return (int)$result;
     }

@@ -11,75 +11,82 @@ use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
 {
-    /**
-     * 格式：
-     * txt => type, content
-     * img => type, content[id, text]
-     */
-
     public function saveRichContent(array $data)
     {
         $result = [];
         foreach ($data as $row)
         {
-            if ($row['type'] === 'txt')
+            $type = $row['type'];
+            if ($type === 'paragraph')
             {
-                $content = Purifier::clean($row['content']);
-                while (preg_match('/\n\n\n/', $content))
-                {
-                    $content = str_replace("\n\n\n", "\n\n", $content);
-                }
-
                 $result[] = [
-                    'type' => 'txt',
-                    'content' => $content
+                    'type' => $type,
+                    'data' => [
+                        'text' => Purifier::clean($row['data']['text'])
+                    ]
                 ];
             }
-            else if ($row['type'] === 'img')
+            else if ($type === 'header')
             {
-                $id = Image::insertGetId($row['content']);
                 $result[] = [
-                    'type' => 'img',
-                    'content' => [
-                        'id' => $id,
-                        'text' => Purifier::clean($row['content']['text'])
+                    'type' => $type,
+                    'data' => [
+                        'level' => $row['data']['level'],
+                        'text' => Purifier::clean($row['data']['text'])
+                    ]
+                ];
+            }
+            else if ($type === 'image')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => array_merge(
+                        $row['data'],
+                        ['caption' => Purifier::clean($row['data']['caption'])]
+                    )
+                ];
+            }
+            else if ($type === 'linkTool')
+            {
+                $meta = $row['data']['meta'];
+
+                $result[] = [
+                    'type' => $type,
+                    'data' => [
+                        'link' => $row['data']['link'],
+                        'meta' => [
+                            'title' => Purifier::clean($meta['title']),
+                            'description' => Purifier::clean($meta['description']),
+                            'image' => $meta['image']
+                        ]
+                    ]
+                ];
+            }
+            else if ($type === 'delimiter')
+            {
+                $result[] = $row;
+            }
+            else if ($type === 'list')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => [
+                        'style' => $row['data']['style'],
+                        'items' => array_map(function ($item)
+                        {
+                            return Purifier::clean($item);
+                        }, $row['data']['items'])
                     ]
                 ];
             }
         }
 
-        return json_encode($result);
+        return json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 
     public function parseRichContent(string $data)
     {
-        $array = json_decode($data, true);
-        $result = [];
-        foreach ($array as $row)
-        {
-            if ($row['type'] === 'img')
-            {
-                $image = Image::find($row['content']['id'])->toArray();
-                if (is_null($image))
-                {
-                    continue;
-                }
-
-                $result[] = [
-                    'type' => 'img',
-                    'content' => array_merge($row['content'], $image)
-                ];
-            }
-            else if ($row['type'] == 'txt')
-            {
-                $result[] = [
-                    'type' => 'txt',
-                    'content' => $row['content']
-                ];
-            }
-        }
-
-        return $result;
+        return json_decode($data, true);
     }
 
     public function detectContentRisk($data, $withImage = true)
@@ -98,16 +105,43 @@ class RichContentService
         $riskScore = 0;
         $useReview = 0;
 
+        $image = [];
+        $words = '';
+
         foreach($data as $row)
         {
-            if ($row['type'] === 'txt')
+            $type = $row['type'];
+            if ($type === 'paragraph')
             {
-                $filter = $wordsFilter->filter($row['content']);
-                $riskWords = array_merge($riskWords, $filter['words']);
-                $content[] = [
-                    'type' => 'txt',
-                    'content' => $filter['text']
-                ];
+                $words .= $row['data']['text'];
+            }
+            else if ($type === 'header')
+            {
+                $words .= $row['data']['text'];
+            }
+            else if ($type === 'image')
+            {
+                $words .= $row['data']['caption'];
+                $image[] = $row['data']['file']['url'];
+            }
+            else if ($type === 'linkTool')
+            {
+                $words .= $row['data']['link'];
+                $words .= $row['data']['meta']['title'];
+                $words .= $row['data']['meta']['description'];
+            }
+            if ($type === 'list')
+            {
+                foreach ($row['data']['items'] as $item)
+                {
+                    $words .= $item;
+                }
+            }
+
+            if ($words)
+            {
+                $filter = $wordsFilter->filter($words);
+                $riskWords = $filter['words'];
                 if ($filter['delete'])
                 {
                     $riskScore++;
@@ -117,52 +151,31 @@ class RichContentService
                     $useReview++;
                 }
             }
-            else if ($row['type'] === 'img')
+
+            if ($withImage)
             {
-                if (!$withImage)
+                foreach ($image as $url)
                 {
-                    continue;
-                }
-                $imageBlock = $row['content'];
-                $filter = $wordsFilter->filter($imageBlock['text']);
-                $riskWords = array_merge($riskWords, $filter['words']);
-                if (isset($imageBlock['id']))
-                {
-                    $imageUrl = Image::where('id', $imageBlock['id'])->pluck('url')->first();
-                }
-                else
-                {
-                    $imageUrl = $imageBlock['url'];
-                }
-                $detect = $imageFilter->check($imageUrl);
-                $content[] = [
-                    'type' => 'img',
-                    'content' => array_merge($imageBlock, [
-                        'text' => $filter['words'],
-                        'detect' => $detect
-                    ])
-                ];
-                if ($detect['review'] || $detect['delete'])
-                {
-                    $riskImage[] = $imageBlock['url'];
-                }
-                if ($detect['delete'])
-                {
-                    $riskScore++;
-                }
-                if ($filter['delete'])
-                {
-                    $riskScore++;
-                }
-                if ($detect['review'])
-                {
-                    $useReview++;
-                }
-                if ($filter['review'])
-                {
-                    $useReview++;
+                    $detect = $imageFilter->check($url);
+                    if ($detect['review'] || $detect['delete'])
+                    {
+                        $riskImage[] = $imageBlock['url'];
+                    }
+                    if ($detect['delete'])
+                    {
+                        $riskScore++;
+                    }
+                    if ($detect['review'])
+                    {
+                        $useReview++;
+                    }
                 }
             }
+        }
+
+        if ($riskScore > 0)
+        {
+            // TODO 把触发的敏感词记录到一个地方，查看是不是误杀
         }
 
         return [

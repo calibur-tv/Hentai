@@ -128,16 +128,23 @@ class PinController extends Controller
                 return $this->resErrParams($validator);
             }
 
-            $img['text'] = '';
             $formatImages[] = [
-                'type' => 'img',
-                'content' => $img
+                'type' => 'image',
+                'data' => [
+                    'file' => $img,
+                    'caption' => '',
+                    'stretched' => false,
+                    'withBackground' => false,
+                    'withBorder' => false
+                ]
             ];
         }
 
         $content = array_merge([[
-            'type' => 'txt',
-            'content' => $request->get('content')
+            'type' => 'paragraph',
+            'data' => [
+                'text' => $request->get('content')
+            ]
         ]], $formatImages);
 
         $pin = Pin::createPin([
@@ -152,7 +159,7 @@ class PinController extends Controller
             return $this->resErrBad('请勿发表敏感内容');
         }
 
-        return $this->resCreated($pin->slug);
+        return $this->resCreated($pin);
     }
 
     public function update(Request $request)
