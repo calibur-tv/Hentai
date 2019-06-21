@@ -90,7 +90,7 @@ class Tag extends Model
             'slug' => $slug
         ]);
         $tag->extra()->create([
-            'text' => json_encode($extra)
+            'text' => json_encode($extra, JSON_UNESCAPED_UNICODE)
         ]);
 
         return $tag;
@@ -108,7 +108,7 @@ class Tag extends Model
             $newData[$key] = Purifier::clean($val);
         }
         $this->extra()->update([
-            'text' => json_encode($newData)
+            'text' => json_encode($newData, JSON_UNESCAPED_UNICODE)
         ]);
 
         return $this;
