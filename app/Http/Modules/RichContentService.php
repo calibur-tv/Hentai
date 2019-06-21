@@ -94,6 +94,15 @@ class RichContentService
                     ]
                 ];
             }
+            else if ($type === 'embed')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => array_merge($row['data'], [
+                        'caption' => Purifier::clean($row['data']['caption'])
+                    ])
+                ];
+            }
         }
 
         return json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -158,6 +167,10 @@ class RichContentService
                 {
                     $words .= $item['text'];
                 }
+            }
+            else if ($type === 'embed')
+            {
+                $words .= $item['data']['caption'];
             }
 
             if ($words)
