@@ -79,6 +79,21 @@ class RichContentService
                     ]
                 ];
             }
+            else if ($type === 'checklist')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => [
+                        'items' => array_map(function ($item)
+                        {
+                            return [
+                                'text' => Purifier::clean($item['text']),
+                                'checked' => $item['checked']
+                            ];
+                        }, $row['data']['items'])
+                    ]
+                ];
+            }
         }
 
         return json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -130,11 +145,18 @@ class RichContentService
                 $words .= $row['data']['meta']['title'];
                 $words .= $row['data']['meta']['description'];
             }
-            if ($type === 'list')
+            else if ($type === 'list')
             {
                 foreach ($row['data']['items'] as $item)
                 {
                     $words .= $item;
+                }
+            }
+            else if ($type === 'checklist')
+            {
+                foreach ($row['data']['items'] as $item)
+                {
+                    $words .= $item['text'];
                 }
             }
 
