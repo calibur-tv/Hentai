@@ -46,7 +46,7 @@ class RichContentService
                     )
                 ];
             }
-            else if ($type === 'linkTool')
+            else if ($type === 'link')
             {
                 $meta = $row['data']['meta'];
 
@@ -148,7 +148,7 @@ class RichContentService
                 $words .= $row['data']['caption'];
                 $image[] = $row['data']['file']['url'];
             }
-            else if ($type === 'linkTool')
+            else if ($type === 'link')
             {
                 $words .= $row['data']['link'];
                 $words .= $row['data']['meta']['title'];
