@@ -214,7 +214,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             ->withTrashed()
             ->firstOrCreate([
                 'event_type' => 1,
-                'event_slug' => $tagSlug
+                'event_slug' => $tagSlug,
+                'created_at' => $this->created_at,
+                'updated_at' => $this->created_at
             ]);
 
         if ($timeline->deleted_at)

@@ -30,7 +30,7 @@ class Test extends Command
     {
         $users = User
             ::withTrashed()
-            ->where('migration_state', '<>', 1)
+            ->where('migration_state', '<>', 2)
             ->take(2000)
             ->get();
 
@@ -38,13 +38,15 @@ class Test extends Command
         {
             $user->timeline()->create([
                 'event_type' => 0,
-                'event_slug' => ''
+                'event_slug' => '',
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at
             ]);
 
             $user->markTag(config('app.tag.newbie'));
 
             $user->update([
-                'migration_state' => 1
+                'migration_state' => 2
             ]);
 
             Log::info('user：' . $user->slug . ' migration success');
