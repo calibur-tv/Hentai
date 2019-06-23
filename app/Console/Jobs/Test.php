@@ -2,9 +2,9 @@
 
 namespace App\Console\Jobs;
 
-use App\Models\Tag;
 use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class Test extends Command
@@ -30,26 +30,31 @@ class Test extends Command
     {
         $users = User
             ::withTrashed()
-            ->where('migration_state', '<>', 2)
+            ->where('migration_state', '<>', 3)
             ->take(2000)
             ->get();
 
         foreach ($users as $user)
         {
-            $user->timeline()->create([
+            $timeline = $user->timeline()->create([
                 'event_type' => 0,
-                'event_slug' => '',
-                'created_at' => $user->created_at,
-                'updated_at' => $user->updated_at
+                'event_slug' => ''
             ]);
+
+            DB::table('timelines')
+                ->where('id', $timeline->id)
+                ->update([
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at
+                ]);
 
             $user->markTag(config('app.tag.newbie'));
 
             $user->update([
-                'migration_state' => 2
+                'migration_state' => 3
             ]);
 
-            Log::info('user：' . $user->slug . ' migration success');
+            Log::info('user：' . $user->id . ' migration success');
         }
 
         return true;
