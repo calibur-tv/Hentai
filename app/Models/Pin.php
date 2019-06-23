@@ -65,6 +65,11 @@ class Pin extends Model
         return $this->morphMany('App\Models\Content', 'contentable');
     }
 
+    public function timeline()
+    {
+        return $this->morphMany('App\Models\Timeline', 'timelineable');
+    }
+
     public function comments()
     {
         return $this->hasMany('App\Models\Comment');

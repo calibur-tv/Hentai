@@ -82,6 +82,11 @@ class Tag extends Model
         return $this->morphOne('App\Models\Content', 'contentable');
     }
 
+    public function timeline()
+    {
+        return $this->morphMany('App\Models\Timeline', 'timelineable');
+    }
+
     public static function createTag(array $data, array $extra)
     {
         $tag = self::create($data);

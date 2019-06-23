@@ -130,6 +130,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->morphToMany('App\Models\Tag', 'taggable');
     }
 
+    public function timeline()
+    {
+        /**
+         * 用户注册 -> 0
+         * 收藏标签 -> 1
+         */
+        return $this->morphMany('App\Models\Timeline', 'timelineable');
+    }
+
     public function comments()
     {
         return $this->hasMany('App\Models\Comment');
@@ -163,11 +172,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $token;
     }
 
-    public static function createUser($data)
+    public static function createUser($data, $invitorSlug = '')
     {
         $user = self::create($data);
         $slug = 'cc-' . id2slug($user->id);
-        if ($data['nickname'])
+        if (isset($data['nickname']))
         {
             $user->update([
                 'slug' => $slug
@@ -183,11 +192,49 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->slug = $slug;
         $user->api_token = $user->createApiToken();
 
-        $user->bookmark(
-            Tag::where('slug', config('app.tag.newbie'))->first(),
+        $user->timeline()->create([
+            'event_type' => 0,
+            'event_slug' => $invitorSlug
+        ]);
+
+        $user->markTag(config('app.tag.newbie'));
+
+        return $user;
+    }
+
+    public function markTag($tagSlug)
+    {
+        $this->bookmark(
+            Tag::where('slug', $tagSlug)->first(),
             Tag::class
         );
 
-        return $user;
+        $timeline = $this
+            ->timeline()
+            ->withTrashed()
+            ->firstOrCreate([
+                'event_type' => 1,
+                'event_slug' => $tagSlug
+            ]);
+
+        if ($timeline->deleted_at)
+        {
+            $timeline->restore();
+        }
+
+        // todo cache
+    }
+
+    public function removeBookmark($tagSlug)
+    {
+        $this
+            ->timeline()
+            ->where([
+                'event_type' => 1,
+                'event_slug' => $tagSlug
+            ])
+            ->delete();
+
+        // todo cache
     }
 }
