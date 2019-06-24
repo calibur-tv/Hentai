@@ -28,35 +28,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $users = User
-            ::withTrashed()
-            ->where('migration_state', '<>', 3)
-            ->take(2000)
-            ->get();
-
-        foreach ($users as $user)
-        {
-            $timeline = $user->timeline()->create([
-                'event_type' => 0,
-                'event_slug' => ''
-            ]);
-
-            DB::table('timelines')
-                ->where('id', $timeline->id)
-                ->update([
-                    'created_at' => $user->created_at,
-                    'updated_at' => $user->updated_at
-                ]);
-
-            $user->markTag(config('app.tag.newbie'));
-
-            $user->update([
-                'migration_state' => 3
-            ]);
-
-            Log::info('user：' . $user->id . ' migration success');
-        }
-
         return true;
     }
 }

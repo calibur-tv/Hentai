@@ -47,8 +47,6 @@ class DoorController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        return $this->resErrServiceUnavailable();
-
         $validator = Validator::make($request->all(), [
             'type' => [
                 'required',
