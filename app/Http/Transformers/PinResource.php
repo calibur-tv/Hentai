@@ -29,6 +29,7 @@ class PinResource extends JsonResource
             'visit_type' => $this->visit_type,
             'trial_type' => $this->trial_type,
             'content_type' => $this->content_type,
+            'comment_type' => $this->comment_type,
             'last_top_at' => $this->last_top_at,
             'recommended_at' => $this->recommended_at,
             'created_at' => $this->created_at,

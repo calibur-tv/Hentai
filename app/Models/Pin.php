@@ -50,6 +50,11 @@ class Pin extends Model
         $this->attributes['title'] = Purifier::clean($title);
     }
 
+    public function getTitleAttribute($title)
+    {
+        return $title ?: '标题什么的不重要~';
+    }
+
     public function author()
     {
         return $this->belongsTo('App\User', 'user_slug', 'slug');
