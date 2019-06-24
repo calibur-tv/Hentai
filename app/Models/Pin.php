@@ -11,13 +11,11 @@ namespace App\Models;
 
 use App\Http\Modules\RichContentService;
 use App\Jobs\Trial\PinTrial;
-use App\Services\Trial\WordsFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\Relation\Traits\CanBeBookmarked;
 use App\Services\Relation\Traits\CanBeFavorited;
 use App\Services\Relation\Traits\CanBeVoted;
-use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class Pin extends Model
@@ -29,7 +27,6 @@ class Pin extends Model
 
     protected $fillable = [
         'slug',
-        'title',
         'user_slug',
         'visit_type',       // 访问类型，0 公开，1 私密
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
@@ -44,16 +41,6 @@ class Pin extends Model
         'mark_count',       // 收藏数
         'reward_count',     // 打赏数
     ];
-
-    public function setTitleAttribute($title)
-    {
-        $this->attributes['title'] = Purifier::clean($title);
-    }
-
-    public function getTitleAttribute($title)
-    {
-        return $title ?: '标题什么的不重要~';
-    }
 
     public function author()
     {
@@ -96,14 +83,6 @@ class Pin extends Model
     public static function createPin($form, $user)
     {
         $content = $form['content'];
-        $title = $form['title'];
-
-        $wordsFilter = new WordsFilter();
-        $filter = $wordsFilter->check($title);
-        if ($filter['delete'])
-        {
-            return null;
-        }
 
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -115,8 +94,7 @@ class Pin extends Model
 
         $pin = self::create([
             'user_slug' => $user->slug,
-            'image_count' => $form['image_count'],
-            'title' => $title
+            'image_count' => $form['image_count']
         ]);
 
         $pin->update([

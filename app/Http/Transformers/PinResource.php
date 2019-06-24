@@ -18,11 +18,20 @@ class PinResource extends JsonResource
     public function toArray($request)
     {
         $richContentService = new RichContentService();
+        $content = $richContentService->parseRichContent($this->content->text);
+        if ($content[0]['type'] === 'title')
+        {
+            $title = array_shift($content)['data'];
+        }
+        else
+        {
+            $title = null;
+        }
 
         return [
             'slug' => $this->slug,
-            'title' => $this->title,
-            'content' => $richContentService->parseRichContent($this->content->text),
+            'title' => $title,
+            'content' => $content,
             'author' => new UserItemResource($this->author),
             'tags' => TagMetaResource::collection($this->tags),
             'visit_type' => $this->visit_type,

@@ -145,15 +145,22 @@ class PinController extends Controller
             ];
         }
 
-        $content = array_merge([[
-            'type' => 'paragraph',
-            'data' => [
-                'text' => $request->get('content')
+        $content = array_merge([
+            [
+                'type' => 'title',
+                'data' => [
+                    'text' => $request->get('title')
+                ]
+            ],
+            [
+                'type' => 'paragraph',
+                'data' => [
+                    'text' => $request->get('content')
+                ]
             ]
-        ]], $formatImages);
+        ], $formatImages);
 
         $pin = Pin::createPin([
-            'title' => $request->get('title'),
             'tag' => $tag,
             'content' => $content,
             'image_count' => count($formatImages)

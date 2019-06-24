@@ -46,6 +46,16 @@ class RichContentService
                     )
                 ];
             }
+            else if ($type === 'title')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => array_merge(
+                        $row['data'],
+                        ['text' => Purifier::clean($row['data']['text'])]
+                    )
+                ];
+            }
             else if ($type === 'link')
             {
                 $meta = $row['data']['meta'];
@@ -147,6 +157,14 @@ class RichContentService
             {
                 $words .= $row['data']['caption'];
                 $image[] = $row['data']['file']['url'];
+            }
+            else if ($type === 'title')
+            {
+                $words .= $row['data']['text'];
+                if (isset($row['data']['banner']))
+                {
+                    $image[] = $row['data']['banner']['url'];
+                }
             }
             else if ($type === 'link')
             {
