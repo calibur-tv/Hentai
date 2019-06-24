@@ -7,7 +7,6 @@ use App\Services\Relation\Traits\CanBeFollowed;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
@@ -216,13 +215,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             ->firstOrCreate([
                 'event_type' => 1,
                 'event_slug' => $tagSlug
-            ]);
-
-        DB::table('timelines')
-            ->where('id', $timeline->id)
-            ->update([
-                'created_at' => $this->created_at,
-                'updated_at' => $this->created_at
             ]);
 
         if ($timeline->deleted_at)

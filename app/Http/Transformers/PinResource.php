@@ -8,6 +8,9 @@
 
 namespace App\Http\Transformers;
 
+use App\Http\Modules\RichContentService;
+use App\Http\Transformers\Tag\TagMetaResource;
+use App\Http\Transformers\User\UserItemResource;
 use App\Models\Image;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,61 +18,22 @@ class PinResource extends JsonResource
 {
     public function toArray($request)
     {
+        $richContentService = new RichContentService();
+
         return [
             'slug' => $this->slug,
             'title' => $this->title,
-            'content' => $this->parseContent(),
-            'is_locked' => $this->is_locked,
-            'is_secret' => $this->is_secret,
+            'content' => $richContentService->parseRichContent($this->content->text),
+            'author' => new UserItemResource($this->author),
+            'tags' => TagMetaResource::collection($this->tags),
+            'visit_type' => $this->visit_type,
             'trial_type' => $this->trial_type,
-            'comment_type' => $this->comment_type,
-            'recommended_at' => $this->recommended_at,
+            'content_type' => $this->content_type,
             'last_top_at' => $this->last_top_at,
-            'publish_at' => $this->published_at ?: $this->created_at,
-            'author' => $this->author,
-            'tags' => $this->tags
+            'recommended_at' => $this->recommended_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
         ];
-    }
-
-    protected function parseContent()
-    {
-        $content = $this
-            ->content()
-            ->pluck('text')
-            ->first();
-
-        if (is_null($content))
-        {
-            return [];
-        }
-
-        $content = json_decode($content, true);
-        $imageArr = [];
-
-        foreach ($content as $i => $item)
-        {
-            if ($item['type'] === 'img')
-            {
-                $imageArr[$i] = $item['id'];
-            }
-        }
-
-        $imageIndex = array_keys($imageArr);
-        $imageIds = array_values($imageArr);
-        $imageIdsStr = implode(',', $imageIds);
-
-        $images = Image
-            ::whereIn('id', $imageIds)
-            ->orderByRaw("FIELD(id, $imageIdsStr)")
-            ->get();
-
-        $images = ImageResource::collection($images);
-
-        foreach ($imageIndex as $i => $index)
-        {
-            $content[$index] = $images[$i];
-        }
-
-        return $content;
     }
 }

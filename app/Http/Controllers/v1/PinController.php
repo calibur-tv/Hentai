@@ -19,7 +19,7 @@ class PinController extends Controller
     public function show_info(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'slug' => 'required|regex:/^[a-z0-9]+$/i',
+            'slug' => 'required|string',
             'key' => 'nullable|string',
             'ts' => 'nullable|integer'
         ]);
@@ -37,12 +37,17 @@ class PinController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($pin['is_locked'])
+        if ($pin->deleted_at != null)
         {
-            return $this->resErrLocked();
+            if ($pin->trial_type != 0)
+            {
+                return $this->resErrLocked();
+            }
+
+            return $this->resErrNotFound();
         }
 
-        if ($pin['is_secret'])
+        if ($pin->visit_type != 0)
         {
             $key = $request->get('key');
             $ts = $request->get('ts');
@@ -51,12 +56,12 @@ class PinController extends Controller
                 return $this->resErrRole();
             }
 
-            if ($key !== md5('some-secret', $ts))
+            if ($key !== md5(slug2id($pin->slug), $ts))
             {
                 return $this->resErrRole('密码不正确');
             }
 
-            if (abs(time() - $ts) < 3000)
+            if (abs(time() - $ts) > 3000)
             {
                 return $this->resErrRole('密码已过期');
             }

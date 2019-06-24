@@ -33,16 +33,16 @@ class Pin extends Model
         'user_slug',
         'visit_type',       // 访问类型，0 公开，1 私密
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
-        'delete_type',      // 删除的原因，0 未删除，1，自己删除，2 系统审核删除，3 人工审核删除，4 版主删除
         'comment_type',     // 评论权限的类型
         'content_type',     // 帖子类型
         'last_top_at',      // 最后置顶时间
         'recommended_at',   // 推荐的时间
-    ];
-
-    protected $casts = [
-        'is_locked' => 'boolean',
-        'is_secret' => 'boolean',
+        'image_count',      // 图片数
+        'visit_count',      // 访问数
+        'comment_count',    // 评论数
+        'like_count',       // 点赞数
+        'mark_count',       // 收藏数
+        'reward_count',     // 打赏数
     ];
 
     public function setTitleAttribute($title)
@@ -62,11 +62,19 @@ class Pin extends Model
 
     public function content()
     {
+        return $this->morphOne('App\Models\Content', 'contentable');
+    }
+
+    public function history()
+    {
         return $this->morphMany('App\Models\Content', 'contentable');
     }
 
     public function timeline()
     {
+        /**
+         * 0 => 创建帖子
+         */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
 
@@ -102,6 +110,7 @@ class Pin extends Model
 
         $pin = self::create([
             'user_slug' => $user->slug,
+            'image_count' => $form['image_count'],
             'title' => $title
         ]);
 
@@ -117,6 +126,11 @@ class Pin extends Model
 
         $pin->tags()->save($form['tag']);
 
+        $pin->timeline()->create([
+            'event_type' => 0,
+            'event_slug' => $user->slug
+        ]);
+
         if ($form['image_count'] > 0)
         {
             $job = (new PinTrial($pin->id, 0));
@@ -126,13 +140,11 @@ class Pin extends Model
         return $pin;
     }
 
-    public function deletePin($type)
+    public function deletePin()
     {
-        $this->update([
-            'delete_type' => $type
-        ]);
         $this->delete();
         $this->content()->delete();
+        $this->tags()->delete();
     }
 
     public function reviewPin($type)

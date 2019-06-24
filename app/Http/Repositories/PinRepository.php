@@ -10,11 +10,7 @@ namespace App\Http\Repositories;
 
 
 use App\Http\Transformers\PinResource;
-use App\Http\Transformers\Tag\TagItemResource;
-use App\Http\Transformers\User\UserItemResource;
 use App\Models\Pin;
-use App\Models\Tag;
-use Illuminate\Support\Facades\DB;
 
 class PinRepository extends Repository
 {
@@ -24,6 +20,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
+                ->with(['author', 'tags', 'content'])
                 ->where('slug', $slug)
                 ->first();
 
@@ -31,50 +28,6 @@ class PinRepository extends Repository
             {
                 return 'nil';
             }
-
-            $tempUser = $pin
-                ->author()
-                ->first();
-
-            if (is_null($tempUser))
-            {
-                return 'nil';
-            }
-
-            $pin->author = new UserItemResource($tempUser);
-
-            $tagTemp = $pin
-                ->tags()
-                ->select(DB::raw('count(*) as count, tag_id'))
-                ->groupBy('tag_id')
-                ->orderBy('count', 'DESC')
-                ->get()
-                ->toArray();
-
-            $tags = [];
-            if (count($tagTemp))
-            {
-                $tagIds = array_map(function ($item)
-                {
-                    return $item['tag_id'];
-                }, $tagTemp);
-
-                $tagIdsStr = implode(',', $tagIds);
-
-                $tags = Tag
-                    ::whereIn('id', $tagIds)
-                    ->orderByRaw("FIELD(id, $tagIdsStr)")
-                    ->get();
-
-                foreach ($tagTemp as $i => $item)
-                {
-                    $tags[$i]['count'] = $item['count'];
-                }
-
-                $tags = TagItemResource::collection($tags);
-            }
-
-            $pin->tags = $tags;
 
             return new PinResource($pin);
         }, $refresh);
