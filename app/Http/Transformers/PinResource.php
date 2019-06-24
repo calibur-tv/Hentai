@@ -11,7 +11,6 @@ namespace App\Http\Transformers;
 use App\Http\Modules\RichContentService;
 use App\Http\Transformers\Tag\TagMetaResource;
 use App\Http\Transformers\User\UserItemResource;
-use App\Models\Image;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PinResource extends JsonResource
