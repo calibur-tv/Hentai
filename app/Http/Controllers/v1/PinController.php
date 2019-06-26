@@ -229,9 +229,24 @@ class PinController extends Controller
         return $this->resCreated($pin->slug);
     }
 
-    public function update(Request $request)
+    public function getEditableContent(Request $request)
     {
+        $slug = $request->get('slug');
+        $user = $request->user();
 
+        $pinRepository = new PinRepository();
+        $pin = $pinRepository->item($slug);
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($pin->author->slug != $user->slug)
+        {
+            return $this->resErrRole();
+        }
+
+        return $this->resOK($pin);
     }
 
     /**

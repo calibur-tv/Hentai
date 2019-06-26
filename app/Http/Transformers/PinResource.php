@@ -39,6 +39,7 @@ class PinResource extends JsonResource
             'content_type' => $this->content_type,
             'comment_type' => $this->comment_type,
             'last_top_at' => $this->last_top_at,
+            'last_edit_at' => $this->last_edit_at,
             'recommended_at' => $this->recommended_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

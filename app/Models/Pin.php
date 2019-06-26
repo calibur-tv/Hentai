@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\Relation\Traits\CanBeBookmarked;
 use App\Services\Relation\Traits\CanBeFavorited;
 use App\Services\Relation\Traits\CanBeVoted;
+use Illuminate\Support\Carbon;
 use Spatie\Permission\Traits\HasRoles;
 
 class Pin extends Model
@@ -33,6 +34,7 @@ class Pin extends Model
         'comment_type',     // 评论权限的类型
         'content_type',     // 内容类型：0 普通图文贴，1 专栏
         'last_top_at',      // 最后置顶时间
+        'last_edit_at',     // 最后编辑时间
         'recommended_at',   // 推荐的时间
         'image_count',      // 图片数
         'visit_count',      // 访问数
@@ -95,7 +97,8 @@ class Pin extends Model
         $pin = self::create([
             'user_slug' => $user->slug,
             'content_type' => $form['content_type'],
-            'image_count' => $form['image_count']
+            'image_count' => $form['image_count'],
+            'last_edit_at' => Carbon::now()
         ]);
 
         $pin->update([

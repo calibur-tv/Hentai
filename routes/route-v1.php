@@ -87,6 +87,13 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
     $route->get('show_meta', 'PinController@show_meta');
 
+    $route->group(['prefix' => 'update', 'middleware' => ['auth']], function () use ($route)
+    {
+        $route->get('content', 'PinController@getEditableContent');
+
+        $route->post('story', 'PinController@updateStory');
+    });
+
     $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
     {
         $route->group(['prefix' => 'create'], function () use ($route)
