@@ -31,7 +31,7 @@ class Pin extends Model
         'visit_type',       // 访问类型，0 公开，1 私密
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
         'comment_type',     // 评论权限的类型
-        'content_type',     // 帖子类型
+        'content_type',     // 内容类型：0 普通图文贴，1 专栏
         'last_top_at',      // 最后置顶时间
         'recommended_at',   // 推荐的时间
         'image_count',      // 图片数
@@ -94,6 +94,7 @@ class Pin extends Model
 
         $pin = self::create([
             'user_slug' => $user->slug,
+            'content_type' => $form['content_type'],
             'image_count' => $form['image_count']
         ]);
 

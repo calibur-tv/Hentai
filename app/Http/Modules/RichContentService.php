@@ -205,7 +205,7 @@ class RichContentService
                 }
             }
 
-            if ($withImage)
+            if ($withImage && config('app.env') !== 'local')
             {
                 foreach ($image as $url)
                 {

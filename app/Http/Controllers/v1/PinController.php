@@ -163,7 +163,8 @@ class PinController extends Controller
         $pin = Pin::createPin([
             'tag' => $tag,
             'content' => $content,
-            'image_count' => count($formatImages)
+            'image_count' => count($formatImages),
+            'content_type' => 0
         ], $user);
 
         if (is_null($pin))
@@ -172,6 +173,60 @@ class PinController extends Controller
         }
 
         return $this->resCreated($pin);
+    }
+
+    public function createStory(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->hasRole('站长'))
+        {
+            return $this->resErrRole();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|array',
+            'area' => 'required|string',
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $area = $request->get('area');
+        $tag = Tag
+            ::where('slug', $area)
+            ->first();
+
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (!$user->hasBookmarked($tag))
+        {
+            return $this->resErrRole();
+        }
+
+        $content = $request->get('content');
+        $images = array_filter($content, function ($row)
+        {
+            return $row['type'] === 'image';
+        });
+
+        $pin = Pin::createPin([
+            'tag' => $tag,
+            'content' => $content,
+            'image_count' => count($images),
+            'content_type' => 1
+        ], $user);
+
+        if (is_null($pin))
+        {
+            return $this->resErrBad('请勿发表敏感内容');
+        }
+
+        return $this->resCreated($pin->slug);
     }
 
     public function update(Request $request)
