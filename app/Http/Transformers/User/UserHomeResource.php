@@ -37,8 +37,8 @@ class UserHomeResource extends JsonResource
                 'relation' => 'unknown'
             ],
             'balance' => [
-                'coin' => sprintf("%.2f", $this->virtual_coin),
-                'money' => sprintf("%.2f", $this->money_coin),
+                'coin' => (float)$this->virtual_coin,
+                'money' => (float)$this->money_coin,
             ],
             'sign' => [
                 'daily_signed' => $userDailySign->check($this->slug),
