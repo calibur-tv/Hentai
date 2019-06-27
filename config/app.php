@@ -112,9 +112,10 @@ return [
         'bangumi' => '2he',
         'game' => '285',
         'topic' => '3p6',
-        'newbie' => 'ugf6',      // 话题 -> 新手乐园
-        'trash' => 'fa0',        // 垃圾箱
-        'notebook' => 'uh4f',    // 用户专栏
+        'newbie' => 'ugf6',             // 话题 -> 新手乐园
+        'trash' => 'fa0',               // 垃圾箱
+        'notebook' => 'uh4f',           // 用户专栏
+        'default-bookmark' => 'uhz0',   // 默认用户专栏
     ],
 
     'qiniu' => [
