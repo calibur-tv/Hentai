@@ -40,7 +40,7 @@ class TagRepository extends Repository
         return $result;
     }
 
-    public function relation_item($slug)
+    public function relation_item($slug, $refresh = false)
     {
         $result = $this->RedisItem("tag-category:{$slug}", function () use ($slug)
         {
@@ -58,7 +58,7 @@ class TagRepository extends Repository
                 'parent' => $tag->parent_slug ? new TagItemResource($tag->parent()->first()) : null,
                 'children' => TagItemResource::collection($tag->children()->get())
             ];
-        });
+        }, $refresh);
 
         if ($result === 'nil')
         {
@@ -111,17 +111,21 @@ class TagRepository extends Repository
                 return [
                     'bangumi' => [],
                     'game' => [],
-                    'topic' => []
+                    'topic' => [],
+                    'notebook' => []
                 ];
             }
 
             $bangumi = [];
             $game = [];
             $topic = [];
+            $notebook = [];
 
             $bangumiSlug = config('app.tag.bangumi');
             $gameSlug = config('app.tag.game');
             $topicSlug = config('app.tag.topic');
+            $notebookSlug = config('app.tag.notebook');
+
             foreach ($list as $item)
             {
                 $one = [
@@ -143,12 +147,17 @@ class TagRepository extends Repository
                 {
                     $topic[] = $one;
                 }
+                else if ($item['parent_slug'] === $notebookSlug)
+                {
+                    $notebook[] = $one;
+                }
             }
 
             return [
                 'bangumi' => $bangumi,
                 'game' => $game,
-                'topic' => $topic
+                'topic' => $topic,
+                'notebook' => $notebook
             ];
         }, $refresh);
 

@@ -100,8 +100,8 @@ class TagController extends Controller
             [
                 'name' => $name,
                 'parent_slug' => $parentSlug,
-                'deep' => $parentTag->deep + 1,
-                'creator_id' => 1 // TODO
+                'creator_slug' => $user->slug,
+                'deep' => $parentTag->deep + 1
             ],
             [
                 'alias' => $name,
@@ -119,12 +119,6 @@ class TagController extends Controller
      */
     public function update(Request $request)
     {
-        $user = $request->user();
-        if ($user->cant('update_tag'))
-        {
-            return $this->resErrRole();
-        }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:1|max:32',
             'slug' => 'required|string',
@@ -138,13 +132,21 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
+        $user = $request->user();
+        $slug = $request->get('slug');
+
         $tag = Tag
-            ::where('slug', $request->get('slug'))
+            ::where('slug', $slug)
             ->first();
 
         if (is_null($tag))
         {
             return $this->resErrNotFound();
+        }
+
+        if ($tag->creator_slug !== $user->slug)
+        {
+            return $this->resErrRole();
         }
 
         $tag->updateTag(
@@ -159,7 +161,10 @@ class TagController extends Controller
         );
 
         // TODO 敏感词检测
-        // TODO 操作缓存
+        $tagRepository = new TagRepository();
+        $tagRepository->item($slug, true);
+        $tagRepository->relation_item($slug, true);
+        $tagRepository->bookmarks($slug, true);
 
         return $this->resNoContent();
     }
