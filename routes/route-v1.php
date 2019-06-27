@@ -103,11 +103,9 @@ $route->group(['prefix' => 'pin'], function () use ($route)
             $route->post('story', 'PinController@createStory');
         });
 
+        $route->post('delete', 'PinController@deletePin');
+
         $route->post('toggle_tag', 'PinController@toggle_tag');
-
-        $route->post('update', 'PinController@update');
-
-        $route->post('destroy', 'PinController@destroy');
 
         $route->post('report', 'PinController@report');
 
@@ -118,8 +116,6 @@ $route->group(['prefix' => 'pin'], function () use ($route)
         $route->post('reward', 'PinController@reward');
 
         $route->post('share', 'PinController@share');
-
-        $route->post('view', 'PinController@view');
     });
 
     $route->group(['middleware' => 'auth'], function () use ($route)

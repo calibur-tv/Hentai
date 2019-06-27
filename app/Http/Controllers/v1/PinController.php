@@ -246,6 +246,7 @@ class PinController extends Controller
 
         $slug = $request->get('slug');
         $pinRepository = new PinRepository();
+
         $pin = $pinRepository->item($slug);
         if (is_null($pin))
         {
@@ -294,6 +295,29 @@ class PinController extends Controller
         return $this->resCreated($pin->slug);
     }
 
+    public function deletePin(Request $request)
+    {
+        $user = $request->user();
+        $slug = $request->get('slug');
+        $pinRepository = new PinRepository();
+
+        $pin = $pinRepository->item($slug);
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($pin->author->slug != $user->slug)
+        {
+            return $this->resErrRole();
+        }
+
+        Pin::deletePin($slug, $user, 2);
+        $pinRepository->item($slug, true);
+
+        return $this->resNoContent();
+    }
+
     public function getEditableContent(Request $request)
     {
         $slug = $request->get('slug');
@@ -309,6 +333,11 @@ class PinController extends Controller
         if ($pin->author->slug != $user->slug)
         {
             return $this->resErrRole();
+        }
+
+        if ($pin->deleted_at != null)
+        {
+            return $this->resErrNotFound();
         }
 
         return $this->resOK($pin);
@@ -395,14 +424,6 @@ class PinController extends Controller
             'success' => 1,
             'meta' => $result
         ], 200);
-    }
-
-    /**
-     * 删除帖子（作者或管理员）
-     */
-    public function destroy(Request $request)
-    {
-
     }
 
     /**

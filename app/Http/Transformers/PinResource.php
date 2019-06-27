@@ -17,15 +17,23 @@ class PinResource extends JsonResource
 {
     public function toArray($request)
     {
-        $richContentService = new RichContentService();
-        $content = $richContentService->parseRichContent($this->content);
-        if ($content[0]['type'] === 'title')
+        $title = null;
+        if (null === $this->content)
         {
-            $title = array_shift($content)['data'];
+            $content = [];
         }
         else
         {
-            $title = null;
+            $richContentService = new RichContentService();
+            $content = $richContentService->parseRichContent($this->content);
+            if ($content[0]['type'] === 'title')
+            {
+                $title = array_shift($content)['data'];
+            }
+            else
+            {
+                $title = null;
+            }
         }
 
         return [

@@ -29,7 +29,7 @@ class Pin extends Model
     protected $fillable = [
         'slug',
         'user_slug',
-        'visit_type',       // 访问类型，0 公开，1 私密
+        'visit_type',       // 访问类型，0 已发布，1 草稿箱, 2 仅好友可见
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
         'comment_type',     // 评论权限的类型
         'content_type',     // 内容类型：0 普通图文贴，1 专栏
@@ -63,7 +63,8 @@ class Pin extends Model
     {
         /**
          * 0 => 创建帖子
-         * 2 => 更新帖子
+         * 1 => 更新帖子
+         * 2 => 作者删除
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
@@ -159,11 +160,19 @@ class Pin extends Model
         return $pin;
     }
 
-    public function deletePin()
+    public static function deletePin($slug, $user, $type)
     {
-        $this->delete();
-        $this->content()->delete();
-        $this->tags()->delete();
+        $pin = self
+            ::where('slug', $slug)
+            ->first();
+
+        $pin->delete();
+        $pin->content()->delete();
+        $pin->tags()->delete();
+        $pin->timeline()->create([
+            'event_type' => $type,
+            'event_slug' => $user->slug
+        ]);
     }
 
     public function reviewPin($type)
