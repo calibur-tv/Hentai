@@ -68,6 +68,25 @@ class TagRepository extends Repository
         return $result;
     }
 
+    public function getMarkedTag($slug, $user)
+    {
+        $tag = Tag
+            ::where('slug', $slug)
+            ->first();
+
+        if (is_null($tag))
+        {
+            return null;
+        }
+
+        if (!$user->hasBookmarked($tag))
+        {
+            return false;
+        }
+
+        return $tag;
+    }
+
     public function bookmarks($slug, $refresh = false)
     {
         $result = $this->RedisItem("user-bookmark-tags:{$slug}", function () use ($slug)

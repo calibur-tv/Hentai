@@ -10,7 +10,8 @@ class PinTrial extends Job
 {
     protected $id;
     /**
-     * 0 帖子创建
+     * 0 => 帖子创建
+     * 1 => 更新帖子
      */
     protected $type;
 

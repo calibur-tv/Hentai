@@ -101,17 +101,15 @@ class PinController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $area = $request->get('area');
-        $tag = Tag
-            ::where('slug', $area)
-            ->first();
+        $tagRepository = new TagRepository();
+        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
 
-        if (is_null($tag))
+        if (null === $tag)
         {
             return $this->resErrNotFound();
         }
 
-        if (!$user->hasBookmarked($tag))
+        if (false === $tag)
         {
             return $this->resErrRole();
         }
@@ -193,17 +191,15 @@ class PinController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $area = $request->get('area');
-        $tag = Tag
-            ::where('slug', $area)
-            ->first();
+        $tagRepository = new TagRepository();
+        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
 
-        if (is_null($tag))
+        if (null === $tag)
         {
             return $this->resErrNotFound();
         }
 
-        if (!$user->hasBookmarked($tag))
+        if (false === $tag)
         {
             return $this->resErrRole();
         }
@@ -225,6 +221,75 @@ class PinController extends Controller
         {
             return $this->resErrBad('请勿发表敏感内容');
         }
+
+        return $this->resCreated($pin->slug);
+    }
+
+    public function updateStory(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->hasRole('站长'))
+        {
+            return $this->resErrRole();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required|string',
+            'content' => 'required|array',
+            'area' => 'required|string',
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $slug = $request->get('slug');
+        $pinRepository = new PinRepository();
+        $pin = $pinRepository->item($slug);
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($pin->author->slug != $user->slug)
+        {
+            return $this->resErrRole();
+        }
+
+        $tagRepository = new TagRepository();
+        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
+
+        if (null === $tag)
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (false === $tag)
+        {
+            return $this->resErrRole();
+        }
+
+        $content = $request->get('content');
+        $images = array_filter($content, function ($row)
+        {
+            return $row['type'] === 'image';
+        });
+
+        $pin = Pin::updatePin([
+            'slug' => $slug,
+            'tag' => $tag,
+            'content' => $content,
+            'image_count' => count($images),
+            'content_type' => 1
+        ], $user);
+
+        if (is_null($pin))
+        {
+            return $this->resErrBad('请勿发表敏感内容');
+        }
+
+        $pinRepository->item($slug, true);
 
         return $this->resCreated($pin->slug);
     }

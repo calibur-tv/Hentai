@@ -56,11 +56,6 @@ class Pin extends Model
 
     public function content()
     {
-        return $this->morphOne('App\Models\Content', 'contentable');
-    }
-
-    public function history()
-    {
         return $this->morphMany('App\Models\Content', 'contentable');
     }
 
@@ -68,6 +63,7 @@ class Pin extends Model
     {
         /**
          * 0 => 创建帖子
+         * 2 => 更新帖子
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
@@ -105,11 +101,9 @@ class Pin extends Model
             'slug' => id2slug($pin->id)
         ]);
 
-        $content = $pin->content()->create([
+        $pin->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
-
-        $pin->content = $richContentService->parseRichContent($content->text);
 
         $pin->tags()->save($form['tag']);
 
@@ -121,6 +115,44 @@ class Pin extends Model
         if ($form['image_count'] > 0)
         {
             $job = (new PinTrial($pin->id, 0));
+            dispatch($job);
+        }
+
+        return $pin;
+    }
+
+    public static function updatePin($form, $user)
+    {
+        $content = $form['content'];
+
+        $richContentService = new RichContentService();
+        $risk = $richContentService->detectContentRisk($content, false);
+
+        if ($risk['risk_score'] > 0)
+        {
+            return null;
+        }
+
+        $pin = self
+            ::where('slug', $form['slug'])
+            ->first();
+
+        $pin->update([
+            'last_edit_at' => Carbon::now()
+        ]);
+
+        $pin->content()->create([
+            'text' => $richContentService->saveRichContent($content)
+        ]);
+
+        $pin->timeline()->create([
+            'event_type' => 1,
+            'event_slug' => $user->slug
+        ]);
+
+        if ($form['image_count'] > 0)
+        {
+            $job = (new PinTrial($pin->id, 1));
             dispatch($job);
         }
 

@@ -20,7 +20,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with(['author', 'tags', 'content'])
+                ->with(['author', 'tags'])
                 ->where('slug', $slug)
                 ->first();
 
@@ -28,6 +28,12 @@ class PinRepository extends Repository
             {
                 return 'nil';
             }
+
+            $pin->content = $pin
+                ->content()
+                ->latest()
+                ->pluck('text')
+                ->first();
 
             return new PinResource($pin);
         }, $refresh);
