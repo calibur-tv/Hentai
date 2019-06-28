@@ -115,7 +115,6 @@ return [
         'newbie' => 'ugf6',             // 话题 -> 新手乐园
         'trash' => 'fa0',               // 垃圾箱
         'notebook' => 'uh4f',           // 用户专栏
-        'default-bookmark' => 'uhz0',   // 默认用户专栏
     ],
 
     'qiniu' => [

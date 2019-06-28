@@ -179,14 +179,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         if (isset($data['nickname']))
         {
             $user->update([
-                'slug' => $slug
+                'slug' => $slug,
+                'migration_state' => 6
             ]);
         }
         else
         {
             $user->update([
                 'slug' => $slug,
-                'nickname' => $slug
+                'nickname' => $slug,
+                'migration_state' => 6
             ]);
         }
         $user->slug = $slug;
@@ -197,13 +199,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             'event_slug' => $invitorSlug
         ]);
 
-        $user->markTag(config('app.tag.newbie'));
+        $user->joinNewbieZone();
+        $user->createDefaultNotebook();
 
         return $user;
     }
 
-    public function markTag($tagSlug)
+    public function joinNewbieZone()
     {
+        $tagSlug = config('app.tag.newbie');
         $this->bookmark(
             Tag::where('slug', $tagSlug)->first(),
             Tag::class
@@ -225,16 +229,24 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         // todo cache
     }
 
-    public function removeBookmark($tagSlug)
+    public function createDefaultNotebook()
     {
-        $this
-            ->timeline()
-            ->where([
-                'event_type' => 1,
-                'event_slug' => $tagSlug
-            ])
-            ->delete();
+        $parentSlug = config('app.tag.notebook');
+        $name = '默认专栏';
 
-        // todo cache
+        $tag = Tag::createTag(
+            [
+                'name' => $name,
+                'parent_slug' => $parentSlug,
+                'creator_slug' => $this->slug,
+                'deep' => 2
+            ],
+            [
+                'alias' => $name,
+                'intro' => ''
+            ]
+        );
+
+        $this->bookmark($tag, Tag::class);
     }
 }

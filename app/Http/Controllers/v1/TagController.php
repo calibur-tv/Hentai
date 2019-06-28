@@ -195,6 +195,7 @@ class TagController extends Controller
 
         $trashSlug = config('app.tag.trash');
         $slug = $request->get('slug');
+
         if ($slug === $trashSlug)
         {
             return $this->resErrRole();
