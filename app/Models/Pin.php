@@ -106,7 +106,8 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        $pin->tags()->save($form['tag']);
+        $pin->tags()->save($form['area']);
+        $pin->tags()->save($form['notebook']);
 
         $pin->timeline()->create([
             'event_type' => 0,

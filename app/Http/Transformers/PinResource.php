@@ -9,7 +9,7 @@
 namespace App\Http\Transformers;
 
 use App\Http\Modules\RichContentService;
-use App\Http\Transformers\Tag\TagMetaResource;
+use App\Http\Transformers\Tag\TagItemResource;
 use App\Http\Transformers\User\UserItemResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +17,10 @@ class PinResource extends JsonResource
 {
     public function toArray($request)
     {
-        $title = null;
+        $title = [
+            'banner' => null,
+            'text' => ''
+        ];
         if (null === $this->content)
         {
             $content = [];
@@ -30,10 +33,6 @@ class PinResource extends JsonResource
             {
                 $title = array_shift($content)['data'];
             }
-            else
-            {
-                $title = null;
-            }
         }
 
         return [
@@ -41,7 +40,9 @@ class PinResource extends JsonResource
             'title' => $title,
             'content' => $content,
             'author' => new UserItemResource($this->author),
-            'tags' => TagMetaResource::collection($this->tags),
+            'tags' => TagItemResource::collection($this->tags),
+            'area' => TagItemResource::collection($this->area),
+            'notebook' => TagItemResource::collection($this->notebook),
             'visit_type' => $this->visit_type,
             'trial_type' => $this->trial_type,
             'content_type' => $this->content_type,

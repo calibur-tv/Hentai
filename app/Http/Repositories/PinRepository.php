@@ -20,7 +20,7 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with(['author', 'tags'])
+                ->with('author')
                 ->where('slug', $slug)
                 ->first();
 
@@ -34,6 +34,25 @@ class PinRepository extends Repository
                 ->latest()
                 ->pluck('text')
                 ->first();
+
+            $pin->notebook = $pin
+                ->tags()
+                ->where('parent_slug', config('app.tag.notebook'))
+                ->get();
+
+            $pin->tags = $pin
+                ->tags()
+                ->where('parent_slug', config('app.tag.pin'))
+                ->get();
+
+            $pin->area = $pin
+                ->tags()
+                ->whereIn('parent_slug', [
+                    config('app.tag.bangumi'),
+                    config('app.tag.topic'),
+                    config('app.tag.game')
+                ])
+                ->get();
 
             return new PinResource($pin);
         }, $refresh);

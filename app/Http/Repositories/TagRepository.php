@@ -87,6 +87,11 @@ class TagRepository extends Repository
         return $tag;
     }
 
+    public function getMyNotebook($slug, $user)
+    {
+
+    }
+
     public function bookmarks($slug, $refresh = false)
     {
         $result = $this->RedisItem("user-bookmark-tags:{$slug}", function () use ($slug)

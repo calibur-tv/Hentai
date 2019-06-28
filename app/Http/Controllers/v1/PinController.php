@@ -175,15 +175,10 @@ class PinController extends Controller
 
     public function createStory(Request $request)
     {
-        $user = $request->user();
-        if (!$user->hasRole('站长'))
-        {
-            return $this->resErrRole();
-        }
-
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
             'area' => 'required|string',
+            'notebook' => 'required|string',
         ]);
 
         if ($validator->fails())
@@ -192,16 +187,30 @@ class PinController extends Controller
         }
 
         $tagRepository = new TagRepository();
-        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
+        $user = $request->user();
 
-        if (null === $tag)
+        $area = $tagRepository->getMarkedTag($request->get('area'), $user);
+        if (null === $area)
         {
-            return $this->resErrNotFound();
+            return $this->resErrNotFound('不能存在的分区');
+        }
+        if (false === $area)
+        {
+            return $this->resErrRole('未解锁的分区');
         }
 
-        if (false === $tag)
+        $notebook = $tagRepository->getMarkedTag($request->get('notebook'), $user);
+        if (null === $notebook)
         {
-            return $this->resErrRole();
+            return $this->resErrNotFound('不能存在的专栏');
+        }
+        if (false === $notebook)
+        {
+            return $this->resErrRole('不属于自己的专栏');
+        }
+        if ($notebook->parent_slug !== config('app.tag.notebook'))
+        {
+            return $this->resErrBad('非法的专栏');
         }
 
         $content = $request->get('content');
@@ -211,7 +220,8 @@ class PinController extends Controller
         });
 
         $pin = Pin::createPin([
-            'tag' => $tag,
+            'area' => $area,
+            'notebook' => $notebook,
             'content' => $content,
             'image_count' => count($images),
             'content_type' => 1
@@ -227,16 +237,11 @@ class PinController extends Controller
 
     public function updateStory(Request $request)
     {
-        $user = $request->user();
-        if (!$user->hasRole('站长'))
-        {
-            return $this->resErrRole();
-        }
-
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
             'area' => 'required|string',
+            'notebook' => 'required|string',
         ]);
 
         if ($validator->fails())
@@ -244,31 +249,45 @@ class PinController extends Controller
             return $this->resErrParams($validator);
         }
 
+        $user = $request->user();
         $slug = $request->get('slug');
         $pinRepository = new PinRepository();
 
         $pin = $pinRepository->item($slug);
         if (is_null($pin))
         {
-            return $this->resErrNotFound();
+            return $this->resErrNotFound('不存在的文章');
         }
 
         if ($pin->author->slug != $user->slug)
         {
-            return $this->resErrRole();
+            return $this->resErrRole('不是自己的文章');
         }
 
         $tagRepository = new TagRepository();
-        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
 
+        $tag = $tagRepository->getMarkedTag($request->get('area'), $user);
         if (null === $tag)
         {
-            return $this->resErrNotFound();
+            return $this->resErrNotFound('不存在的分区');
         }
-
         if (false === $tag)
         {
-            return $this->resErrRole();
+            return $this->resErrRole('未解锁的分区');
+        }
+
+        $notebook = $tagRepository->getMarkedTag($request->get('notebook'), $user);
+        if (null === $notebook)
+        {
+            return $this->resErrNotFound('不能存在的专栏');
+        }
+        if (false === $notebook)
+        {
+            return $this->resErrRole('不属于自己的专栏');
+        }
+        if ($notebook->parent_slug !== config('app.tag.notebook'))
+        {
+            return $this->resErrBad('非法的专栏');
         }
 
         $content = $request->get('content');
@@ -280,6 +299,7 @@ class PinController extends Controller
         $pin = Pin::updatePin([
             'slug' => $slug,
             'tag' => $tag,
+            'notebook' => $notebook,
             'content' => $content,
             'image_count' => count($images),
             'content_type' => 1
