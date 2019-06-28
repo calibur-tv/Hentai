@@ -31,7 +31,7 @@ class TagBodyResource extends JsonResource
             'type' => $type,
             'parent_slug' => $parentSlug,
             'alias' => $extra['alias'],
-            'intro' => $extra['intro'] ?: '暂无简介'
+            'intro' => $extra['intro']
         ];
     }
 }

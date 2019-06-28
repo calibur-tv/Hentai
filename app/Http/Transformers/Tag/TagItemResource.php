@@ -18,8 +18,7 @@ class TagItemResource extends JsonResource
             'slug' => $this->slug,
             'name' => $this->name,
             'avatar' => $this->avatar,
-            'parent_slug' => $this->parent_slug,
-            'creator_slug' => $this->creator_slug
+            'parent_slug' => $this->parent_slug
         ];
     }
 }

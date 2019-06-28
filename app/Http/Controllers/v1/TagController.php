@@ -62,12 +62,6 @@ class TagController extends Controller
      */
     public function create(Request $request)
     {
-        $user = $request->user();
-        if ($user->cant('create_tag'))
-        {
-            return $this->resErrRole();
-        }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:1|max:32',
             'parent_slug' => 'required|string'
@@ -79,11 +73,16 @@ class TagController extends Controller
         }
 
         $name = $request->get('name');
+        $user = $request->user();
         $parentSlug = $request->get('parent_slug');
+        $isNotebook = $parentSlug === config('app.tag.notebook');
+        if (!$isNotebook && $user->cant('create_tag'))
+        {
+            return $this->resErrRole();
+        }
 
-        $parentTag = Tag
-            ::where('slug', $parentSlug)
-            ->first();
+        $tagRepository = new TagRepository();
+        $parentTag = $tagRepository->item($parentSlug);
 
         if (is_null($parentTag))
         {
@@ -110,6 +109,11 @@ class TagController extends Controller
         );
 
         // TODO 操作缓存
+        if ($isNotebook)
+        {
+            $user->bookmark($tag, Tag::class);
+            $tagRepository->bookmarks($user->slug, true);
+        }
 
         return $this->resOK(new TagItemResource($tag));
     }
@@ -189,7 +193,7 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $trashSlug = 'fa0';
+        $trashSlug = config('app.tag.trash');
         $slug = $request->get('slug');
         if ($slug === $trashSlug)
         {
@@ -263,7 +267,8 @@ class TagController extends Controller
         Tag
             ::where('parent_slug', $slug)
             ->update([
-                'parent_slug' => $targetSlug
+                'parent_slug' => $targetSlug,
+                'deep' => $target + 1
             ]);
 
         // TODO cache
@@ -311,7 +316,8 @@ class TagController extends Controller
         }
 
         $tag->update([
-            'parent_slug' => $request->get('target_slug')
+            'parent_slug' => $request->get('target_slug'),
+            'deep' => $target->deep + 1
         ]);
         // TODO cache
 
