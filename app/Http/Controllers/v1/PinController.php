@@ -227,6 +227,13 @@ class PinController extends Controller
             return $this->resErrBad('请勿发表敏感内容');
         }
 
+        if ($pin->visit_type != 0)
+        {
+            $ts = time();
+            $key = md5(config('app.md5') . $pin->slug . $ts);
+            return $this->resCreated($pin->slug . '?key=' . $key . '&ts=' . $ts);
+        }
+
         return $this->resCreated($pin->slug);
     }
 
@@ -301,7 +308,14 @@ class PinController extends Controller
 
         $pinRepository->item($slug, true);
 
-        return $this->resCreated($pin->slug);
+        if ($pin->visit_type != 0)
+        {
+            $ts = time();
+            $key = md5(config('app.md5') . $pin->slug . $ts);
+            return $this->resOK($pin->slug . '?key=' . $key . '&ts=' . $ts);
+        }
+
+        return $this->resOK($pin->slug);
     }
 
     public function deletePin(Request $request)
