@@ -229,6 +229,8 @@ class PinController extends Controller
 
         if ($pin->visit_type != 0)
         {
+            $pinRepository = new PinRepository();
+            $pinRepository->drafts($user->slug, 0, 0, true);
             $ts = time();
             return $this->resCreated($pin->slug . '?key=' . (md5(config('app.md5') . $pin->slug . $ts)) . '&ts=' . $ts);
         }
@@ -306,6 +308,7 @@ class PinController extends Controller
         }
 
         $pinRepository->item($slug, true);
+        $pinRepository->drafts($user->slug, 0, 0, true);
 
         if ($pin->visit_type != 0)
         {
