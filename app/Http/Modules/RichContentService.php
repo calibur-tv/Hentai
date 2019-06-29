@@ -123,6 +123,61 @@ class RichContentService
         return json_decode($data, true);
     }
 
+    public function paresPureContent(array $data)
+    {
+        $result = '';
+        foreach ($data as $row)
+        {
+            $type = $row['type'];
+            if ($type === 'paragraph')
+            {
+                $result .= $row['data']['text'];
+            }
+            else if ($type === 'header')
+            {
+                $result .= $row['data']['text'];
+            }
+            else if ($type === 'list')
+            {
+                foreach ($row['data']['items'] as $i => $item)
+                {
+                    $result .= (($i + 1) . ' ' . $item);
+                }
+            }
+            else if ($type === 'checklist')
+            {
+                foreach ($row['data']['items'] as $i => $item)
+                {
+                    $result .= (($i + 1) . ' ' . $item['text']);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function parseRichPoster($title, array $data)
+    {
+        if ($title['banner'])
+        {
+            return [
+                'type' => 'image',
+                'data' => $title['banner']
+            ];
+        }
+
+        foreach ($data as $row)
+        {
+            $type = $row['type'];
+            if ($type === 'image')
+            {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
     public function detectContentRisk($data, $withImage = true)
     {
         if (gettype($data) === 'string')

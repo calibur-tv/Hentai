@@ -39,6 +39,8 @@ class PinResource extends JsonResource
             'slug' => $this->slug,
             'title' => $title,
             'content' => $content,
+            'media' => $richContentService->parseRichPoster($title, $content),
+            'intro' => $richContentService->paresPureContent($content),
             'author' => new UserItemResource($this->author),
             'tags' => TagItemResource::collection($this->tags),
             'area' => new TagItemResource($this->area),
