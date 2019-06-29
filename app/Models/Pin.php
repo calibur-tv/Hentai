@@ -94,8 +94,8 @@ class Pin extends Model
         $pin = self::create([
             'user_slug' => $user->slug,
             'content_type' => $form['content_type'],
-            'image_count' => $form['image_count'],
-            'last_edit_at' => Carbon::now()
+            'last_edit_at' => Carbon::now(),
+            'visit_type' => $form['visit_type']
         ]);
 
         $pin->update([
@@ -114,11 +114,8 @@ class Pin extends Model
             'event_slug' => $user->slug
         ]);
 
-        if ($form['image_count'] > 0)
-        {
-            $job = (new PinTrial($pin->id, 0));
-            dispatch($job);
-        }
+        $job = (new PinTrial($pin->id, 0));
+        dispatch($job);
 
         return $pin;
     }
@@ -140,7 +137,8 @@ class Pin extends Model
             ->first();
 
         $pin->update([
-            'last_edit_at' => Carbon::now()
+            'last_edit_at' => Carbon::now(),
+            'visit_type' => $form['visit_type']
         ]);
 
         $pin->content()->create([
@@ -152,11 +150,8 @@ class Pin extends Model
             'event_slug' => $user->slug
         ]);
 
-        if ($form['image_count'] > 0)
-        {
-            $job = (new PinTrial($pin->id, 1));
-            dispatch($job);
-        }
+        $job = (new PinTrial($pin->id, 1));
+        dispatch($job);
 
         return $pin;
     }

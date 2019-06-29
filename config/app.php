@@ -106,6 +106,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'md5' => env('MD5_SALT'),
+
     'cipher' => 'AES-256-CBC',
 
     'tag' => [

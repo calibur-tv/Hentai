@@ -56,12 +56,12 @@ class PinController extends Controller
                 return $this->resErrRole();
             }
 
-            if ($key !== md5(slug2id($pin->slug), $ts))
+            if ($key !== md5(config('app.md5') . $pin->slug . $ts))
             {
                 return $this->resErrRole('密码不正确');
             }
 
-            if (abs(time() - $ts) > 3000)
+            if (abs(time() - $ts) > 300)
             {
                 return $this->resErrRole('密码已过期');
             }
@@ -179,6 +179,7 @@ class PinController extends Controller
             'content' => 'required|array',
             'area' => 'required|string',
             'notebook' => 'required|string',
+            'publish' => 'required|boolean'
         ]);
 
         if ($validator->fails())
@@ -213,18 +214,12 @@ class PinController extends Controller
             return $this->resErrBad('非法的专栏');
         }
 
-        $content = $request->get('content');
-        $images = array_filter($content, function ($row)
-        {
-            return $row['type'] === 'image';
-        });
-
         $pin = Pin::createPin([
             'area' => $area,
             'notebook' => $notebook,
-            'content' => $content,
-            'image_count' => count($images),
-            'content_type' => 1
+            'content' => $request->get('content'),
+            'content_type' => 1,
+            'visit_type' => $request->get('publish') ? 0 : 1
         ], $user);
 
         if (is_null($pin))
@@ -242,6 +237,7 @@ class PinController extends Controller
             'content' => 'required|array',
             'area' => 'required|string',
             'notebook' => 'required|string',
+            'publish' => 'required|boolean'
         ]);
 
         if ($validator->fails())
@@ -290,19 +286,12 @@ class PinController extends Controller
             return $this->resErrBad('非法的专栏');
         }
 
-        $content = $request->get('content');
-        $images = array_filter($content, function ($row)
-        {
-            return $row['type'] === 'image';
-        });
-
         $pin = Pin::updatePin([
             'slug' => $slug,
             'tag' => $tag,
             'notebook' => $notebook,
-            'content' => $content,
-            'image_count' => count($images),
-            'content_type' => 1
+            'content' => $request->get('content'),
+            'visit_type' => $request->get('publish') ? 0 : $pin->visit_type
         ], $user);
 
         if (is_null($pin))
