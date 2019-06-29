@@ -120,6 +120,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
+        $route->get('drafts', 'PinController@userDrafts');
+
         $route->get('trials', 'PinController@trials');
 
         $route->post('resolve', 'PinController@resolve');
@@ -130,8 +132,6 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     $route->group(['prefix' => 'editor'], function () use ($route)
     {
         $route->get('fetch_site', 'PinController@fetchSiteMeta');
-
-        $route->get('show_meta', 'PinController@show_meta');
     });
 });
 

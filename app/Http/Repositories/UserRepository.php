@@ -38,25 +38,6 @@ class UserRepository extends Repository
         return $result;
     }
 
-    public function list($ids)
-    {
-        if (empty($ids))
-        {
-            return [];
-        }
-
-        $result = [];
-        foreach ($ids as $id)
-        {
-            $item = $this->item($id);
-            if ($item)
-            {
-                $result[] = $item;
-            }
-        }
-        return $result;
-    }
-
     public function followers($slug, $refresh = false, $seenIds = [], $count = 15)
     {
         // 动态有序要分页

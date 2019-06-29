@@ -230,8 +230,7 @@ class PinController extends Controller
         if ($pin->visit_type != 0)
         {
             $ts = time();
-            $key = md5(config('app.md5') . $pin->slug . $ts);
-            return $this->resCreated($pin->slug . '?key=' . $key . '&ts=' . $ts);
+            return $this->resCreated($pin->slug . '?key=' . (md5(config('app.md5') . $pin->slug . $ts)) . '&ts=' . $ts);
         }
 
         return $this->resCreated($pin->slug);
@@ -311,8 +310,7 @@ class PinController extends Controller
         if ($pin->visit_type != 0)
         {
             $ts = time();
-            $key = md5(config('app.md5') . $pin->slug . $ts);
-            return $this->resOK($pin->slug . '?key=' . $key . '&ts=' . $ts);
+            return $this->resOK($pin->slug . '?key=' . (md5(config('app.md5') . $pin->slug . $ts)) . '&ts=' . $ts);
         }
 
         return $this->resOK($pin->slug);
@@ -447,6 +445,37 @@ class PinController extends Controller
             'success' => 1,
             'meta' => $result
         ], 200);
+    }
+
+    public function userDrafts(Request $request)
+    {
+        $user = $request->user();
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('count') ?: 10;
+
+        $pinRepository = new PinRepository();
+
+        $ids = $pinRepository->drafts($user->slug, $page - 1, $take);
+        if ($ids['total'] === 0)
+        {
+            return $this->resOK($ids);
+        }
+
+        $pins = $pinRepository->list($ids['result']);
+
+        $secret = [];
+        $ts = time();
+        $salt = config('app.md5');
+
+        foreach ($pins as $pin)
+        {
+            $secret[] = $pin->slug . '?key=' . (md5($salt . $pin->slug . $ts)) . '&ts=' . $ts;
+        }
+
+        $ids['result'] = $pins;
+        $ids['extra'] = $secret;
+
+        return $this->resOK($ids);
     }
 
     /**

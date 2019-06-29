@@ -64,4 +64,19 @@ class PinRepository extends Repository
 
         return $result;
     }
+
+    public function drafts($slug, $page, $take, $refresh = false)
+    {
+        $ids = $this->RedisSort("user-{$slug}-drafts", function () use ($slug)
+        {
+            return Pin
+                ::where('user_slug', $slug)
+                ->where('visit_type', 1)
+                ->orderBy('last_edit_at', 'DESC')
+                ->pluck('last_edit_at', 'slug')
+                ->toArray();
+        }, ['force' => $refresh, 'is_time' => true]);
+
+        return $this->filterIdsByPage($ids, $page, $take, true);
+    }
 }

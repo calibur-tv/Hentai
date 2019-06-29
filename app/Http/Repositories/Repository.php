@@ -13,6 +13,25 @@ use Illuminate\Support\Facades\Redis;
 
 class Repository
 {
+    public function list($ids)
+    {
+        if (empty($ids))
+        {
+            return [];
+        }
+
+        $result = [];
+        foreach ($ids as $id)
+        {
+            $item = $this->item($id);
+            if ($item)
+            {
+                $result[] = $item;
+            }
+        }
+        return $result;
+    }
+
     public function RedisItem($key, $func, $force = false, $exp = 'd')
     {
         $cache = $force ? null : Redis::GET($key);

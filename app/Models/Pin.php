@@ -114,8 +114,11 @@ class Pin extends Model
             'event_slug' => $user->slug
         ]);
 
-        $job = (new PinTrial($pin->id, 0));
-        dispatch($job);
+        if ($pin->visit_type != 1)
+        {
+            $job = (new PinTrial($pin->id, 0));
+            dispatch($job);
+        }
 
         return $pin;
     }
@@ -150,8 +153,11 @@ class Pin extends Model
             'event_slug' => $user->slug
         ]);
 
-        $job = (new PinTrial($pin->id, 1));
-        dispatch($job);
+        if ($pin->visit_type != 1)
+        {
+            $job = (new PinTrial($pin->id, 0));
+            dispatch($job);
+        }
 
         return $pin;
     }
