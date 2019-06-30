@@ -170,26 +170,27 @@ class PinController extends Controller
 
         $user = $request->user();
         $slug = $request->get('slug');
-        $pinRepository = new PinRepository();
 
-        $pin = $pinRepository->item($slug);
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
+
         if (is_null($pin))
         {
             return $this->resErrNotFound('不存在的文章');
         }
 
-        if ($pin->author->slug != $user->slug)
+        if ($pin->user_slug != $user->slug)
         {
-            return $this->resErrRole('不能修改的文章');
+            return $this->resErrRole('不能修改别人的文章');
         }
 
-        $pin = Pin::updatePin(
-            $slug,
+        $result = $pin->updatePin(
             $request->get('content'),
             $request->get('publish') ? 0 : $pin->visit_type
         );
 
-        if (is_null($pin))
+        if (!$result)
         {
             return $this->resErrBad('请勿发表敏感内容');
         }
@@ -209,21 +210,24 @@ class PinController extends Controller
     {
         $user = $request->user();
         $slug = $request->get('slug');
-        $pinRepository = new PinRepository();
 
-        $pin = $pinRepository->item($slug);
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
+
         if (is_null($pin))
         {
             return $this->resErrNotFound();
         }
 
-        if ($pin->author->slug != $user->slug)
+        if ($pin->user_slug != $user->slug)
         {
             return $this->resErrRole();
         }
 
-        Pin::deletePin($slug, $user, 2);
-        $pinRepository->item($slug, true);
+        $pin->deletePin();
+
+        event(new \App\Events\Pin\Delete($pin, $user));
 
         return $this->resNoContent();
     }

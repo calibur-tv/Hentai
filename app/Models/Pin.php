@@ -105,45 +105,32 @@ class Pin extends Model
         return $pin;
     }
 
-    public static function updatePin($slug, $content, $visit_type)
+    public function updatePin($content, $visit_type)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
 
         if ($risk['risk_score'] > 0)
         {
-            return null;
+            return false;
         }
 
-        $pin = self
-            ::where('slug', $slug)
-            ->first();
-
-        $pin->update([
+        $this->update([
             'last_edit_at' => Carbon::now(),
             'visit_type' => $visit_type
         ]);
 
-        $pin->content()->create([
+        $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        return $pin;
+        return true;
     }
 
-    public static function deletePin($slug, $user, $type)
+    public function deletePin()
     {
-        $pin = self
-            ::where('slug', $slug)
-            ->first();
-
-        $pin->delete();
-        $pin->content()->delete();
-        $pin->tags()->delete();
-        $pin->timeline()->create([
-            'event_type' => $type,
-            'event_slug' => $user->slug
-        ]);
+        $this->delete();
+        $this->content()->delete();
     }
 
     public function reviewPin($type)
