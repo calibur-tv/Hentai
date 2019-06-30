@@ -1,7 +1,7 @@
 {
-  "name": "Hentai",
+  "name": "hentai",
   "version": "1.0.0",
-  "description": "Lumen project",
+  "description": "calibur.tv backend project",
   "author": "falstack",
   "private": true,
   "scripts": {
