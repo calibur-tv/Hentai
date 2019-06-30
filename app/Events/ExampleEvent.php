@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\Pin;
+namespace App\Events;
 
 use Illuminate\Queue\SerializesModels;
 

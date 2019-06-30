@@ -136,7 +136,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         /**
          * 用户注册 -> 0
-         * 收藏标签 -> 1
+         * 收藏分区 -> 1
+         * 创建分区 -> 2
+         * 创建文章 -> 3
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }

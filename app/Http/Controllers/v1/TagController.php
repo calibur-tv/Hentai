@@ -110,15 +110,9 @@ class TagController extends Controller
             [
                 'alias' => $name,
                 'intro' => ''
-            ]
+            ],
+            $user
         );
-
-        // TODO 操作缓存
-        if ($isNotebook)
-        {
-            $user->bookmark($tag, Tag::class);
-            $tagRepository->bookmarks($user->slug, true);
-        }
 
         return $this->resOK(new TagItemResource($tag));
     }

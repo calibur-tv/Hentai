@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Tag\Create;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ExampleListener
+class UpdateCreatorTimeline
 {
     /**
      * Create the event listener.
@@ -23,8 +23,12 @@ class ExampleListener
      * @param  ExampleEvent  $event
      * @return void
      */
-    public function handle(Event $event)
+    public function handle(\App\Events\Tag\Create $event)
     {
-        //
+        $user = $event->user;
+        $user->timeline()->create([
+            'event_type' => 2,
+            'event_slug' => $event->tag->slug
+        ]);
     }
 }

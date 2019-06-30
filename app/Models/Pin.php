@@ -77,7 +77,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $visit_type, $user_slug, $area, $notebook)
+    public static function createPin($content, $content_type, $visit_type, $user, $area, $notebook)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -88,7 +88,7 @@ class Pin extends Model
         }
 
         $pin = self::create([
-            'user_slug' => $user_slug,
+            'user_slug' => $user->slug,
             'content_type' => $content_type,
             'visit_type' => $visit_type,
             'last_edit_at' => Carbon::now()
@@ -102,7 +102,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Create($pin, $area, $notebook));
+        event(new \App\Events\Pin\Create($pin, $user, $area, $notebook));
 
         return $pin;
     }

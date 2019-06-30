@@ -52,7 +52,7 @@ class AddDefaultTagRelation
         $parentSlug = config('app.tag.notebook');
         $name = '默认专栏';
 
-        $tag = Tag::createTag(
+        Tag::createTag(
             [
                 'name' => $name,
                 'parent_slug' => $parentSlug,
@@ -62,9 +62,8 @@ class AddDefaultTagRelation
             [
                 'alias' => $name,
                 'intro' => ''
-            ]
+            ],
+            $user
         );
-
-        $user->bookmark($tag, Tag::class);
     }
 }

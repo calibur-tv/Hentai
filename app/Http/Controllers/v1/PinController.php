@@ -136,7 +136,7 @@ class PinController extends Controller
             $request->get('content'),
             1,
             $request->get('publish') ? 0 : 1,
-            $user->slug,
+            $user,
             $area,
             $notebook
         );

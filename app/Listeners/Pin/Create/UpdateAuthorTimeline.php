@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Pin\Create;
 
+use App\Http\Repositories\PinRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ExampleListener
+class UpdateAuthorTimeline
 {
     /**
      * Create the event listener.
@@ -23,8 +24,11 @@ class ExampleListener
      * @param  ExampleEvent  $event
      * @return void
      */
-    public function handle(Event $event)
+    public function handle(\App\Events\Pin\Create $event)
     {
-        //
+        $event->user->timeline()->create([
+            'event_type' => 3,
+            'event_slug' => $event->pin->slug
+        ]);
     }
 }

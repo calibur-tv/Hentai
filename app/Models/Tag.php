@@ -90,7 +90,7 @@ class Tag extends Model
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
 
-    public static function createTag(array $data, array $extra)
+    public static function createTag(array $data, array $extra, $user)
     {
         $tag = self::create($data);
         $slug = id2slug($tag->id);
@@ -100,6 +100,8 @@ class Tag extends Model
         $tag->extra()->create([
             'text' => json_encode($extra, JSON_UNESCAPED_UNICODE)
         ]);
+
+        event(new \App\Events\Tag\Create($tag, $user));
 
         return $tag;
     }

@@ -21,6 +21,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\InitPinTimeline',
             'App\Listeners\Pin\Create\AddPinTagRelation',
             'App\Listeners\Pin\Create\RefreshUserDrafts',
+            'App\Listeners\Pin\Create\UpdateAuthorTimeline',
         ],
         'App\Events\Pin\Update' => [
             'App\Listeners\Pin\Update\Trial',
@@ -30,6 +31,11 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Pin\Delete' => [
             'App\Listeners\Pin\Delete\UpdatePinTimeline',
             'App\Listeners\Pin\Delete\RefreshCache',
+            'App\Listeners\Pin\Delete\UpdateAuthorTimeline',
+        ],
+        'App\Events\Tag\Create' => [
+            'App\Listeners\Tag\Create\UpdateCreatorBookmark',
+            'App\Listeners\Tag\Create\UpdateCreatorTimeline',
         ],
     ];
 }
