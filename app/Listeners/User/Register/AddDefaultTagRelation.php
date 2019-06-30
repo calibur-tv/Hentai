@@ -49,21 +49,15 @@ class AddDefaultTagRelation
 
     protected function createDefaultNotebook($user)
     {
-        $parentSlug = config('app.tag.notebook');
-        $name = '默认专栏';
+        $parent = Tag
+            ::where('slug', config('app.tag.notebook'))
+            ->first();
 
-        Tag::createTag(
-            [
-                'name' => $name,
-                'parent_slug' => $parentSlug,
-                'creator_slug' => $user->slug,
-                'deep' => 2
-            ],
-            [
-                'alias' => $name,
-                'intro' => ''
-            ],
-            $user
-        );
+        if (is_null($parent))
+        {
+            return;
+        }
+
+        Tag::createTag('默认专栏', $user, $parent);
     }
 }

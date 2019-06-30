@@ -36,21 +36,6 @@ class Tag extends Model
         'migration_state'
     ];
 
-    public function setNameAttribute($name)
-    {
-        $this->attributes['name'] = Purifier::clean($name);
-    }
-
-    public function setAvatarAttribute($url)
-    {
-        $this->attributes['avatar'] = trimImage($url);
-    }
-
-    public function getAvatarAttribute($avatar)
-    {
-        return patchImage($avatar, 'default-poster');
-    }
-
     public function parent()
     {
         return $this->belongsTo('App\Models\Tag', 'parent_slug', 'slug');
@@ -91,25 +76,39 @@ class Tag extends Model
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
 
-    public static function createTag(array $data, array $extra, $user)
+    public static function createTag($name, $user, $parent)
     {
-        $tag = self::create($data);
+        $tag = self::create([
+            'name' => '',
+            'creator_slug' => $user->slug,
+            'parent_slug' => $parent->slug,
+            'deep' => $parent->deep + 1
+        ]);
         $slug = id2slug($tag->id);
         $tag->update([
             'slug' => $slug
         ]);
+
         $tag->extra()->create([
-            'text' => json_encode($extra, JSON_UNESCAPED_UNICODE)
+            'text' => json_encode([
+                'name' => $name,
+                'alias' => $name,
+                'avatar' => '',
+                'intro' => ''
+            ], JSON_UNESCAPED_UNICODE)
         ]);
 
-        event(new \App\Events\Tag\Create($tag, $user));
+        event(new \App\Events\Tag\Create($tag, $user, $parent));
 
         return $tag;
     }
 
     public function updateTag(array $data, array $extra)
     {
-        $this->update($data);
+        if (!empty($data))
+        {
+            $this->update($data);
+        }
 
 //        $text = $this->extra()
 //            ->pluck('text')

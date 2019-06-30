@@ -12,14 +12,16 @@ class Create
 
     public $tag;
     public $user;
+    public $parent;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Tag $tag, User $user)
+    public function __construct(Tag $tag, User $user, Tag $parent)
     {
         $this->tag = $tag;
         $this->user = $user;
+        $this->parent = $parent;
     }
 }

@@ -86,10 +86,11 @@ class TagController extends Controller
             return $this->resErrRole();
         }
 
-        $tagRepository = new TagRepository();
-        $parentTag = $tagRepository->item($parentSlug);
+        $parent = Tag
+            ::where('slug', $parentSlug)
+            ->first();
 
-        if (is_null($parentTag))
+        if (is_null($parent))
         {
             return $this->resErrBad();
         }
@@ -100,19 +101,7 @@ class TagController extends Controller
             return $this->resErrBad();
         }
 
-        $tag = Tag::createTag(
-            [
-                'name' => $name,
-                'parent_slug' => $parentSlug,
-                'creator_slug' => $user->slug,
-                'deep' => $parentTag->deep + 1
-            ],
-            [
-                'alias' => $name,
-                'intro' => ''
-            ],
-            $user
-        );
+        $tag = Tag::createTag($name, $user, $parent);
 
         return $this->resOK(new TagItemResource($tag));
     }
@@ -153,11 +142,10 @@ class TagController extends Controller
         }
 
         $tag->updateTag(
+            [],
             [
                 'avatar' => $request->get('avatar'),
-                'name' => $request->get('name')
-            ],
-            [
+                'name' => $request->get('name'),
                 'intro' => $request->get('intro'),
                 'alias' => $request->get('alias')
             ]
