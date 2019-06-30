@@ -111,9 +111,11 @@ class Tag extends Model
     {
         $this->update($data);
 
-        $text = $this->extra()->pluck('text');
-        $text = json_decode($text, true);
-        $newData = array_merge($extra, $text);
+//        $text = $this->extra()
+//            ->pluck('text')
+//            ->first();
+//        $text = json_decode($text, true);
+        $newData = array_merge($extra, []);
         foreach ($newData as $key => $val)
         {
             $newData[$key] = Purifier::clean($val);

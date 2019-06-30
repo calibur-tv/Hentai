@@ -30,7 +30,7 @@ class Test extends Command
     public function handle()
     {
         $tags = Tag
-            ::where('migration_state', '<>', 1)
+            ::where('migration_state', '<>', 2)
             ->take(2000)
             ->get();
 
@@ -38,11 +38,13 @@ class Test extends Command
         {
             $tag->updateTag(
                 [
-                    'migration_state' => 1,
+                    'migration_state' => 2,
                 ],
                 [
                     'name' => $tag->name,
-                    'avatar' => $tag->avatar
+                    'avatar' => $tag->avatar,
+                    'alias' => $tag->name,
+                    'intro' => ''
                 ]
             );
 
