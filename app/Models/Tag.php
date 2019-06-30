@@ -33,6 +33,7 @@ class Tag extends Model
         'seen_user_count',      // 看过的人数（可以在这个 tag 下发表文章的人数）（bookmark）
         'followers_count',      // 订阅的人数（可以收到 tag 下文章推送的人数）（follow）
         'activity_stat',        // tag 的活跃度计数
+        'migration_state'
     ];
 
     public function setNameAttribute($name)
