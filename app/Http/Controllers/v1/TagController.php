@@ -142,7 +142,7 @@ class TagController extends Controller
         }
 
         $tag->updateTag([
-            'avatar' => $request->get('avatar'),
+            'avatar' => trimImage($request->get('avatar')),
             'name' => $request->get('name'),
             'intro' => $request->get('intro'),
             'alias' => $request->get('alias')

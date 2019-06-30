@@ -21,7 +21,7 @@ class TagBodyResource extends JsonResource
                 'slug' => $this->slug,
                 'parent_slug' => $this->parent_slug,
                 'name' => $content['name'],
-                'avatar' => $content['avatar'],
+                'avatar' => patchImage($content['avatar']),
                 'alias' => $content['alias'],
                 'intro' => $content['intro']
             ],
