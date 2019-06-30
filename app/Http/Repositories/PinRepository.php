@@ -73,4 +73,32 @@ class PinRepository extends Repository
 
         return $this->filterIdsByPage($ids, $page, $take, true);
     }
+
+    public function decrypt($request)
+    {
+        $key = $request->get('key');
+        $ts = $request->get('ts');
+        if (!$key || !$ts)
+        {
+            return '该文章尚未发布';
+        }
+
+        if ($key !== md5(config('app.md5') . $request->get('slug') . $ts))
+        {
+            return '密码不正确';
+        }
+
+        if (abs(time() - $ts) > 300)
+        {
+            return '密码已过期';
+        }
+
+        return '';
+    }
+
+    public function encrypt($slug)
+    {
+        $ts = time();
+        return $slug . '?key=' . (md5(config('app.md5') . $slug . $ts)) . '&ts=' . $ts;
+    }
 }

@@ -46,21 +46,10 @@ class PinController extends Controller
 
         if ($pin->visit_type != 0)
         {
-            $key = $request->get('key');
-            $ts = $request->get('ts');
-            if (!$key || !$ts)
+            $errMessage = $pinRepository->decrypt($request);
+            if ($errMessage)
             {
-                return $this->resErrRole();
-            }
-
-            if ($key !== md5(config('app.md5') . $pin->slug . $ts))
-            {
-                return $this->resErrRole('密码不正确');
-            }
-
-            if (abs(time() - $ts) > 300)
-            {
-                return $this->resErrRole('密码已过期');
+                return $this->resErrRole($errMessage);
             }
         }
 
@@ -148,8 +137,8 @@ class PinController extends Controller
 
         if ($pin->visit_type != 0)
         {
-            $ts = time();
-            return $this->resCreated($pin->slug . '?key=' . (md5(config('app.md5') . $pin->slug . $ts)) . '&ts=' . $ts);
+            $pinRepository = new PinRepository();
+            return $this->resCreated($pinRepository->encrypt($pin->slug));
         }
 
         return $this->resCreated($pin->slug);
@@ -197,8 +186,8 @@ class PinController extends Controller
 
         if ($pin->visit_type != 0)
         {
-            $ts = time();
-            return $this->resOK($pin->slug . '?key=' . (md5(config('app.md5') . $pin->slug . $ts)) . '&ts=' . $ts);
+            $pinRepository = new PinRepository();
+            return $this->resOK($pinRepository->encrypt($pin->slug));
         }
 
         return $this->resOK($pin->slug);
@@ -290,14 +279,10 @@ class PinController extends Controller
         }
 
         $pins = $pinRepository->list($ids['result']);
-
         $secret = [];
-        $ts = time();
-        $salt = config('app.md5');
-
         foreach ($pins as $pin)
         {
-            $secret[] = $pin->slug . '?key=' . (md5($salt . $pin->slug . $ts)) . '&ts=' . $ts;
+            $secret[] = $pinRepository->encrypt($pin->slug);
         }
 
         $ids['result'] = $pins;
