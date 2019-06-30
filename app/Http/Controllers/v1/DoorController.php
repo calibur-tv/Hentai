@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Events\UserRegister;
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Qiniu\Qshell;
 use App\Services\Sms\Message;
@@ -138,7 +140,7 @@ class DoorController extends Controller
      *      @Parameter("access", description="手机号", type="number", required=true),
      *      @Parameter("secret", description="`6至16位`的密码", type="string", required=true),
      *      @Parameter("authCode", description="6位数字的短信验证码", type="number", required=true),
-     *      @Parameter("inviteCode", description="邀请码", type="number", required=false),
+     *      @Parameter("inviteCode", description="邀请码", type="string", required=false),
      * })
      *
      * @Transaction({
@@ -176,29 +178,20 @@ class DoorController extends Controller
             'phone' => $access
         ];
 
+        $inviteCode = $request->get('inviteCode');
+        if ($inviteCode)
+        {
+            $userRepository = new UserRepository();
+            $invitor = $userRepository->item($inviteCode);
+            if ($invitor)
+            {
+                $data['invitor_slug'] = $inviteCode;
+            }
+        }
+
         $user = User::createUser($data);
 
-//        $userId = $user->id;
-//        $UserIpAddress = new UserIpAddress();
-//        $UserIpAddress->add(
-//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-//            $userId
-//        );
-//
-//        $inviteCode = $request->get('inviteCode');
-//        if ($inviteCode)
-//        {
-//            $job = (new \App\Jobs\User\InviteUser($userId, $inviteCode));
-//            dispatch($job);
-//        }
-//        else
-//        {
-//            $virtualCoinService = new VirtualCoinService();
-//            $virtualCoinService->coinGift($userId, 1);
-//        }
-//
-//        $userRepository = new UserRepository();
-//        $userRepository->migrateSearchIndex('C', $userId);
+        event(new UserRegister($user));
 
         return $this->resCreated($user->api_token);
     }

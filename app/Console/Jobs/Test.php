@@ -28,20 +28,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $users = User
-            ::withTrashed()
-            ->where('migration_state', '<>', 6)
-            ->take(2000)
-            ->get();
-
-        foreach ($users as $user)
-        {
-            $user->createDefaultNotebook();
-            $user->update([
-                'migration_state' => 6
-            ]);
-        }
-
         return true;
     }
 }

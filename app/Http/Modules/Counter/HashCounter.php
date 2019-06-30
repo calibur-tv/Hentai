@@ -125,6 +125,8 @@ class HashCounter
             return;
         }
 
+        unset($result['migrate_at']);
+
         DB
             ::table($this->table)
             ->where($this->uniqueKey, $slug)

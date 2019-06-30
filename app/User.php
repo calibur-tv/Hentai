@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Models\Tag;
 use App\Services\Relation\Traits\CanBeFollowed;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -175,7 +174,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $token;
     }
 
-    public static function createUser($data, $invitorSlug = '')
+    public static function createUser($data)
     {
         $user = self::create($data);
         $slug = 'cc-' . id2slug($user->id);
@@ -196,60 +195,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
         $user->slug = $slug;
         $user->api_token = $user->createApiToken();
-
-        $user->timeline()->create([
-            'event_type' => 0,
-            'event_slug' => $invitorSlug
-        ]);
-
-        $user->joinNewbieZone();
-        $user->createDefaultNotebook();
+        $user->invitor_slug = $data['invitor_slug'] ?? '';
 
         return $user;
-    }
-
-    public function joinNewbieZone()
-    {
-        $tagSlug = config('app.tag.newbie');
-        $this->bookmark(
-            Tag::where('slug', $tagSlug)->first(),
-            Tag::class
-        );
-
-        $timeline = $this
-            ->timeline()
-            ->withTrashed()
-            ->firstOrCreate([
-                'event_type' => 1,
-                'event_slug' => $tagSlug
-            ]);
-
-        if ($timeline->deleted_at)
-        {
-            $timeline->restore();
-        }
-
-        // todo cache
-    }
-
-    public function createDefaultNotebook()
-    {
-        $parentSlug = config('app.tag.notebook');
-        $name = '默认专栏';
-
-        $tag = Tag::createTag(
-            [
-                'name' => $name,
-                'parent_slug' => $parentSlug,
-                'creator_slug' => $this->slug,
-                'deep' => 2
-            ],
-            [
-                'alias' => $name,
-                'intro' => ''
-            ]
-        );
-
-        $this->bookmark($tag, Tag::class);
     }
 }

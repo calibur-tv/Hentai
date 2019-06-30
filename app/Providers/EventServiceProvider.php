@@ -12,8 +12,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\ExampleEvent' => [
-            'App\Events\Listeners\ExampleListener',
+        'App\Events\UserRegister' => [
+            'App\Listeners\UserRegister\InitUserTimeline',
+            'App\Listeners\UserRegister\AddDefaultTagRelation',
         ],
     ];
 }
