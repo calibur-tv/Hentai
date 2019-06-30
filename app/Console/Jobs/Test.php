@@ -48,7 +48,7 @@ class Test extends Command
                 ]
             );
 
-            Log::info('tag migrate success' , $tag->id);
+            Log::info('tag migrate success' . $tag->id);
         }
         return true;
     }
