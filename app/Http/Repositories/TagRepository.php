@@ -22,6 +22,10 @@ class TagRepository extends Repository
         {
             $tag = Tag
                 ::where('slug', $slug)
+                ->with(['content' => function ($query)
+                {
+                    $query->orderBy('created_at', 'desc');
+                }])
                 ->first();
 
             if (is_null($tag))
@@ -46,6 +50,21 @@ class TagRepository extends Repository
         {
             $tag = Tag
                 ::where('slug', $slug)
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        },
+                        'children' => function ($query)
+                        {
+                            $query->with(['content' => function ($q)
+                            {
+                                $q->orderBy('created_at', 'desc');
+                            }]);
+                        }
+                    ]
+                )
                 ->first();
 
             if (is_null($tag))
@@ -53,11 +72,7 @@ class TagRepository extends Repository
                 return 'nil';
             }
 
-            return [
-                'tag' => new TagBodyResource($tag),
-                'parent' => $tag->parent_slug ? new TagItemResource($tag->parent()->first()) : null,
-                'children' => TagItemResource::collection($tag->children()->get())
-            ];
+            return new TagBodyResource($tag);
         }, $refresh);
 
         if ($result === 'nil')
@@ -112,9 +127,11 @@ class TagRepository extends Repository
 
             $list = $user
                 ->bookmarks(Tag::class)
-                ->with('extra')
-                ->get()
-                ->toArray();
+                ->with(['content' => function ($query)
+                {
+                    $query->orderBy('created_at', 'desc');
+                }])
+                ->get();
 
             if (empty($list))
             {
@@ -136,30 +153,25 @@ class TagRepository extends Repository
             $topicSlug = config('app.tag.topic');
             $notebookSlug = config('app.tag.notebook');
 
+            $list = TagItemResource::collection($list);
+
             foreach ($list as $item)
             {
-                $one = [
-                    'slug' => $item['slug'],
-                    'avatar' => $item['avatar'],
-                    'name' => $item['name'],
-                    'extra' => json_decode($item['extra']['text'], true)
-                ];
-
                 if ($item['parent_slug'] === $bangumiSlug)
                 {
-                    $bangumi[] = $one;
+                    $bangumi[] = $item;
                 }
                 else if ($item['parent_slug'] === $gameSlug)
                 {
-                    $game[] = $one;
+                    $game[] = $item;
                 }
                 else if ($item['parent_slug'] === $topicSlug)
                 {
-                    $topic[] = $one;
+                    $topic[] = $item;
                 }
                 else if ($item['parent_slug'] === $notebookSlug)
                 {
-                    $notebook[] = $one;
+                    $notebook[] = $item;
                 }
             }
 

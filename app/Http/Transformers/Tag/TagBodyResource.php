@@ -14,24 +14,18 @@ class TagBodyResource extends JsonResource
 {
     public function toArray($request)
     {
-        $extra = $this->extra()->pluck('text')->first();
-        $extra = json_decode($extra, true);
-        $parentSlug = $this->parent_slug;
-        $area = array_flip(config('app.tag'));
-        $type = 'tag';
-        if (isset($area[$parentSlug]))
-        {
-            $type = $area[$parentSlug];
-        }
+        $content = json_decode($this->content->text, true);
 
         return [
-            'slug' => $this->slug,
-            'name' => $this->name,
-            'avatar' => $this->avatar,
-            'type' => $type,
-            'parent_slug' => $parentSlug,
-            'alias' => $extra['alias'],
-            'intro' => $extra['intro']
+            'tag' => [
+                'slug' => $this->slug,
+                'parent_slug' => $this->parent_slug,
+                'name' => $content['name'],
+                'avatar' => $content['avatar'],
+                'alias' => $content['alias'],
+                'intro' => $content['intro']
+            ],
+            'children' => TagItemResource::collection($this->children)
         ];
     }
 }

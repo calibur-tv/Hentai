@@ -14,10 +14,13 @@ class TagItemResource extends JsonResource
 {
     public function toArray($request)
     {
+        $content = json_decode($this->content->text, true);
+
         return [
             'slug' => $this->slug,
-            'name' => $this->name,
-            'avatar' => $this->avatar,
+            'name' => $content['name'],
+            'avatar' => $content['avatar'],
+            'intro' => $content['intro'],
             'parent_slug' => $this->parent_slug,
             'deep' => $this->deep
         ];

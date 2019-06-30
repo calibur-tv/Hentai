@@ -107,7 +107,7 @@ class TagController extends Controller
     }
 
     /**
-     * 更新 tag（头像，拼写错误，仅支持后台操作）
+     * 更新 tag
      */
     public function update(Request $request)
     {
@@ -141,21 +141,12 @@ class TagController extends Controller
             return $this->resErrRole();
         }
 
-        $tag->updateTag(
-            [],
-            [
-                'avatar' => $request->get('avatar'),
-                'name' => $request->get('name'),
-                'intro' => $request->get('intro'),
-                'alias' => $request->get('alias')
-            ]
-        );
-
-        // TODO 敏感词检测
-        $tagRepository = new TagRepository();
-        $tagRepository->item($slug, true);
-        $tagRepository->relation_item($slug, true);
-        $tagRepository->bookmarks($slug, true);
+        $tag->updateTag([
+            'avatar' => $request->get('avatar'),
+            'name' => $request->get('name'),
+            'intro' => $request->get('intro'),
+            'alias' => $request->get('alias')
+        ], $user);
 
         return $this->resNoContent();
     }
@@ -180,10 +171,9 @@ class TagController extends Controller
             return $this->resErrParams($validator);
         }
 
-        $trashSlug = config('app.tag.trash');
         $slug = $request->get('slug');
 
-        if ($slug === $trashSlug)
+        if ($slug === config('app.tag.trash'))
         {
             return $this->resErrRole();
         }
@@ -197,15 +187,7 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        $tag->deleteTag();
-
-        Tag
-            ::where('parent_slug', $slug)
-            ->update([
-                'parent_slug' => $trashSlug // 回收站
-            ]);
-
-        // TODO cache
+        $tag->deleteTag($user);
 
         return $this->resNoContent();
     }

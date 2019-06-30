@@ -29,27 +29,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $tags = Tag
-            ::where('migration_state', '<>', 2)
-            ->take(2000)
-            ->get();
-
-        foreach ($tags as $tag)
-        {
-            $tag->updateTag(
-                [
-                    'migration_state' => 2,
-                ],
-                [
-                    'name' => $tag->name,
-                    'avatar' => $tag->avatar,
-                    'alias' => $tag->name,
-                    'intro' => ''
-                ]
-            );
-
-            Log::info('tag migrate success' . $tag->id);
-        }
         return true;
     }
 }

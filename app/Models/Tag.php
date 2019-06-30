@@ -23,8 +23,6 @@ class Tag extends Model
 
     protected $fillable = [
         'slug',
-        'name',
-        'avatar',
         'deep',
         'redirect_slug',
         'creator_slug',
@@ -66,13 +64,18 @@ class Tag extends Model
         return $this->morphedByMany('App\Models\Pin', 'taggable');
     }
 
-    public function extra()
+    public function content()
     {
         return $this->morphOne('App\Models\Content', 'contentable');
     }
 
     public function timeline()
     {
+        /**
+         * 1. 创建
+         * 2. 更新
+         * 3. 删除
+         */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
 
@@ -89,7 +92,7 @@ class Tag extends Model
             'slug' => $slug
         ]);
 
-        $tag->extra()->create([
+        $tag->content()->create([
             'text' => json_encode([
                 'name' => $name,
                 'alias' => $name,
@@ -103,34 +106,38 @@ class Tag extends Model
         return $tag;
     }
 
-    public function updateTag(array $data, array $extra)
+    public function updateTag(array $data, $user)
     {
-        if (!empty($data))
-        {
-            $this->update($data);
-        }
+        $text = $this
+            ->content()
+            ->pluck('text')
+            ->first();
 
-//        $text = $this->extra()
-//            ->pluck('text')
-//            ->first();
-//        $text = json_decode($text, true);
-        $newData = array_merge($extra, []);
+        $text = json_decode($text, true);
+        $newData = array_merge($data, $text);
+
         foreach ($newData as $key => $val)
         {
             $newData[$key] = Purifier::clean($val);
         }
-        $this->extra()->update([
-            'text' => json_encode($newData, JSON_UNESCAPED_UNICODE)
-        ]);
+
+        $this
+            ->content()
+            ->create([
+                'text' => json_encode($newData, JSON_UNESCAPED_UNICODE)
+            ]);
+
+        event(new \App\Events\Tag\Update($this, $user));
 
         return $this;
     }
 
-    public function deleteTag()
+    public function deleteTag($user)
     {
         $this->delete();
+        $this->content()->delete();
 
-        $this->extra()->delete();
+        event(new \App\Events\Tag\Delete($this, $user));
 
         return $this;
     }
