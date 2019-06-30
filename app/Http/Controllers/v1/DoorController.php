@@ -190,8 +190,6 @@ class DoorController extends Controller
 
         $user = User::createUser($data);
 
-        event(new \App\Events\User\Register($user));
-
         return $this->resCreated($user->api_token);
     }
 

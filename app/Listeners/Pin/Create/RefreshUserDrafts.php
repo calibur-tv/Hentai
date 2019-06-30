@@ -26,7 +26,8 @@ class RefreshUserDrafts
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->pin->visit_type == 0)
+        $pin = $event->pin;
+        if ($pin->visit_type == 0)
         {
             return;
         }

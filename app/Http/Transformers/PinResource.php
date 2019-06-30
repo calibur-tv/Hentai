@@ -17,6 +17,8 @@ class PinResource extends JsonResource
 {
     public function toArray($request)
     {
+        $richContentService = new RichContentService();
+
         $title = [
             'banner' => null,
             'text' => ''
@@ -27,7 +29,6 @@ class PinResource extends JsonResource
         }
         else
         {
-            $richContentService = new RichContentService();
             $content = $richContentService->parseRichContent($this->content);
             if ($content[0]['type'] === 'title')
             {

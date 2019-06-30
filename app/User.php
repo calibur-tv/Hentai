@@ -197,6 +197,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->api_token = $user->createApiToken();
         $user->invitor_slug = $data['invitor_slug'] ?? '';
 
+        event(new \App\Events\User\Register($user));
+
         return $user;
     }
 }

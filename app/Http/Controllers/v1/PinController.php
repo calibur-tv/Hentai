@@ -136,15 +136,15 @@ class PinController extends Controller
             $request->get('content'),
             1,
             $request->get('publish') ? 0 : 1,
-            $user->slug
+            $user->slug,
+            $area,
+            $notebook
         );
 
         if (is_null($pin))
         {
             return $this->resErrBad('请勿发表敏感内容');
         }
-
-        event(new \App\Events\Pin\Create($pin, $area, $notebook));
 
         if ($pin->visit_type != 0)
         {
@@ -195,8 +195,6 @@ class PinController extends Controller
             return $this->resErrBad('请勿发表敏感内容');
         }
 
-        event(new \App\Events\Pin\Update($pin));
-
         if ($pin->visit_type != 0)
         {
             $ts = time();
@@ -225,9 +223,7 @@ class PinController extends Controller
             return $this->resErrRole();
         }
 
-        $pin->deletePin();
-
-        event(new \App\Events\Pin\Delete($pin, $user));
+        $pin->deletePin($user);
 
         return $this->resNoContent();
     }
