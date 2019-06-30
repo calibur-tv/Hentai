@@ -36,7 +36,6 @@ class Pin extends Model
         'last_top_at',      // 最后置顶时间
         'last_edit_at',     // 最后编辑时间
         'recommended_at',   // 推荐的时间
-        'image_count',      // 图片数
         'visit_count',      // 访问数
         'comment_count',    // 评论数
         'like_count',       // 点赞数

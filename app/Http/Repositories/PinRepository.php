@@ -38,6 +38,7 @@ class PinRepository extends Repository
             $pin->notebook = $pin
                 ->tags()
                 ->where('parent_slug', config('app.tag.notebook'))
+                ->orderBy('id', 'ASC')
                 ->first();
 
             $pin->area = $pin
@@ -47,12 +48,8 @@ class PinRepository extends Repository
                     config('app.tag.topic'),
                     config('app.tag.game')
                 ])
+                ->orderBy('id', 'ASC')
                 ->first();
-
-            $pin->tags = $pin
-                ->tags()
-                ->where('parent_slug', config('app.tag.pin'))
-                ->get();
 
             return new PinResource($pin);
         }, $refresh);

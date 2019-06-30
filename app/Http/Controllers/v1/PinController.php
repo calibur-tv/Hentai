@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\PinPatchCounter;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
@@ -16,7 +17,7 @@ class PinController extends Controller
     /**
      * 查看帖子（最好直接返回缓存，支持带 password 参数）
      */
-    public function show_info(Request $request)
+    public function show(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
@@ -73,9 +74,28 @@ class PinController extends Controller
     /**
      * 返回无法缓存的数据（special的）
      */
-    public function show_meta(Request $request)
+    public function patch(Request $request)
     {
-        return $this->resOK('1');
+        $slug = $request->get('slug');
+        $pinRepository = new PinRepository();
+        $pin = $pinRepository->item($slug);
+
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $pinPatchCounter = new PinPatchCounter();
+        $patch = $pinPatchCounter->all($slug);
+
+        $patch['trial_type'] = $pin->trial_type;
+        $patch['visit_type'] = $pin->visit_type;
+        $patch['comment_type'] = $pin->comment_type;
+        $patch['recommended_at'] = $pin->recommended_at;
+        $patch['last_top_at'] = $pin->last_top_at;
+        $patch['deleted_at'] = $pin->deleted_at;
+
+        return $this->resOK($patch);
     }
 
     /**

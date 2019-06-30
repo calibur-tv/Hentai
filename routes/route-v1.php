@@ -83,9 +83,12 @@ $route->group(['prefix' => 'image'], function () use ($route)
 
 $route->group(['prefix' => 'pin'], function () use ($route)
 {
-    $route->get('show_info', 'PinController@show_info');
+    $route->get('show', 'PinController@show');
 
-    $route->get('show_meta', 'PinController@show_meta');
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('patch', 'PinController@patch');
+    });
 
     $route->group(['prefix' => 'update', 'middleware' => ['auth']], function () use ($route)
     {
