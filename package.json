@@ -8,8 +8,15 @@
     "deploy": "bash deploy.sh",
     "test": "echo 1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": [
+        "./vendor/bin/phplint"
+      ]
+    }
+  },
   "dependencies": {},
   "devDependencies": {
-    "vuepress": "^1.0.0-rc.1"
+    "husky": "^2.7.0"
   }
 }

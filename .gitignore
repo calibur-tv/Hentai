@@ -5,3 +5,4 @@
 .DS_Store
 *.tree
 node_modules/
+.phplint-cache

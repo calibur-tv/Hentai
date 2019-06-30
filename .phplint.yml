@@ -1,0 +1,5 @@
+path: ./
+extensions:
+  - php
+exclude:
+  - vendor
