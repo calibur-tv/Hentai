@@ -57,6 +57,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'activity_stat',                // 活跃度统计
         'exposure_stat',                // 曝光度统计
         'migration_state',
+        'followers_count',              // 粉丝数量
+        'following_count',              // 关注数量
+        'visit_count',                  // 访问量
     ];
 
     protected $hidden = [

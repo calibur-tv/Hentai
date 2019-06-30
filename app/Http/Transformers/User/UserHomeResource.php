@@ -27,11 +27,10 @@ class UserHomeResource extends JsonResource
             'level' => $this->level,
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
-            'social' => [
-                'followers_count' => $this->followers_count,
-                'following_count' => $this->following_count,
-                'relation' => 'unknown'
-            ],
+            'followers_count' => $this->followers_count,
+            'following_count' => $this->following_count,
+            'relation' => 'unknown',
+            'visit_count' => $this->visit_count,
             'balance' => [
                 'coin' => (float)$this->virtual_coin,
                 'money' => (float)$this->money_coin,
