@@ -67,6 +67,36 @@ class Repository
         return $cache;
     }
 
+    public function RedisHash($key, $func, $force = false, $exp = 'd')
+    {
+        $cache = $force ? null : Redis::HGETALL($key);
+
+        if (!empty($cache))
+        {
+            return $cache;
+        }
+
+        $cache = $func();
+
+        if (is_null($cache))
+        {
+            return null;
+        }
+
+        if (Redis::SETNX('lock_'.$key, 1))
+        {
+            Redis::pipeline(function ($pipe) use ($key, $cache, $exp)
+            {
+                $pipe->EXPIRE('lock_'.$key, 10);
+                $pipe->HMSET($key, gettype($cache) === 'array' ? $cache : $cache->toArray());
+                $pipe->EXPIREAT($key, $this->expire($exp));
+                $pipe->DEL('lock_'.$key);
+            });
+        }
+
+        return $cache;
+    }
+
     public function RedisList($key, $func, $force = false, $exp = 'd')
     {
         $cache = $force ? [] : Redis::LRANGE($key, 0, -1);

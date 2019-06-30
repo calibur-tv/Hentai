@@ -40,12 +40,12 @@ $route->group(['prefix' => 'user'], function () use ($route)
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('detect_relation', 'UserController@detectUserRelation');
+
+        $route->get('patch', 'UserController@patch');
     });
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
-        $route->get('patch', 'UserController@patch');
-
         $route->post('update_info', 'UserController@updateProfile');
 
         $route->post('daily_sign', 'UserController@dailySign');

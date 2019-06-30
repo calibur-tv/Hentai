@@ -8,8 +8,6 @@
 
 namespace App\Http\Transformers\User;
 
-use App\Http\Modules\Counter\UserBeFollowedCounter;
-use App\Http\Modules\Counter\UserFollowingCounter;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,8 +16,6 @@ class UserHomeResource extends JsonResource
     public function toArray($request)
     {
         $userDailySign = new UserDailySign();
-        $userBeFollowedCounter = new UserBeFollowedCounter();
-        $userFollowingCounter = new UserFollowingCounter();
 
         return [
             'slug' => $this->slug,
@@ -32,8 +28,8 @@ class UserHomeResource extends JsonResource
             'sex' => $this->sex_secret ? -1 : $this->sex,
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
             'social' => [
-                'followers_count' => $userBeFollowedCounter->get($this->slug),
-                'following_count' => $userFollowingCounter->get($this->slug),
+                'followers_count' => $this->followers_count,
+                'following_count' => $this->following_count,
                 'relation' => 'unknown'
             ],
             'balance' => [

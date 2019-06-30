@@ -5,7 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\UserBeFollowedCounter;
 use App\Http\Modules\Counter\UserFollowingCounter;
-use App\Http\Modules\Counter\UserFriendCounter;
+use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
@@ -36,37 +36,38 @@ class UserController extends Controller
      */
     public function patch(Request $request)
     {
-        $visitor = $request->user();
         $targetSlug = $request->get('slug');
         if (!$targetSlug)
         {
             return $this->resErrBad();
         }
 
+        $userRepository = new UserRepository();
+        $target = $userRepository->item($targetSlug);
+        if (is_null($target))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $userPatchCounter = new UserPatchCounter();
+        $patch = $userPatchCounter->all($targetSlug);
+        $visitor = $request->user();
+        if (!$visitor)
+        {
+            $patch['relation'] = 'unknown';
+            return $this->resOK($patch);
+        }
+
         $visitorSlug = $visitor->slug;
-
-        $userBeFollowedCounter = new UserBeFollowedCounter();
-        $userFollowingCounter = new UserFollowingCounter();
-
-        $followers_count = $userBeFollowedCounter->get($targetSlug);
-        $following_count = $userFollowingCounter->get($targetSlug);
         if ($visitorSlug === $targetSlug)
         {
-            return $this->resOK([
-                'followers_count' => $followers_count,
-                'following_count' => $following_count,
-                'relation' => 'self'
-            ]);
+            $patch['relation'] = 'self';
+            return $this->resOK($patch);
         }
 
         $target = User
             ::where('slug', $targetSlug)
             ->first();
-
-        if (is_null($target))
-        {
-            return $this->resErrNotFound();
-        }
 
         $relation = $this->convertUserRelation($visitor->isFollowing($target), $target->isFollowing($visitor));
 
@@ -74,12 +75,11 @@ class UserController extends Controller
         $userExposure = new UserExposure();
         $userActivity->set($visitorSlug);
         $userExposure->set($targetSlug);
+        $userPatchCounter->add($targetSlug, 'visit_count');
 
-        return $this->resOK([
-            'followers_count' => $followers_count,
-            'following_count' => $following_count,
-            'relation' => $relation
-        ]);
+        $patch['relation'] = $relation;
+
+        return $this->resOK($patch);
     }
 
     /**
@@ -164,15 +164,14 @@ class UserController extends Controller
             return $this->resErrNotFound();
         }
 
-        $userFollowingCounter = new UserFollowingCounter();
-        $userBeFollowedCounter = new UserBeFollowedCounter();
+        $userPatchCounter = new UserPatchCounter();
 
         $isFollowing = $user->isFollowing($target); // 我是否关注了 TA
         $isFollowMe = $target->isFollowing($user);  // TA 是否关注了我
 
         if (!$isFollowing) // 如果未关注
         {
-            $hasFollowingCount = $userFollowingCounter->get($mineSlug);
+            $hasFollowingCount = $userPatchCounter->get($mineSlug, 'following_count');
             // 100人是关注的上限
             if ($hasFollowingCount >= 100)
             {
@@ -180,14 +179,14 @@ class UserController extends Controller
             }
 
             $user->follow($target);
-            $userFollowingCounter->add($mineSlug);
-            $userBeFollowedCounter->add($targetSlug);
+            $userPatchCounter->add($mineSlug, 'following_count');
+            $userPatchCounter->add($targetSlug, 'followers_count');
         }
         else // 如果已关注
         {
             $user->unfollow($target);
-            $userFollowingCounter->add($mineSlug, -1);
-            $userBeFollowedCounter->add($targetSlug, -1);
+            $userPatchCounter->add($mineSlug, 'following_count', -1);
+            $userPatchCounter->add($targetSlug, 'followers_count', -1);
         }
 
         $isFollowing = !$isFollowing; // 我关注的结果
@@ -198,12 +197,6 @@ class UserController extends Controller
             // 无论我是否取消关注，都刷新彼此朋友列表的缓存
             $userRepository->friends($targetSlug, true);
             $userRepository->friends($mineSlug, true);
-
-            $userFriendCounter = new UserFriendCounter();
-            $num = $isFollowing ? 1 : -1;
-            // 改变彼此朋友的个数
-            $userFriendCounter->add($targetSlug, $num);
-            $userFriendCounter->add($mineSlug, $num);
         }
         else
         {
