@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Listeners\UserRegister;
+namespace App\Listeners\User\Register;
 
-use App\Events\UserRegister;
 use App\Models\Tag;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,10 +21,10 @@ class AddDefaultTagRelation
     /**
      * Handle the event.
      *
-     * @param  UserRegister  $event
+     * @param  Register  $event
      * @return void
      */
-    public function handle(UserRegister $event)
+    public function handle(\App\Events\User\Register $event)
     {
         $this->joinNewbieTopic($event->user);
         $this->createDefaultNotebook($event->user);

@@ -10,7 +10,6 @@ namespace App\Models;
 
 
 use App\Http\Modules\RichContentService;
-use App\Jobs\Trial\PinTrial;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\Relation\Traits\CanBeBookmarked;
@@ -78,10 +77,8 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($form, $user)
+    public static function createPin($content, $content_type, $visit_type, $user_slug)
     {
-        $content = $form['content'];
-
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
 
@@ -91,10 +88,10 @@ class Pin extends Model
         }
 
         $pin = self::create([
-            'user_slug' => $user->slug,
-            'content_type' => $form['content_type'],
-            'last_edit_at' => Carbon::now(),
-            'visit_type' => $form['visit_type']
+            'user_slug' => $user_slug,
+            'content_type' => $content_type,
+            'visit_type' => $visit_type,
+            'last_edit_at' => Carbon::now()
         ]);
 
         $pin->update([
@@ -105,27 +102,11 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        $pin->tags()->save($form['area']);
-        $pin->tags()->save($form['notebook']);
-
-        $pin->timeline()->create([
-            'event_type' => 0,
-            'event_slug' => $user->slug
-        ]);
-
-        if ($pin->visit_type != 1)
-        {
-            $job = (new PinTrial($pin->id, 0));
-            dispatch($job);
-        }
-
         return $pin;
     }
 
-    public static function updatePin($form, $user)
+    public static function updatePin($slug, $content, $visit_type)
     {
-        $content = $form['content'];
-
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
 
@@ -135,28 +116,17 @@ class Pin extends Model
         }
 
         $pin = self
-            ::where('slug', $form['slug'])
+            ::where('slug', $slug)
             ->first();
 
         $pin->update([
             'last_edit_at' => Carbon::now(),
-            'visit_type' => $form['visit_type']
+            'visit_type' => $visit_type
         ]);
 
         $pin->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
-
-        $pin->timeline()->create([
-            'event_type' => 1,
-            'event_slug' => $user->slug
-        ]);
-
-        if ($pin->visit_type != 1)
-        {
-            $job = (new PinTrial($pin->id, 0));
-            dispatch($job);
-        }
 
         return $pin;
     }

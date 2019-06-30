@@ -101,14 +101,10 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->group(['prefix' => 'create'], function () use ($route)
         {
-            $route->post('daily', 'PinController@createDaily');
-
             $route->post('story', 'PinController@createStory');
         });
 
         $route->post('delete', 'PinController@deletePin');
-
-        $route->post('toggle_tag', 'PinController@toggle_tag');
 
         $route->post('report', 'PinController@report');
 

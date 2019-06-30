@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Listeners\UserRegister;
+namespace App\Listeners\Pin\Update;
 
-use App\Events\UserRegister;
+use App\Http\Repositories\PinRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class InitUserTimeline
+class RefreshCache
 {
     /**
      * Create the event listener.
@@ -24,12 +24,12 @@ class InitUserTimeline
      * @param  ExampleEvent  $event
      * @return void
      */
-    public function handle(UserRegister $event)
+    public function handle(\App\Events\Pin\Update $event)
     {
-        $user = $event->user;
-        $user->timeline()->create([
-            'event_type' => 0,
-            'event_slug' => $user->invitor_slug
-        ]);
+        $pin = $event->pin;
+        $pinRepository = new PinRepository();
+
+        $pinRepository->item($pin->slug, true);
+        $pinRepository->drafts($pin->user_slug, 0, 0, true);
     }
 }

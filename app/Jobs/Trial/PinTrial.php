@@ -8,7 +8,7 @@ use App\Models\Pin;
 
 class PinTrial extends Job
 {
-    protected $id;
+    protected $slug;
     /**
      * 0 => 帖子创建
      * 1 => 更新帖子
@@ -20,9 +20,9 @@ class PinTrial extends Job
      *
      * @return void
      */
-    public function __construct($id, $type)
+    public function __construct($slug, $type)
     {
-        $this->id = $id;
+        $this->slug = $slug;
         $this->type = $type;
     }
 
@@ -33,7 +33,7 @@ class PinTrial extends Job
      */
     public function handle()
     {
-        $pin = Pin::find($this->id);
+        $pin = Pin::where('slug', $this->slug)->first();
         if (is_null($pin))
         {
             return;

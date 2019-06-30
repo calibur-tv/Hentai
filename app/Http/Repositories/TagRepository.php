@@ -68,6 +68,11 @@ class TagRepository extends Repository
         return $result;
     }
 
+    /**
+     * @param $slug
+     * @param $user
+     * @return bool|null|Tag
+     */
     public function getMarkedTag($slug, $user)
     {
         $tag = Tag

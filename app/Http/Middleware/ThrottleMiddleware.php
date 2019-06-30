@@ -77,9 +77,16 @@ class ThrottleMiddleware
      */
     protected function resolveRequestSignature($request)
     {
-        $ip = explode(', ', $request->headers->get('X-Forwarded-For'))[0];
+        if ($request->user())
+        {
+            $id = $request->user()->slug;
+        }
+        else
+        {
+            $id = explode(', ', $request->headers->get('X-Forwarded-For'))[0];
+        }
 
-        return sha1($request->url().'|'.$ip. '|' . $request->header('User-Agent'));
+        return sha1($request->url().'|'.$id. '|' . $request->header('User-Agent'));
     }
 
     /**

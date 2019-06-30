@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Pin;
 
-use App\User;
+use App\Models\Pin;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegister
+class Update
 {
     use SerializesModels;
 
-    public $user;
+    public $pin;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(Pin $pin)
     {
-        $this->user = $user;
+        $this->pin = $pin;
     }
 }

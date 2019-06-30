@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\v1;
 
-use App\Events\UserRegister;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserAuthResource;
@@ -191,7 +190,7 @@ class DoorController extends Controller
 
         $user = User::createUser($data);
 
-        event(new UserRegister($user));
+        event(new \App\Events\User\Register($user));
 
         return $this->resCreated($user->api_token);
     }
