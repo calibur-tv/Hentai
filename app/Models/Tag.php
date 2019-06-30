@@ -12,13 +12,12 @@ namespace App\Models;
 use App\Services\Relation\Traits\CanBeBookmarked;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
-use App\Services\Relation\Traits\CanFavorite;
 use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
 {
-    use CanBeFollowed, CanBeBookmarked, CanFavorite, HasRoles;
+    use CanBeFollowed, CanBeBookmarked, HasRoles;
 
     protected $guard_name = 'api';
 
@@ -30,6 +29,10 @@ class Tag extends Model
         'redirect_slug',
         'creator_slug',
         'parent_slug',
+        'pin_count',            // 文章的数量
+        'seen_user_count',      // 看过的人数（可以在这个 tag 下发表文章的人数）（bookmark）
+        'followers_count',      // 订阅的人数（可以收到 tag 下文章推送的人数）（follow）
+        'activity_stat',        // tag 的活跃度计数
     ];
 
     public function setNameAttribute($name)

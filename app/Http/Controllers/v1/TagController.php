@@ -30,6 +30,11 @@ class TagController extends Controller
         return $this->resOK($data);
     }
 
+    public function mixinPatch(Request $request)
+    {
+        $field = $request->get('field');
+    }
+
 
     /**
      * 获取用户的收藏版区

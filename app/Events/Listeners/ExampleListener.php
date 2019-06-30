@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Events\Listeners;
 
 use App\Events\ExampleEvent;
 use Illuminate\Queue\InteractsWithQueue;
