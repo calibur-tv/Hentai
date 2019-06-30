@@ -26,13 +26,17 @@ function id2slug($id)
 
 function trimImage($url)
 {
+    if (!$url)
+    {
+        return $url;
+    }
     $arr = explode('calibur.tv/', $url);
     return count($arr) === 1 ? $url : explode('calibur.tv/', $url)[1];
 }
 
 function patchImage($url, $default = '')
 {
-    if (preg_match('/^http/', $url))
+    if (!$url || preg_match('/^http/', $url))
     {
         return $url;
     }
