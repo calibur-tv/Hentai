@@ -54,6 +54,11 @@ class Pin extends Model
 
     public function content()
     {
+        return $this->morphOne('App\Models\Content', 'contentable');
+    }
+
+    public function history()
+    {
         return $this->morphMany('App\Models\Content', 'contentable');
     }
 

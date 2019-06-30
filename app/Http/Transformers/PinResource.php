@@ -23,17 +23,11 @@ class PinResource extends JsonResource
             'banner' => null,
             'text' => ''
         ];
-        if (null === $this->content)
+
+        $content = $richContentService->parseRichContent($this->content->text);
+        if ($content[0]['type'] === 'title')
         {
-            $content = [];
-        }
-        else
-        {
-            $content = $richContentService->parseRichContent($this->content);
-            if ($content[0]['type'] === 'title')
-            {
-                $title = array_shift($content)['data'];
-            }
+            $title = array_shift($content)['data'];
         }
 
         return [

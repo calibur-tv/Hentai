@@ -20,7 +20,10 @@ class PinRepository extends Repository
         {
             $pin = Pin
                 ::withTrashed()
-                ->with('author')
+                ->with(['author', 'content' => function ($query)
+                {
+                    $query->orderBy('created_at', 'desc');
+                }])
                 ->where('slug', $slug)
                 ->first();
 
@@ -28,12 +31,6 @@ class PinRepository extends Repository
             {
                 return 'nil';
             }
-
-            $pin->content = $pin
-                ->content()
-                ->latest()
-                ->pluck('text')
-                ->first();
 
             $pin->notebook = $pin
                 ->tags()
