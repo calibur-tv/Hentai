@@ -99,8 +99,7 @@ class HashCounter
             ::table($this->table)
             ->where($this->uniqueKey, $slug)
             ->select($this->fields)
-            ->first()
-            ->toArray();
+            ->first();
     }
 
     /**
@@ -108,6 +107,7 @@ class HashCounter
      */
     public function save($slug, $value)
     {
+        $value = gettype($value) === 'array' ? $value : json_decode(json_encode($value), true);
         $value['migrate_at'] = time();
 
         $key = $this->cacheKey($slug);
