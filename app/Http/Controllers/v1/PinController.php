@@ -59,8 +59,9 @@ class PinController extends Controller
     public function patch(Request $request)
     {
         $slug = $request->get('slug');
-        $pinRepository = new PinRepository();
-        $pin = $pinRepository->item($slug);
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
 
         if (is_null($pin))
         {
@@ -76,6 +77,21 @@ class PinController extends Controller
         $patch['recommended_at'] = $pin->recommended_at;
         $patch['last_top_at'] = $pin->last_top_at;
         $patch['deleted_at'] = $pin->deleted_at;
+        $user = $request->user();
+        if ($user)
+        {
+            $patch['vote_up_status'] = $pin->isUpvotedBy($user);
+            $patch['vote_down_status'] = $pin->isDownvotedBy($user);
+            $patch['mark_status'] = $pin->isBookmarkedBy($user);
+            $patch['reward_status'] = $pin->isFavoritedBy($user);
+        }
+        else
+        {
+            $patch['vote_up_status'] = false;
+            $patch['vote_down_status'] = false;
+            $patch['mark_status'] = false;
+            $patch['reward_status'] = false;
+        }
 
         return $this->resOK($patch);
     }

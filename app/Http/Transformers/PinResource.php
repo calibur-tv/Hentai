@@ -49,6 +49,15 @@ class PinResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
+            'visit_count' => $this->visit_count,
+            'comment_count' => $this->comment_count,
+            'like_count' => $this->like_count,
+            'mark_count' => $this->mark_count,
+            'reward_count' => $this->reward_count,
+            'vote_up_status' => false,
+            'vote_down_status' => false,
+            'mark_status' => false,
+            'reward_status' => false
         ];
     }
 }
