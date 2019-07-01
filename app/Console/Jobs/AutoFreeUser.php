@@ -14,14 +14,14 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class CronFreeUser extends Command
+class AutoFreeUser extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'CronFreeUser';
+    protected $signature = 'AutoFreeUser';
     /**
      * The console command description.
      *
@@ -51,10 +51,7 @@ class CronFreeUser extends Command
             ]);
 
         $userRepository = new UserRepository();
-        foreach ($slugs as $slug)
-        {
-            $userRepository->item($slug, true);
-        }
+        $userRepository->list($slugs, true);
 
         return true;
     }

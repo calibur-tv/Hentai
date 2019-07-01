@@ -26,12 +26,12 @@ class DailyRecord
 
     public function set($slug, $score = 1)
     {
-        Redis::INCRBY($this->setCacheKey($slug), $score);
+        Redis::INCRBY($this->setterCacheKey($slug), $score);
     }
 
     public function get($slug, $delta = 0)
     {
-        $cacheKey = $this->getCacheKey($slug, $delta);
+        $cacheKey = $this->getterCacheKey($slug, $delta);
         $value = Redis::GET($cacheKey);
         if ($value !== null)
         {
@@ -76,7 +76,7 @@ class DailyRecord
     public function migrate($slug)
     {
         $timeSeed = date('Y-m-d', strtotime('-1 day'));
-        $cacheKey = $this->setCacheKey($slug, $timeSeed);
+        $cacheKey = $this->setterCacheKey($slug, $timeSeed);
         $value = Redis::GET($cacheKey);
         if ($value === null)
         {
@@ -107,12 +107,12 @@ class DailyRecord
 
     }
 
-    protected function getCacheKey($slug, $delta)
+    protected function getterCacheKey($slug, $delta)
     {
         return 'daily_record_' . $this->record_type . '_' . $slug . '_get_' . $delta . '_' . date('Y-m-d');
     }
 
-    protected function setCacheKey($slug, $tail = null)
+    protected function setterCacheKey($slug, $tail = null)
     {
         return 'daily_record_' . $this->record_type . '_' . $slug . '_set_' . ($tail ? $tail : date('Y-m-d'));
     }

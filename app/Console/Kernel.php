@@ -14,8 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Jobs\Test::class,
-        Jobs\CronFreeUser::class,
+        Jobs\AutoFreeUser::class,
         Jobs\ComputeSignCount::class,
+        Jobs\ComputeUserDailyStat::class
     ];
 
     /**
@@ -26,8 +27,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('CronFreeUser')->everyFiveMinutes();
+        $schedule->command('AutoFreeUser')->everyFiveMinutes();
         $schedule->command('ComputeSignCount')->dailyAt('00:30');
+        $schedule->command('ComputeUserDailyStat')->dailyAt('00:01');
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
     }
 }

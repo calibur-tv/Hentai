@@ -3,6 +3,8 @@
 
 namespace App\Http\Modules\DailyRecord;
 
+use Illuminate\Support\Facades\DB;
+
 class UserActivity extends DailyRecord
 {
     public function __construct()
@@ -13,6 +15,11 @@ class UserActivity extends DailyRecord
 
     protected function hook($userSlug, $score)
     {
-
+        DB
+            ::table('users')
+            ->where('slug', $userSlug)
+            ->update([
+                'activity_stat' => $this->get($userSlug, -1)
+            ]);
     }
 }

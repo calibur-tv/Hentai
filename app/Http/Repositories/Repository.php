@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Redis;
 
 class Repository
 {
-    public function list($ids)
+    public function list($ids, $refresh = false)
     {
         if (empty($ids))
         {
@@ -23,7 +23,7 @@ class Repository
         $result = [];
         foreach ($ids as $id)
         {
-            $item = $this->item($id);
+            $item = $this->item($id, $refresh);
             if ($item)
             {
                 $result[] = $item;
