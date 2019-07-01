@@ -19,7 +19,7 @@ class TagItemResource extends JsonResource
         return [
             'slug' => $this->slug,
             'name' => $content['name'],
-            'avatar' => patchImage($content['avatar']),
+            'avatar' => patchImage($content['avatar'], 'default-poster'),
             'intro' => $content['intro'],
             'parent_slug' => $this->parent_slug,
             'deep' => $this->deep

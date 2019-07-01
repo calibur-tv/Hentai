@@ -54,8 +54,7 @@ class PinResource extends JsonResource
             'like_count' => $this->like_count,
             'mark_count' => $this->mark_count,
             'reward_count' => $this->reward_count,
-            'vote_up_status' => false,
-            'vote_down_status' => false,
+            'vote_status' => 0,
             'mark_status' => false,
             'reward_status' => false
         ];
