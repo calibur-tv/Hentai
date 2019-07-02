@@ -3,6 +3,7 @@
 namespace App\Events\Pin;
 
 use App\Models\Pin;
+use App\User;
 use Illuminate\Queue\SerializesModels;
 
 class Update
