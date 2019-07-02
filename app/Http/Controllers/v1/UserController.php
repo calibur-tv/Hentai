@@ -114,6 +114,7 @@ class UserController extends Controller
             ->skip(($page - 1) * $count)
             ->take($count)
             ->select('event_type', 'event_slug', 'created_at')
+            ->orderBy('created_at', 'DESC')
             ->get()
             ->toArray();
 
