@@ -82,7 +82,6 @@ class Tag extends Model
     public static function createTag($name, $user, $parent)
     {
         $tag = self::create([
-            'name' => '',
             'creator_slug' => $user->slug,
             'parent_slug' => $parent->slug,
             'deep' => $parent->deep + 1
