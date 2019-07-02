@@ -117,6 +117,11 @@ class UserController extends Controller
             ->get()
             ->toArray();
 
+        if (empty($timeline))
+        {
+            return $this->resOK([]);
+        }
+
         $result = [];
         $tagRepository = new TagRepository();
         $pinRepository = new PinRepository();
@@ -152,11 +157,7 @@ class UserController extends Controller
             }
         }
 
-        return $this->resOK([
-            'result' => $result,
-            'total' => 0,
-            'no_more' => false
-        ]);
+        return $this->resOK($result);
     }
 
     /**
