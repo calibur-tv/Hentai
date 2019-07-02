@@ -10,14 +10,18 @@ class Update
     use SerializesModels;
 
     public $pin;
+    public $user;
+    public $publish;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Pin $pin)
+    public function __construct(Pin $pin, User $user, bool $publish)
     {
         $this->pin = $pin;
+        $this->user = $user;
+        $this->publish = $publish;
     }
 }

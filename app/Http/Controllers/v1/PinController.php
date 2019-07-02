@@ -190,7 +190,8 @@ class PinController extends Controller
 
         $result = $pin->updatePin(
             $request->get('content'),
-            $request->get('publish') ? 0 : $pin->visit_type
+            $request->get('publish') ? 0 : $pin->visit_type,
+            $user
         );
 
         if (!$result)

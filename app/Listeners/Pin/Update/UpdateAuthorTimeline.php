@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\Pin\Delete;
+namespace App\Listeners\Pin\Update;
 
 use App\Http\Repositories\PinRepository;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,17 +24,14 @@ class UpdateAuthorTimeline
      * @param  ExampleEvent  $event
      * @return void
      */
-    public function handle(\App\Events\Pin\Delete $event)
+    public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->pin->visit_type != 0)
+        if ($event->publish)
         {
-            $event->user
-                ->timeline()
-                ->where([
-                    'event_type' => 3,
-                    'event_slug' => $event->pin->slug
-                ])
-                ->delete();
+            $event->user->timeline()->create([
+                'event_type' => 3,
+                'event_slug' => $event->pin->slug
+            ]);
         }
     }
 }

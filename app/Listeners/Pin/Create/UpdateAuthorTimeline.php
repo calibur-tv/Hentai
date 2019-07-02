@@ -26,9 +26,12 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        $event->user->timeline()->create([
-            'event_type' => 3,
-            'event_slug' => $event->pin->slug
-        ]);
+        if ($event->pin->visit_type != 0)
+        {
+            $event->user->timeline()->create([
+                'event_type' => 3,
+                'event_slug' => $event->pin->slug
+            ]);
+        }
     }
 }

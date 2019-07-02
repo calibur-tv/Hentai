@@ -27,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Update\Trial',
             'App\Listeners\Pin\Update\UpdatePinTimeline',
             'App\Listeners\Pin\Update\RefreshCache',
+            'App\Listeners\Pin\Update\UpdateAuthorTimeline',
         ],
         'App\Events\Pin\Delete' => [
             'App\Listeners\Pin\Delete\UpdatePinTimeline',

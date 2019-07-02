@@ -112,7 +112,7 @@ class Pin extends Model
         return $pin;
     }
 
-    public function updatePin($content, $visit_type)
+    public function updatePin($content, $visit_type, $user)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -121,6 +121,8 @@ class Pin extends Model
         {
             return false;
         }
+
+        $publish = $this->visit_type === 0 && $visit_type !== 0;
 
         $this->update([
             'last_edit_at' => Carbon::now(),
@@ -131,7 +133,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Update($this));
+        event(new \App\Events\Pin\Update($this, $user, $publish));
 
         return true;
     }
