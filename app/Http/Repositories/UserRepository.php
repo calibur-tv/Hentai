@@ -122,4 +122,58 @@ class UserRepository extends Repository
             'no_more' => true
         ];
     }
+
+    public function timeline($slug, $refresh = false, $page = 0, $count = 10)
+    {
+        $list = $this->RedisSort("user-{$slug}-timeline", function () use ($slug)
+        {
+            $user = User
+                ::where('slug', $slug)
+                ->first();
+
+            if (is_null($user))
+            {
+                return [];
+            }
+
+            $list = $user
+                ->timeline()
+                ->select('event_type', 'event_slug', 'created_at')
+                ->orderBy('created_at', 'DESC')
+                ->get()
+                ->toArray();
+
+            $result = [];
+            foreach ($list as $row)
+            {
+                $result["{$row['event_type']}#{$row['event_slug']}"] = $row['created_at'];
+            }
+
+            return $result;
+        }, ['force' => $refresh, 'is_time' => true, 'with_score' => true]);
+
+        if ($refresh)
+        {
+            return [];
+        }
+
+        $idsObj = $this->filterIdsByPage($list, $page, $count, true);
+        $result = [];
+
+        foreach ($idsObj['result'] as $key => $val)
+        {
+            $event = explode('#', $key);
+            $result[] = [
+                'type' => $event[0],
+                'slug' => $event[1],
+                'created_at' => $val
+            ];
+        }
+
+        return [
+            'result' => $result,
+            'total' => $idsObj['total'],
+            'no_more' => $idsObj['no_more']
+        ];
+    }
 }

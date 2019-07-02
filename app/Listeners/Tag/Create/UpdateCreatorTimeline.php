@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Tag\Create;
 
+use App\Http\Repositories\UserRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -30,5 +31,8 @@ class UpdateCreatorTimeline
             'event_type' => 2,
             'event_slug' => $event->tag->slug
         ]);
+
+        $userRepository = new UserRepository();
+        $userRepository->timeline($user->slug, true);
     }
 }

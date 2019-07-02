@@ -101,64 +101,57 @@ class UserController extends Controller
         $page = $request->get('page') ?: 1;
         $count = $request->get('count') ?: 10;
 
-        $user = User
-            ::where('slug', $slug)
-            ->first();
+        $userRepository = new UserRepository();
+
+        $user = $userRepository->item($slug);
         if (is_null($user))
         {
             return $this->resErrNotFound();
         }
 
-        $timeline = $user
-            ->timeline()
-            ->skip(($page - 1) * $count)
-            ->take($count)
-            ->select('event_type', 'event_slug', 'created_at')
-            ->orderBy('created_at', 'DESC')
-            ->get()
-            ->toArray();
+        $idsObj = $userRepository->timeline($slug, false, $page - 1, $count);
 
-        if (empty($timeline))
+        if (!$idsObj['total'])
         {
-            return $this->resOK([]);
+            return $this->resOK($idsObj);
         }
 
         $result = [];
         $tagRepository = new TagRepository();
         $pinRepository = new PinRepository();
-        $userRepository = new UserRepository();
 
-        foreach ($timeline as $row)
+        foreach ($idsObj['result'] as $row)
         {
-            $type = $row['event_type'];
-            $slug = $row['event_slug'];
-            if ($type === 0)
+            $type = $row['type'];
+            $slug = $row['slug'];
+            if ($type == 0)
             {
                 $result[] = array_merge($row, [
                     'data' => $userRepository->item($slug)
                 ]);
             }
-            else if ($type === 1)
+            else if ($type == 1)
             {
                 $result[] = array_merge($row, [
                     'data' => $tagRepository->item($slug)
                 ]);
             }
-            else if ($type === 2)
+            else if ($type == 2)
             {
                 $result[] = array_merge($row, [
                     'data' => $tagRepository->item($slug)
                 ]);
             }
-            else if ($type === 3)
+            else if ($type == 3)
             {
                 $result[] = array_merge($row, [
                     'data' => $pinRepository->item($slug)
                 ]);
             }
         }
+        $idsObj['result'] = $result;
 
-        return $this->resOK($result);
+        return $this->resOK($idsObj);
     }
 
     /**

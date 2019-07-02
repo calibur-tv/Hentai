@@ -3,6 +3,7 @@
 namespace App\Listeners\Pin\Update;
 
 use App\Http\Repositories\PinRepository;
+use App\Http\Repositories\UserRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -32,6 +33,9 @@ class UpdateAuthorTimeline
                 'event_type' => 3,
                 'event_slug' => $event->pin->slug
             ]);
+
+            $userRepository = new UserRepository();
+            $userRepository->timeline($event->user->slug, true);
         }
     }
 }
