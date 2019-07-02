@@ -18,6 +18,11 @@ class TagRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
+        if (!$slug)
+        {
+            return null;
+        }
+
         $result = $this->RedisItem("tag:{$slug}", function () use ($slug)
         {
             $tag = Tag
@@ -46,6 +51,10 @@ class TagRepository extends Repository
 
     public function relation_item($slug, $refresh = false)
     {
+        if (!$slug)
+        {
+            return null;
+}
         $result = $this->RedisItem("tag-category:{$slug}", function () use ($slug)
         {
             $tag = Tag

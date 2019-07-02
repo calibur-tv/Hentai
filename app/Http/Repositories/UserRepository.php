@@ -16,6 +16,11 @@ class UserRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
+        if (!$slug)
+        {
+            return null;
+        }
+
         $result = $this->RedisItem("user:{$slug}", function () use ($slug)
         {
             $user = User

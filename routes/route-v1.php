@@ -37,6 +37,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 
     $route->get('relation', 'UserController@getUserRelation');
 
+    $route->get('timeline', 'UserController@timeline');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('detect_relation', 'UserController@detectUserRelation');

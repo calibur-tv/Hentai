@@ -16,6 +16,11 @@ class PinRepository extends Repository
 {
     public function item($slug, $refresh = false)
     {
+        if (!$slug)
+        {
+            return null;
+        }
+
         $result = $this->RedisItem("pin:{$slug}", function () use ($slug)
         {
             $pin = Pin

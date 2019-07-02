@@ -9,6 +9,8 @@ use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
+use App\Http\Repositories\PinRepository;
+use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
@@ -80,6 +82,81 @@ class UserController extends Controller
         $patch['relation'] = $relation;
 
         return $this->resOK($patch);
+    }
+
+    public function timeline(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required|string',
+            'page' => 'required|integer',
+            'count' => 'required|integer'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 1;
+        $count = $request->get('count') ?: 10;
+
+        $user = User
+            ::where('slug', $slug)
+            ->first();
+        if (is_null($user))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $timeline = $user
+            ->timeline()
+            ->skip(($page - 1) * $count)
+            ->take($count)
+            ->select('event_type', 'event_slug', 'created_at')
+            ->get()
+            ->toArray();
+
+        $result = [];
+        $tagRepository = new TagRepository();
+        $pinRepository = new PinRepository();
+        $userRepository = new UserRepository();
+
+        foreach ($timeline as $row)
+        {
+            $type = $row['event_type'];
+            $slug = $row['event_slug'];
+            if ($type === 0)
+            {
+                $result[] = array_merge($row, [
+                    'data' => $userRepository->item($slug)
+                ]);
+            }
+            else if ($type === 1)
+            {
+                $result[] = array_merge($row, [
+                    'data' => $tagRepository->item($slug)
+                ]);
+            }
+            else if ($type === 2)
+            {
+                $result[] = array_merge($row, [
+                    'data' => $tagRepository->item($slug)
+                ]);
+            }
+            else if ($type === 3)
+            {
+                $result[] = array_merge($row, [
+                    'data' => $pinRepository->item($slug)
+                ]);
+            }
+        }
+
+        return $this->resOK([
+            'result' => $result,
+            'total' => 0,
+            'no_more' => false
+        ]);
     }
 
     /**
