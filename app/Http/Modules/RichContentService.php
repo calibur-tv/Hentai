@@ -113,6 +113,15 @@ class RichContentService
                     ])
                 ];
             }
+            else if ($type === 'music')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => array_merge($row['data'], [
+                        'caption' => Purifier::clean($row['data']['caption'])
+                    ])
+                ];
+            }
         }
 
         return json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -174,6 +183,10 @@ class RichContentService
                 return $row;
             }
             else if ($type === 'video')
+            {
+                return $row;
+            }
+            else if ($type === 'music')
             {
                 return $row;
             }
@@ -246,6 +259,10 @@ class RichContentService
                 }
             }
             else if ($type === 'video')
+            {
+                $words .= $row['data']['caption'];
+            }
+            else if ($type === 'music')
             {
                 $words .= $row['data']['caption'];
             }
