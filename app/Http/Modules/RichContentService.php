@@ -104,7 +104,7 @@ class RichContentService
                     ]
                 ];
             }
-            else if ($type === 'embed')
+            else if ($type === 'video')
             {
                 $result[] = [
                     'type' => $type,
@@ -170,6 +170,10 @@ class RichContentService
         {
             $type = $row['type'];
             if ($type === 'image')
+            {
+                return $row;
+            }
+            else if ($type === 'video')
             {
                 return $row;
             }
@@ -241,9 +245,9 @@ class RichContentService
                     $words .= $item['text'];
                 }
             }
-            else if ($type === 'embed')
+            else if ($type === 'video')
             {
-                $words .= $item['data']['caption'];
+                $words .= $row['data']['caption'];
             }
 
             if ($words)
