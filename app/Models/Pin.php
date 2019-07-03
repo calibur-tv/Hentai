@@ -141,7 +141,6 @@ class Pin extends Model
     public function deletePin($user)
     {
         $this->delete();
-        $this->content()->delete();
 
         event(new \App\Events\Pin\Delete($this, $user));
     }

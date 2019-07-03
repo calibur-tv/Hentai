@@ -134,7 +134,6 @@ class Tag extends Model
     public function deleteTag($user)
     {
         $this->delete();
-        $this->content()->delete();
 
         event(new \App\Events\Tag\Delete($this, $user));
 
