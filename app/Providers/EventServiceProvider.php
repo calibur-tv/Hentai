@@ -15,6 +15,16 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\User\Register' => [
             'App\Listeners\User\Register\InitUserTimeline',
             'App\Listeners\User\Register\AddDefaultTagRelation',
+            // TODO gift for invitor
+        ],
+        'App\Events\User\UpdateProfile' => [
+            'App\Listeners\User\UpdateProfile\RefreshCache',
+            // TODO trial user info
+        ],
+        'App\Events\User\DailySign' => [
+            'App\Listeners\User\DailySign\UpdateUserActivity',
+            'App\Listeners\User\DailySign\GiveUserCoin',
+            'App\Listeners\User\DailySign\RefreshCache',
         ],
         'App\Events\Pin\Create' => [
             'App\Listeners\Pin\Create\Trial',

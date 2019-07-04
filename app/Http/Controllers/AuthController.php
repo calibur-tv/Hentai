@@ -118,18 +118,6 @@ class AuthController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $newUserId = $user->id;
-//                $invite = $request->get('invite');
-//                if ($invite)
-//                {
-//                    $invoter = $userRepository->item($invite);
-//                    if ($invoter)
-//                    {
-//                        $virtualCoinService = new VirtualCoinService();
-//                        $virtualCoinService->inviteUser($invite, $newUserId);
-//                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
-//                    }
-//                }
         }
         else
         {
@@ -208,18 +196,6 @@ class AuthController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $newUserId = $user->id;
-//                $invite = $request->get('invite');
-//                if ($invite)
-//                {
-//                    $invoter = $userRepository->item($invite);
-//                    if ($invoter)
-//                    {
-//                        $virtualCoinService = new VirtualCoinService();
-//                        $virtualCoinService->inviteUser($invite, $newUserId);
-//                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
-//                    }
-//                }
         }
         else
         {
@@ -293,18 +269,6 @@ class AuthController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $newUserId = $user->id;
-//                $invite = $request->get('invite');
-//                if ($invite)
-//                {
-//                    $invoter = $userRepository->item($invite);
-//                    if ($invoter)
-//                    {
-//                        $virtualCoinService = new VirtualCoinService();
-//                        $virtualCoinService->inviteUser($invite, $newUserId);
-//                        $virtualCoinService->invitedNewbieCoinGift($invite, $newUserId);
-//                    }
-//                }
         }
         else
         {

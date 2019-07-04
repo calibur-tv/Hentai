@@ -4,9 +4,6 @@
 namespace App\Http\Modules\DailyRecord;
 
 
-use App\Http\Modules\VirtualCoinService;
-use App\Http\Repositories\UserRepository;
-use App\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -16,16 +13,17 @@ class UserDailySign
     private $table = 'daily_records';
     private $record_type = 0;
 
-    public function sign($userSlug)
+    public function sign($user)
     {
-        $signed = $this->check($userSlug);
+        $slug = $user->slug;
+        $signed = $this->check($slug);
         if ($signed)
         {
             return false;
         }
 
         // 设为已签到
-        Redis::SET($this->sign_cache_key($userSlug), 1);
+        Redis::SET($this->sign_cache_key($slug), 1);
         $now = Carbon::now();
         $addCoinCount = 1;
         // 记录签到
@@ -33,50 +31,34 @@ class UserDailySign
             ::table($this->table)
             ->insert([
                 'record_type' => $this->record_type,
-                'record_slug' => $userSlug,
+                'record_slug' => $slug,
                 'value' => $addCoinCount,
                 'day' => $now
             ]);
 
         // 最后签到时间和总签到次数
-        User::where('slug', $userSlug)
-            ->increment(
-                'total_sign_count', 1,
-                [
-                    'latest_signed_at' => $now
-                ]
-            );
+        $user->increment(
+            'total_sign_count', 1,
+            [
+                'latest_signed_at' => $now
+            ]
+        );
 
         // 更新连续签到次数
-        $continuous_sign_count = User
-            ::where('slug', $userSlug)
-            ->pluck('continuous_sign_count')
-            ->first();
+        $continuous_sign_count = $user->continuous_sign_count;
 
         if ($continuous_sign_count < 0)
         {
-            User::where('slug', $userSlug)
-                ->update([
-                    'continuous_sign_count' => 0
-                ]);
+            $user->update([
+                'continuous_sign_count' => 0
+            ]);
         }
         else
         {
-            User::where('slug', $userSlug)
-                ->increment('continuous_sign_count');
+            $user->increment('continuous_sign_count');
         }
 
-        // 修改用户的活跃度，默认 + 3
-        $userActivity = new UserActivity();
-        $userActivity->set($userSlug, 3);
-
-        // 给用户发团子
-        $virtualCoinService = new VirtualCoinService();
-        $virtualCoinService->daySign($userSlug, $addCoinCount);
-
-        // 刷新用户缓存
-        $userRepository = new UserRepository();
-        $userRepository->item($userSlug, true);
+        event(new \App\Events\User\DailySign($user, 3, $addCoinCount));
 
         return [
             'message' => "签到成功，团子+{$addCoinCount}",

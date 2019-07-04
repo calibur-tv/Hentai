@@ -203,4 +203,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
         return $user;
     }
+
+    public function updateProfile(array $data)
+    {
+        $this->update($data);
+
+        event(new \App\Events\User\UpdateProfile($this));
+    }
 }

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Modules\Counter\UserBeFollowedCounter;
-use App\Http\Modules\Counter\UserFollowingCounter;
 use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
@@ -176,26 +174,18 @@ class UserController extends Controller
         }
 
         $user = $request->user();
-        $slug = $user->slug;
         $birthday = $request->get('birthday') ? date('Y-m-d H:m:s', (int)$request->get('birthday')) : null;
-        $avatar = $request->get('avatar');
-        $banner = $request->get('banner');
 
-        User
-            ::where('slug', $slug)
-            ->update([
-                'nickname' => $request->get('nickname'),
-                'signature' => $request->get('signature'),
-                'sex' => $request->get('sex'),
-                'avatar' => $avatar,
-                'banner' => $banner,
-                'sex_secret' => $request->get('sex_secret'),
-                'birthday' => $birthday,
-                'birth_secret' => $request->get('birth_secret')
-            ]);
-
-        $userRepository = new UserRepository();
-        $userRepository->item($slug, true);
+        $user->updateProfile([
+            'nickname' => $request->get('nickname'),
+            'signature' => $request->get('signature'),
+            'sex' => $request->get('sex'),
+            'avatar' => $request->get('avatar'),
+            'banner' => $request->get('banner'),
+            'sex_secret' => $request->get('sex_secret'),
+            'birthday' => $birthday,
+            'birth_secret' => $request->get('birth_secret')
+        ]);
 
         return $this->resOK();
     }
@@ -208,7 +198,7 @@ class UserController extends Controller
         $user = $request->user();
 
         $userDailySign = new UserDailySign();
-        $result = $userDailySign->sign($user->slug);
+        $result = $userDailySign->sign($user);
 
         if (false === $result)
         {
@@ -335,7 +325,6 @@ class UserController extends Controller
         }
 
         $targets = $request->get('targets') ? explode(',', $request->get('targets')) : [];
-        $type = 'user';
         $userSlug = $user->slug;
 
         if (empty($targets))

@@ -140,6 +140,7 @@ class UserRepository extends Repository
                 ->timeline()
                 ->select('event_type', 'event_slug', 'created_at')
                 ->orderBy('created_at', 'DESC')
+                ->orderBy('id', 'DESC')
                 ->get()
                 ->toArray();
 

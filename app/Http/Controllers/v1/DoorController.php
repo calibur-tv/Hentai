@@ -360,8 +360,6 @@ class DoorController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $userRepository = new UserRepository();
-//                $userRepository->migrateSearchIndex('C', $user->id);
         }
         else
         {
@@ -375,13 +373,6 @@ class DoorController extends Controller
                 return $this->resErrRole('该账号不存在了');
             }
         }
-
-//        $userId = $user->id;
-//        $UserIpAddress = new UserIpAddress();
-//        $UserIpAddress->add(
-//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-//            $userId
-//        );
 
         return $this->resCreated($user->api_token);
     }
@@ -472,8 +463,6 @@ class DoorController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $userRepository = new UserRepository();
-//                $userRepository->migrateSearchIndex('C', $user->id);
         }
         else
         {
@@ -487,13 +476,6 @@ class DoorController extends Controller
                 return $this->resErrRole('该账号不存在了');
             }
         }
-
-//        $userId = $user->id;
-//        $UserIpAddress = new UserIpAddress();
-//        $UserIpAddress->add(
-//            explode(', ', $request->headers->get('X-Forwarded-For'))[0],
-//            $userId
-//        );
 
         return $this->resCreated($user->api_token);
     }
@@ -618,8 +600,6 @@ class DoorController extends Controller
             ];
 
             $user = User::createUser($data);
-//                $userRepository = new UserRepository();
-//                $userRepository->migrateSearchIndex('C', $user->id);
         }
         else
         {
