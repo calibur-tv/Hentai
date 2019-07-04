@@ -51,8 +51,6 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->post('update_info', 'UserController@updateProfile');
 
         $route->post('daily_sign', 'UserController@dailySign');
-
-        $route->post('toggle_follow', 'UserController@toggleFollow');
     });
 });
 
@@ -81,6 +79,11 @@ $route->group(['prefix' => 'image'], function () use ($route)
     $route->get('captcha', 'ImageController@captcha');
 
     $route->get('uptoken', 'ImageController@uptoken');
+});
+
+$route->group(['prefix' => 'social'], function () use ($route)
+{
+    $route->post('toggle', 'ToggleController@toggle');
 });
 
 $route->group(['prefix' => 'pin'], function () use ($route)

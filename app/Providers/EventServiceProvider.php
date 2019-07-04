@@ -61,5 +61,9 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Tag\Delete\MoveChildrenToTrash',
             'App\Listeners\Tag\Delete\RefreshCache',
         ],
+        'App\Events\User\ToggleFollowUser' => [
+            'App\Listeners\User\ToggleFollowUser\UpdateRelationCounter',
+            'App\Listeners\User\ToggleFollowUser\RefreshRelationCache',
+        ],
     ];
 }

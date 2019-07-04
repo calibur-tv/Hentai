@@ -17,11 +17,16 @@ class ToggleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'target_slug' => 'required|string',
-            'model_type' => [
+            'target_type' => [
                 'required',
                 Rule::in(['user', 'pin', 'tag']),
             ],
+            'action_slug' => 'required|string',
             'action_type' => [
+                'required',
+                Rule::in(['user', 'tag']),
+            ],
+            'method_type' => [
                 'required',
                 Rule::in(['like', 'bookmark', 'follow', 'favorite', 'subscribe', 'up_vote', 'down_vote']),
             ],
@@ -33,69 +38,86 @@ class ToggleController extends Controller
         }
 
         $targetSlug = $request->get('target_slug');
+        $targetType = $request->get('target_type');
+        $methodType = $request->get('method_type');
         $actionType = $request->get('action_type');
-        $modelType = $request->get('model_type');
+        $actionSlug = $request->get('action_slug');
 
-        $targetClass = $this->convertTargetClass($modelType);
+        $targetClass = $this->convertClass($targetType);
         if (is_null($targetClass))
         {
             return $this->resErrBad();
         }
 
-        $targetModel = $this->getTargetModel($modelType, $targetSlug);
-        if (is_null($targetClass))
+        $target = $this->convertModel($targetType, $targetSlug);
+        if (is_null($target))
         {
             return $this->resErrNotFound();
         }
 
         $user = $request->user();
-        $result = $this->toggleAction($user, $targetModel, $targetClass, $actionType);
+        if ($actionType !== 'user' || $user->slug !== $actionSlug)
+        {
+            $object = $this->convertModel($actionType, $actionSlug);
+        }
+        else
+        {
+            $object = $user;
+        }
+
+        if (is_null($object))
+        {
+            return $this->resErrBad();
+        }
+
+        $result = $this->toggleAction($object, $target, $targetClass, $methodType);
         if (null === $result)
         {
             return $this->resErrServiceUnavailable();
         }
 
-        $this->emitToggleEvent($user, $targetModel, $targetClass, $modelType, $actionType, $result);
+        $result = empty($result['detached']);
+        $this->emitToggleEvent($object, $target, $targetType, $methodType, $result);
 
-        return $this->resNoContent();
+        return $this->resOK($result);
     }
 
-    protected function emitToggleEvent($user, $target, $class, $model, $action, $result)
+    protected function emitToggleEvent($object, $target, $targetType, $method, $result)
     {
-        if ($model === 'user')
+        if ($targetType === 'user')
         {
-            if ($action === 'follow')
+            if ($method === 'follow')
             {
-                event(new ToggleFollowUser($user, $target, $class, $model, $action, $result));
+                event(new ToggleFollowUser($object, $target, $result));
             }
         }
     }
 
-    protected function toggleAction($user, $target, $class, $type)
+    protected function toggleAction($object, $target, $class, $type)
     {
         switch ($type) {
             case 'follow':
-                return $user->toggleFollow($target, $class);
+                return $object->toggleFollow($target, $class);
             case 'bookmark':
-                return $user->toggleBookmark($target, $class);
+                return $object->toggleBookmark($target, $class);
             case 'like':
-                return $user->toggleLike($target, $class);
+                return $object->toggleLike($target, $class);
             case 'favorite':
-                return $user->toggleFavorite($target, $class);
+                return $object->toggleFavorite($target, $class);
             case 'subscribe':
-                return $user->toggleSubscribe($target, $class);
+                return $object->toggleSubscribe($target, $class);
             case 'up_vote':
-                $user->cancelVote($target, $class);
-                return $user->upvote($target, $class);
+                $object->cancelVote($target, $class);
+                return $object->upvote($target, $class);
             case 'down_vote':
-                $user->cancelVote($target, $class);
-                return $user->downvote($target, $class);
+                $object->cancelVote($target, $class);
+                return $object->downvote($target, $class);
             default:
                 return null;
         }
     }
 
-    protected function convertTargetClass($type)
+    protected function convertClass($type)
     {
         switch ($type) {
             case 'user':
@@ -109,7 +131,7 @@ class ToggleController extends Controller
         }
     }
 
-    protected function getTargetModel($type, $slug)
+    protected function convertModel($type, $slug)
     {
         switch ($type) {
             case 'user':
@@ -121,28 +143,5 @@ class ToggleController extends Controller
             default:
                 return null;
         }
-    }
-
-    protected function convertUserRelation($currentFollowTarget, $targetFollowCurrent)
-    {
-        // 'friend', 'follower', 'following', 'stranger'
-        if ($currentFollowTarget && $targetFollowCurrent)
-        {
-            $result = 'friend';
-        }
-        else if ($currentFollowTarget && !$targetFollowCurrent)
-        {
-            $result = 'following';
-        }
-        else if (!$currentFollowTarget && $targetFollowCurrent)
-        {
-            $result = 'follower';
-        }
-        else
-        {
-            $result = 'stranger';
-        }
-
-        return $result;
     }
 }

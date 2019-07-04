@@ -2,11 +2,11 @@
 
 namespace App\Listeners\User\ToggleFollowUser;
 
-use App\Http\Repositories\UserRepository;
+use App\Http\Modules\Counter\UserPatchCounter;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class RefreshCache
+class UpdateRelationCounter
 {
     /**
      * Create the event listener.
@@ -26,8 +26,9 @@ class RefreshCache
      */
     public function handle(\App\Events\User\ToggleFollowUser $event)
     {
-        $userRepository = new UserRepository();
-        $userRepository->friends($event->target->slug, true);
-        $userRepository->friends($event->user->slug, true);
+        $userPatchCounter = new UserPatchCounter();
+        $num = $event->result ? 1 : -1;
+        $userPatchCounter->add($event->user->slug, 'following_count', $num);
+        $userPatchCounter->add($event->target->slug, 'followers_count', $num);
     }
 }

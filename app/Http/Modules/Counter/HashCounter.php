@@ -56,7 +56,9 @@ class HashCounter
         }
         else
         {
-            $this->migrate($slug, $result);
+            $this->migrate($slug, [
+                'key' => $result
+            ]);
         }
 
         return $result;

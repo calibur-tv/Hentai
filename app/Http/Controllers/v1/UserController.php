@@ -52,16 +52,9 @@ class UserController extends Controller
         $userPatchCounter = new UserPatchCounter();
         $patch = $userPatchCounter->all($targetSlug);
         $visitor = $request->user();
-        if (!$visitor)
-        {
-            $patch['relation'] = 'unknown';
-            return $this->resOK($patch);
-        }
-
         $visitorSlug = $visitor->slug;
-        if ($visitorSlug === $targetSlug)
+        if (!$visitor || $visitorSlug === $targetSlug)
         {
-            $patch['relation'] = 'self';
             return $this->resOK($patch);
         }
 
@@ -69,15 +62,14 @@ class UserController extends Controller
             ::where('slug', $targetSlug)
             ->first();
 
-        $relation = $this->convertUserRelation($visitor->isFollowing($target), $target->isFollowing($visitor));
-
         $userActivity = new UserActivity();
         $userExposure = new UserExposure();
         $userActivity->set($visitorSlug);
         $userExposure->set($targetSlug);
         $userPatchCounter->add($targetSlug, 'visit_count');
 
-        $patch['relation'] = $relation;
+        $patch['is_following'] = $visitor->isFollowing($target);
+        $patch['is_followed_by'] = $visitor->isFollowedBy($target);
 
         return $this->resOK($patch);
     }
@@ -207,72 +199,6 @@ class UserController extends Controller
 
         return $this->resOK($result);
     }
-
-    /**
-     * 用户关注
-     */
-    public function toggleFollow(Request $request)
-    {
-        $user = $request->user();
-        $targetSlug = $request->get('slug');
-        $mineSlug = $user->slug;
-
-        $target = User
-            ::where('slug', $targetSlug)
-            ->first();
-
-        if (is_null($target))
-        {
-            return $this->resErrNotFound();
-        }
-
-        $userPatchCounter = new UserPatchCounter();
-
-        $isFollowing = $user->isFollowing($target); // 我是否关注了 TA
-        $isFollowMe = $target->isFollowing($user);  // TA 是否关注了我
-
-        if (!$isFollowing) // 如果未关注
-        {
-            $hasFollowingCount = $userPatchCounter->get($mineSlug, 'following_count');
-            // 100人是关注的上限
-            if ($hasFollowingCount >= 100)
-            {
-                return $this->resErrRole('最多关注100个人');
-            }
-
-            $user->follow($target);
-            $userPatchCounter->add($mineSlug, 'following_count');
-            $userPatchCounter->add($targetSlug, 'followers_count');
-        }
-        else // 如果已关注
-        {
-            $user->unfollow($target);
-            $userPatchCounter->add($mineSlug, 'following_count', -1);
-            $userPatchCounter->add($targetSlug, 'followers_count', -1);
-        }
-
-        $isFollowing = !$isFollowing; // 我关注的结果
-
-        $userRepository = new UserRepository();
-        if ($isFollowMe)
-        {
-            // 无论我是否取消关注，都刷新彼此朋友列表的缓存
-            $userRepository->friends($targetSlug, true);
-            $userRepository->friends($mineSlug, true);
-        }
-        else
-        {
-            // 刷新TA的粉丝列表
-            $userRepository->followers($targetSlug, true);
-            // 刷新我的关注列表
-            $userRepository->followings($mineSlug, true);
-        }
-        // 返回彼此的关系
-        $result = $this->convertUserRelation($isFollowing, $isFollowMe);
-
-        return $this->resOK($result);
-    }
-
 
     /**
      * 用户关系
