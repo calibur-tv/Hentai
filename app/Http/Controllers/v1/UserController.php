@@ -270,8 +270,6 @@ class UserController extends Controller
         // 返回彼此的关系
         $result = $this->convertUserRelation($isFollowing, $isFollowMe);
 
-        // TODO 消息通知
-
         return $this->resOK($result);
     }
 
