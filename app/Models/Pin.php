@@ -74,7 +74,7 @@ class Pin extends Model
 
     public function comments()
     {
-        return $this->hasMany('App\Models\Comment');
+        return $this->hasMany('App\Models\Comment', 'pin_slug', 'slug');
     }
 
     public function reports()

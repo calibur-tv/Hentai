@@ -14,27 +14,28 @@ class Comment extends Model
     use SoftDeletes, CanBeVoted, HasRoles;
 
     protected $fillable = [
-        'from_user_id',
-        'to_user_id',
-        'pin_id',
+        'from_user_slug',
+        'to_user_slug',
+        'pin_slug',
         'trial_type',       // 审核结果，默认是 0，不在审核中
+        'like_count',       // 喜欢和反对最后算出的值
     ];
 
     protected $touches = ['pin'];
 
-    public function from_user()
+    public function author()
     {
-        return $this->belongsTo('App\User', 'from_user_id', 'id');
+        return $this->belongsTo('App\User', 'from_user_slug', 'slug');
     }
 
-    public function to_user()
+    public function getter()
     {
-        return $this->belongsTo('App\User', 'to_user_id', 'id');
+        return $this->belongsTo('App\User', 'to_user_slug', 'slug');
     }
 
     public function pin()
     {
-        return $this->belongsTo('App\Models\Pin', 'pin_id', 'id');
+        return $this->belongsTo('App\Models\Pin', 'pin_slug', 'slug');
     }
 
     public function content()
