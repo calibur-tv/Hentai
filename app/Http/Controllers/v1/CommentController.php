@@ -81,11 +81,6 @@ class CommentController extends Controller
 
     }
 
-    public function vote(Request $request)
-    {
-
-    }
-
     public function trials(Request $request)
     {
 

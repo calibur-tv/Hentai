@@ -80,13 +80,15 @@ class PinController extends Controller
         $user = $request->user();
         if (!$user || $user->slug === $pin->user_slug)
         {
-            $patch['vote_status'] = 0;
+            $patch['up_vote_status'] = false;
+            $patch['down_vote_status'] = false;
             $patch['mark_status'] = false;
             $patch['reward_status'] = false;
         }
         else
         {
-            $patch['vote_status'] = 0;
+            $patch['up_vote_status'] = 0;
+            $patch['down_vote_status'] = false;
             $patch['mark_status'] = $pin->isBookmarkedBy($user);
             $patch['reward_status'] = $pin->isFavoritedBy($user);
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Events\User\ToggleFollowUser;
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Pin;
 use App\Models\Tag;
 use App\User;
@@ -19,7 +20,7 @@ class ToggleController extends Controller
             'target_slug' => 'required|string',
             'target_type' => [
                 'required',
-                Rule::in(['user', 'pin', 'tag']),
+                Rule::in(['user', 'pin', 'tag', 'comment']),
             ],
             'action_slug' => 'required|string',
             'action_type' => [
@@ -56,6 +57,11 @@ class ToggleController extends Controller
         }
 
         $user = $request->user();
+        if ($this->getCreatorSlug($target, $targetType) === $user->slug)
+        {
+            return $this->resErrRole('自己的内容');
+        }
+
         if ($actionType !== 'user' || $user->slug !== $actionSlug)
         {
             $object = $this->convertModel($actionType, $actionSlug);
@@ -80,6 +86,22 @@ class ToggleController extends Controller
         $this->emitToggleEvent($object, $target, $targetType, $methodType, $result);
 
         return $this->resOK($result);
+    }
+
+    protected function getCreatorSlug($target, $type)
+    {
+        switch ($target) {
+            case 'user':
+                return $target->slug;
+            case 'pin':
+                return $target->user_slug;
+            case 'tag':
+                return $target->creator_slug;
+            case 'comment':
+                return $target->from_user_slug;
+            default:
+                return '';
+        }
     }
 
     protected function emitToggleEvent($object, $target, $targetType, $method, $result)
@@ -126,6 +148,8 @@ class ToggleController extends Controller
                 return Tag::class;
             case 'pin':
                 return Pin::class;
+            case 'comment':
+                return Comment::class;
             default:
                 return null;
         }
@@ -140,6 +164,8 @@ class ToggleController extends Controller
                 return Tag::where('slug', $slug)->first();
             case 'pin':
                 return Pin::where('slug', $slug)->first();
+            case 'comment':
+                return Comment::where('id', $slug)->first();
             default:
                 return null;
         }

@@ -480,12 +480,6 @@ class DoorController extends Controller
         return $this->resCreated($user->api_token);
     }
 
-    // Todo：绑定第三方账号
-    public function bindProvider()
-    {
-
-    }
-
     /**
      * 绑定用户手机号
      *
@@ -635,7 +629,7 @@ class DoorController extends Controller
             ]
         );
         $body = json_decode($resp->body, true);
-        $uniqueId = isset($body['unionid']) ? $body['unionid'] : '';
+        $uniqueId = isset($body['unionid']) ?? '';
         if (!$uniqueId)
         {
             return $this->resOK([

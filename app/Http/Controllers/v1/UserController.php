@@ -53,8 +53,16 @@ class UserController extends Controller
         $patch = $userPatchCounter->all($targetSlug);
         $visitor = $request->user();
         $visitorSlug = $visitor->slug;
-        if (!$visitor || $visitorSlug === $targetSlug)
+        if (!$visitor)
         {
+            return $this->resOK($patch);
+        }
+
+        if ($visitorSlug === $targetSlug)
+        {
+            $userDailySign = new UserDailySign();
+            $patch['daily_signed'] = $userDailySign->check($targetSlug);
+
             return $this->resOK($patch);
         }
 
