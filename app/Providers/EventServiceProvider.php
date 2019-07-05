@@ -32,16 +32,19 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\AddPinTagRelation',
             'App\Listeners\Pin\Create\RefreshUserDrafts',
             'App\Listeners\Pin\Create\UpdateAuthorTimeline',
+            'App\Listeners\Pin\Create\UpdateTagCounter',
         ],
         'App\Events\Pin\Update' => [
             'App\Listeners\Pin\Update\Trial',
             'App\Listeners\Pin\Update\UpdatePinTimeline',
             'App\Listeners\Pin\Update\RefreshCache',
             'App\Listeners\Pin\Update\UpdateAuthorTimeline',
+            'App\Listeners\Pin\Update\UpdateTagCounter',
         ],
         'App\Events\Pin\Delete' => [
             'App\Listeners\Pin\Delete\UpdatePinTimeline',
             'App\Listeners\Pin\Delete\UpdateAuthorTimeline',
+            'App\Listeners\Pin\Delete\UpdateTagCounter',
             'App\Listeners\Pin\Delete\RefreshCache',
         ],
         'App\Events\Tag\Create' => [

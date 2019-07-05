@@ -4,6 +4,8 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Models\Pin;
+
 class PinPatchCounter extends HashCounter
 {
     public function __construct()
@@ -15,5 +17,20 @@ class PinPatchCounter extends HashCounter
             'mark_count',
             'reward_count'
         ]);
+    }
+
+    public function boot($slug)
+    {
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
+
+        return [
+            'visit_count' => $pin->visit_count,
+            'comment_count' => $pin->comment_count,
+            'mark_count' => $pin->mark_count,
+            'reward_count' => $pin->reward_count,
+            'like_count' => $pin->upvoters()->count()
+        ];
     }
 }

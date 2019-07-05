@@ -76,18 +76,12 @@ class PinController extends Controller
         $patch['recommended_at'] = $pin->recommended_at;
         $patch['last_top_at'] = $pin->last_top_at;
         $patch['deleted_at'] = $pin->deleted_at;
+
         $user = $request->user();
-        if (!$user || $user->slug === $pin->author->slug)
-        {
-            $patch['up_vote_status'] = false;
-            $patch['down_vote_status'] = false;
-            $patch['mark_status'] = false;
-            $patch['reward_status'] = false;
-        }
-        else
+        if ($user && $user->slug !== $pin->author->slug)
         {
             $pinId = slug2id($slug);
-            $patch['up_vote_status'] = 0;
+            $patch['up_vote_status'] = false;
             $patch['down_vote_status'] = false;
             $patch['mark_status'] = $user->hasBookmarked($pinId, Pin::class);
             $patch['reward_status'] = $user->hasFavorited($pinId, Pin::class);

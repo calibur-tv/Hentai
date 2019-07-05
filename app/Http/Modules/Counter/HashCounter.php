@@ -38,6 +38,8 @@ class HashCounter
             $this->migrate($slug, $result);
         }
 
+        unset($result['migrate_at']);
+
         return $result;
     }
 
@@ -53,12 +55,6 @@ class HashCounter
         {
             $this->save($slug, $this->boot($slug));
             $result = Redis::HGET($cacheKey, $key);
-        }
-        else
-        {
-            $this->migrate($slug, [
-                'key' => $result
-            ]);
         }
 
         return $result;
@@ -133,6 +129,13 @@ class HashCounter
             ::table($this->table)
             ->where($this->uniqueKey, $slug)
             ->update($result);
+
+        Redis::HMSET(
+            $this->cacheKey($slug),
+            [
+                'migrate_at' => time()
+            ]
+        );
     }
 
     protected function cacheKey($slug)

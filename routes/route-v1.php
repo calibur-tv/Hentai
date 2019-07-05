@@ -143,6 +143,11 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
 
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('patch', 'TagController@patch');
+    });
+
     $route->get('mixin_patch', 'TagController@mixinPatch');
 
     $route->get('bookmarks', 'TagController@bookmarks');

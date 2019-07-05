@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
@@ -28,6 +29,33 @@ class TagController extends Controller
         }
 
         return $this->resOK($data);
+    }
+
+    public function patch(Request $request)
+    {
+        $slug = $request->get('slug');
+
+        $tagRepository = new TagRepository();
+        $data = $tagRepository->item($slug);
+        if (is_null($data))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $tagPatchCounter = new TagPatchCounter();
+        $patch = $tagPatchCounter->all($slug);
+        $user = $request->user();
+
+        if (!$user)
+        {
+            return $this->resOK($patch);
+        }
+
+        $tagId = slug2id($slug);
+        $patch['is_followed'] = $user->isFollowing($tagId, Tag::class);
+        $patch['is_marked'] = $user->hasBookmarked($tagId, Tag::class);
+
+        return $this->resOK($patch);
     }
 
     public function mixinPatch(Request $request)
