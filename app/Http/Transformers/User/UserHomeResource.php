@@ -8,12 +8,15 @@
 
 namespace App\Http\Transformers\User;
 
+use App\Http\Modules\DailyRecord\UserDailySign;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserHomeResource extends JsonResource
 {
     public function toArray($request)
     {
+        $userDailySign = new UserDailySign();
+
         return [
             'slug' => $this->slug,
             'nickname' => $this->nickname,
@@ -33,7 +36,7 @@ class UserHomeResource extends JsonResource
                 'coin' => (float)$this->virtual_coin,
                 'money' => (float)$this->money_coin,
             ],
-            'daily_signed' => false,
+            'daily_signed' => $userDailySign->check($this->slug),
             'sign' => [
                 'continuous_sign_count' => $this->continuous_sign_count,
                 'total_sign_count' => $this->total_sign_count,
