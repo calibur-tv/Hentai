@@ -66,8 +66,9 @@ class UserController extends Controller
             return $this->resOK($patch);
         }
 
-        $target = User
+        $targetId = User
             ::where('slug', $targetSlug)
+            ->pluck('id')
             ->first();
 
         $userActivity = new UserActivity();
@@ -76,8 +77,8 @@ class UserController extends Controller
         $userExposure->set($targetSlug);
         $userPatchCounter->add($targetSlug, 'visit_count');
 
-        $patch['is_following'] = $visitor->isFollowing($target);
-        $patch['is_followed_by'] = $visitor->isFollowedBy($target);
+        $patch['is_following'] = $visitor->isFollowing($targetId);
+        $patch['is_followed_by'] = $visitor->isFollowedBy($targetId);
 
         return $this->resOK($patch);
     }
