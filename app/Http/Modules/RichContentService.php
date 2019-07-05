@@ -160,6 +160,18 @@ class RichContentService
                     $result .= (($i + 1) . ' ' . $item['text']);
                 }
             }
+            else if ($type === 'image')
+            {
+                $result .= $row['data']['caption'];
+            }
+            else if ($type === 'video')
+            {
+                $result .= $row['data']['caption'];
+            }
+            else if ($type === 'music')
+            {
+                $result .= $row['data']['caption'];
+            }
         }
 
         return $result;
@@ -167,32 +179,67 @@ class RichContentService
 
     public function parseRichPoster($title, array $data)
     {
-        if ($title['banner'])
-        {
-            return [
-                'type' => 'image',
-                'data' => $title['banner']
-            ];
-        }
+        $imageCount = 0;
+        $videoCount = 0;
+        $musicCount = 0;
+        $firstImage = null;
+        $firstVideo = null;
+        $firstMusic = null;
 
         foreach ($data as $row)
         {
             $type = $row['type'];
             if ($type === 'image')
             {
-                return $row;
+                $imageCount++;
+                if (!$firstImage)
+                {
+                    $firstImage = $row;
+                }
             }
             else if ($type === 'video')
             {
-                return $row;
+                $videoCount++;
+                if (!$firstVideo)
+                {
+                    $firstVideo = $row;
+                }
             }
             else if ($type === 'music')
             {
-                return $row;
+                $musicCount++;
+                if (!$firstMusic)
+                {
+                    $firstMusic = $row;
+                }
             }
         }
 
-        return null;
+        if (
+            !$firstImage &&
+            !$firstVideo &&
+            !$firstMusic &&
+            !$title['banner']
+        )
+        {
+            return null;
+        }
+
+        $banner = $title['banner'];
+        if (!$banner && $firstImage)
+        {
+            $banner = $firstImage;
+        }
+
+        return [
+            'image_count' => $imageCount,
+            'video_count' => $videoCount,
+            'music_count' => $musicCount,
+            'first_image' => $firstImage,
+            'first_video' => $firstVideo,
+            'first_music' => $firstMusic,
+            'banner' => $banner
+        ];
     }
 
     public function detectContentRisk($data, $withImage = true)
