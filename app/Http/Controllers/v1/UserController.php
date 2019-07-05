@@ -266,23 +266,38 @@ class UserController extends Controller
         {
             if (in_array($item, $userFriends))
             {
-                $result[$item] = 'friend';
+                $result[$item] = [
+                    'is_following' => true,
+                    'is_followed_by' => true
+                ];
             }
             else if (in_array($item, $userFollowings))
             {
-                $result[$item] = 'following';
+                $result[$item] = [
+                    'is_following' => true,
+                    'is_followed_by' => false
+                ];
             }
             else if ($item === $userSlug)
             {
-                $result[$item] = 'self';
+                $result[$item] = [
+                    'is_following' => false,
+                    'is_followed_by' => false
+                ];
             }
             else if (in_array($item, $userFollowers))
             {
-                $result[$item] = 'follower';
+                $result[$item] = [
+                    'is_following' => false,
+                    'is_followed_by' => true
+                ];
             }
             else
             {
-                $result[$item] = 'stranger';
+                $result[$item] = [
+                    'is_following' => false,
+                    'is_followed_by' => false
+                ];
             }
         }
 
@@ -311,28 +326,5 @@ class UserController extends Controller
     public function reject(Request $request)
     {
 
-    }
-
-    protected function convertUserRelation($currentFollowTarget, $targetFollowCurrent)
-    {
-        // 'friend', 'follower', 'following', 'stranger'
-        if ($currentFollowTarget && $targetFollowCurrent)
-        {
-            $result = 'friend';
-        }
-        else if ($currentFollowTarget && !$targetFollowCurrent)
-        {
-            $result = 'following';
-        }
-        else if (!$currentFollowTarget && $targetFollowCurrent)
-        {
-            $result = 'follower';
-        }
-        else
-        {
-            $result = 'stranger';
-        }
-
-        return $result;
     }
 }
