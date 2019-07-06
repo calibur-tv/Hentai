@@ -77,5 +77,9 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Comment\Delete\UpdateListCache',
             'App\Listeners\Comment\Delete\RefreshCache',
         ],
+        'App\Events\Comment\UpVote' => [
+            'App\Listeners\Comment\UpVote\UpdateLikeCounter',
+            'App\Listeners\Comment\UpVote\UpdateHottestCache'
+        ],
     ];
 }

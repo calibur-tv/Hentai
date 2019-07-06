@@ -11,18 +11,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\UserRepository;
-use App\Models\Comment;
-use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
 {
     public function index()
     {
-        $user = User::find(1);
-        $comment = Comment::find(1);
-        $result = $user->cancelUpVote($comment);
-        dd($result);
         return response('<html lang="en" class="">
 <head>
     <meta charset="UTF-8">

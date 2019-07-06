@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\CommentLikeCounter;
 use App\Http\Repositories\CommentRepository;
 use App\Http\Repositories\PinRepository;
 use App\Models\Comment;
+use App\Services\Relation\RelationDetect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -70,6 +72,34 @@ class CommentController extends Controller
     public function talk(Request $request)
     {
 
+    }
+
+    /**
+     * 给评论打补丁
+     */
+    public function patch(Request $request)
+    {
+        $ids = explode(',', $request->get('comment_ids'));
+        $commentLikeCounter = new CommentLikeCounter();
+        $result = [];
+
+        foreach ($ids as $commentId)
+        {
+            $result[$commentId] = [
+                'like_count' => $commentLikeCounter->get($commentId),
+                'up_vote_status' => false
+            ];
+        }
+        $user = $request->user();
+        if (is_null($user))
+        {
+            return $this->resOK($result);
+        }
+
+        $relationDetect = new RelationDetect();
+        $result = $relationDetect->batchDetect($result, $ids, $user->id, 'comment', 'upvote', 'up_vote_status');
+
+        return $this->resOK($result);
     }
 
     public function create(Request $request)

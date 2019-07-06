@@ -174,6 +174,11 @@ $route->group(['prefix' => 'comment'], function () use ($route)
 
     $route->get('talk', 'CommentController@talk');
 
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('patch', 'CommentController@patch');
+    });
+
     $route->group(['middleware' => ['auth']], function () use ($route)
     {
         $route->post('create', 'CommentController@create');

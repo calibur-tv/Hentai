@@ -98,7 +98,7 @@ class CommentRepository extends Repository
             $result = [];
             foreach ($list as $row)
             {
-                $result[$row['id']] = $row['like_count'] * 10000000000 + strtotime($row['created_at']);
+                $result[$row['id']] = $row['like_count'] * 10000 + strtotime($row['created_at']);
             }
 
             return $result;
