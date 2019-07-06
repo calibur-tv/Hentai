@@ -168,21 +168,17 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 
 $route->group(['prefix' => 'comment'], function () use ($route)
 {
-    $route->get('main_item', 'CommentController@main_item');
+    $route->get('show', 'CommentController@show');
 
-    $route->get('main_list', 'CommentController@main_list');
+    $route->get('list', 'CommentController@list');
 
-    $route->get('reply_list', 'CommentController@reply_list');
+    $route->get('talk', 'CommentController@talk');
 
-    $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
+    $route->group(['middleware' => ['auth']], function () use ($route)
     {
         $route->post('create', 'CommentController@create');
 
-        $route->post('reply', 'CommentController@reply');
-
-        $route->post('destroy', 'CommentController@destroy');
-
-        $route->post('vote', 'CommentController@vote');
+        $route->post('delete', 'CommentController@delete');
     });
 
     $route->group(['middleware' => 'auth'], function () use ($route)

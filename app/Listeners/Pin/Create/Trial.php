@@ -20,7 +20,7 @@ class Trial
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Create  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Create $event)

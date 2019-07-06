@@ -68,5 +68,8 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\User\ToggleFollowUser\UpdateRelationCounter',
             'App\Listeners\User\ToggleFollowUser\RefreshRelationCache',
         ],
+        'App\Events\Comment\Create' => [
+            'App\Listeners\Comment\Create\UpdatePinCounter',
+        ],
     ];
 }

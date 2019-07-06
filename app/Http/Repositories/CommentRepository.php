@@ -9,7 +9,7 @@
 namespace App\Http\Repositories;
 
 
-use App\Http\Transformers\Tag\CommentItemResource;
+use App\Http\Transformers\Comment\CommentItemResource;
 use App\Models\Comment;
 
 class CommentRepository extends Repository
@@ -19,8 +19,12 @@ class CommentRepository extends Repository
         $result = $this->RedisItem("comment:{$id}", function () use ($id)
         {
             $comment = Comment
-                ::where('id', $id)
-                ->with(['author', 'getter', 'content'])
+                ::withTrashed()
+                ->where('id', $id)
+                ->with(['author', 'getter', 'content' => function ($query)
+                {
+                    $query->orderBy('created_at', 'desc');
+                }])
                 ->first();
 
             if (is_null($comment))

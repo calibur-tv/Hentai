@@ -27,9 +27,9 @@ class PinPatchCounter extends HashCounter
 
         return [
             'visit_count' => $pin->visit_count,
-            'comment_count' => $pin->comment_count,
-            'mark_count' => $pin->mark_count,
-            'reward_count' => $pin->reward_count,
+            'comment_count' => $pin->comments()->count(),
+            'mark_count' => $pin->bookmarks()->count(),
+            'reward_count' => $pin->favorites()->count(),
             'like_count' => $pin->upvoters()->count()
         ];
     }

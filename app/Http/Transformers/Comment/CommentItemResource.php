@@ -6,7 +6,7 @@
  * Time: 08:53
  */
 
-namespace App\Http\Transformers\Tag;
+namespace App\Http\Transformers\Comment;
 
 use App\Http\Modules\RichContentService;
 use App\Http\Transformers\User\UserItemResource;
@@ -21,11 +21,12 @@ class CommentItemResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'pin_slug' => $this->pin_slug,
             'getter' => new UserItemResource($this->getter),
             'author' => new UserItemResource($this->author),
             'content' => $content,
             'trial_type' => $this->trial_type,
-            'like_count' => $this->like_count,
+            'like_count' => $this->upvoters()->count(),
             'created_at' => $this->created_at
         ];
     }
