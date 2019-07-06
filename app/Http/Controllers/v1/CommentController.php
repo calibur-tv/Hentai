@@ -124,10 +124,15 @@ class CommentController extends Controller
         }
         else
         {
-            $targetUserSlug = '';
+            $targetUserSlug = $pin->author->slug;
         }
 
         $user = $request->user();
+        if ($targetUserSlug === $user->slug)
+        {
+            $targetUserSlug = '';
+        }
+
         $content = [
             [
                 'type' => 'paragraph',
