@@ -83,6 +83,32 @@ trait CanVote
     }
 
     /**
+     * Cancel vote for an item or items.
+     *
+     * @param int|array|\Illuminate\Database\Eloquent\Model $targets
+     * @param string                                        $class
+     *
+     * @return \Overtrue\LaravelFollow\Traits\CanVote
+     */
+    public function cancelUpVote($targets, $class = __CLASS__)
+    {
+        return Follow::detachRelations($this, 'upvotes', $targets, $class);
+    }
+
+    /**
+     * Cancel vote for an item or items.
+     *
+     * @param int|array|\Illuminate\Database\Eloquent\Model $targets
+     * @param string                                        $class
+     *
+     * @return \Overtrue\LaravelFollow\Traits\CanVote
+     */
+    public function cancelDownVote($targets, $class = __CLASS__)
+    {
+        return Follow::detachRelations($this, 'downvotes', $targets, $class);
+    }
+
+    /**
      * Check if user is upvoted given item.
      *
      * @param int|array|\Illuminate\Database\Eloquent\Model $target

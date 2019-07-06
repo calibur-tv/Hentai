@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Events\Comment\UpVote;
 use App\Events\User\ToggleFollowUser;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
@@ -82,7 +83,7 @@ class ToggleController extends Controller
             return $this->resErrServiceUnavailable();
         }
 
-        $result = empty($result['detached']);
+        $result = gettype($result) === 'array' ? empty($result['detached']) : $result;
         $this->emitToggleEvent($object, $target, $targetType, $methodType, $result);
 
         return $this->resOK($result);
@@ -90,7 +91,7 @@ class ToggleController extends Controller
 
     protected function getCreatorSlug($target, $type)
     {
-        switch ($target) {
+        switch ($type) {
             case 'user':
                 return $target->slug;
             case 'pin':
@@ -113,6 +114,13 @@ class ToggleController extends Controller
                 event(new ToggleFollowUser($object, $target, $result));
             }
         }
+        else if ($targetType === 'comment')
+        {
+            if ($method === 'up_vote')
+            {
+                event(new UpVote($target, $object, $result));
+            }
+        }
     }
 
     protected function toggleAction($object, $target, $class, $type)
@@ -129,11 +137,21 @@ class ToggleController extends Controller
             case 'subscribe':
                 return $object->toggleSubscribe($target, $class);
             case 'up_vote':
-                $object->cancelVote($target, $class);
-                return $object->upvote($target, $class);
+                if ($object->hasUpvoted($target, $class))
+                {
+                    $object->cancelUpVote($target, $class);
+                    return false;
+                }
+                $object->upvote($target, $class);
+                return true;
             case 'down_vote':
-                $object->cancelVote($target, $class);
-                return $object->downvote($target, $class);
+                if ($object->hasDownvoted($target, $class))
+                {
+                    $object->cancelDownVote($target, $class);
+                    return false;
+                }
+                $object->downvote($target, $class);
+                return true;
             default:
                 return null;
         }
