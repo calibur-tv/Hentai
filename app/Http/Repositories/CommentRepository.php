@@ -54,24 +54,21 @@ class CommentRepository extends Repository
         return $result;
     }
 
-    public function flow($slug, $sort, $count, $specId, $refresh = false)
+    public function flow($slug, $sort, $mode, $page, $count, $specId)
     {
-        if ($refresh)
-        {
-            $this->hottest_comment($slug, true);
-            $this->timeline_comment($slug, $sort, true);
-            return [];
-        }
-
         if ($sort === 'hottest')
         {
             $ids = $this->hottest_comment($slug);
-            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $count);
+            $idsObj = $mode === 'jump'
+                ? $this->filterIdsByPage($ids, $page, $count)
+                : $this->filterIdsBySeenIds($ids, $specId, $count);
         }
         else
         {
             $ids = $this->timeline_comment($slug, $sort);
-            $idsObj = $this->filterIdsByMaxId($ids, $specId, $count);
+            $idsObj = $mode === 'jump'
+                ? $this->filterIdsByPage($ids, $page, $count)
+                : $this->filterIdsByMaxId($ids, $specId, $count);
         }
 
         return $idsObj;

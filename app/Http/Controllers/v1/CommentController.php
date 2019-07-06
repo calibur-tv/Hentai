@@ -27,6 +27,8 @@ class CommentController extends Controller
     {
         $slug = $request->get('slug');
         $sort = $request->get('sort');
+        $mode = $request->get('mode') ?: 'flow';
+        $page = $request->get('page') ?: 1;
         $count = $request->get('count') ?: 10;
         if ($sort === 'hottest')
         {
@@ -45,7 +47,7 @@ class CommentController extends Controller
         }
 
         $commentRepository = new CommentRepository();
-        $idsObj = $commentRepository->flow($slug, $sort, $count, $specId);
+        $idsObj = $commentRepository->flow($slug, $sort, $mode, $page - 1, $count, $specId);
         if (!$idsObj['total'])
         {
             return $this->resOK($idsObj);
