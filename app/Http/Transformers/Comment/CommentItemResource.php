@@ -27,7 +27,9 @@ class CommentItemResource extends JsonResource
             'content' => $content,
             'trial_type' => $this->trial_type,
             'like_count' => $this->upvoters()->count(),
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at
         ];
     }
 }

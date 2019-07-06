@@ -86,6 +86,7 @@ class PinController extends Controller
             $patch['mark_status'] = $user->hasBookmarked($pinId, Pin::class);
             $patch['reward_status'] = $user->hasFavorited($pinId, Pin::class);
         }
+        $pinPatchCounter->add($slug, 'visit_count');
 
         return $this->resOK($patch);
     }
