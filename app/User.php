@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Services\Relation\Traits\CanBeFollowed;
+use App\Services\Trial\WordsFilter;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
@@ -206,8 +207,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function updateProfile(array $data)
     {
-        $this->update($data);
+        $wordsFilter = new WordsFilter();
+        $riskCount = $wordsFilter->count($data['nickname'] . $data['signature']);
+        if ($riskCount > 0)
+        {
+            return false;
+        }
 
+        $this->update($data);
         event(new \App\Events\User\UpdateProfile($this));
+
+        return true;
     }
 }

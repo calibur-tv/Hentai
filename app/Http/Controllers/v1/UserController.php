@@ -177,7 +177,7 @@ class UserController extends Controller
         $user = $request->user();
         $birthday = $request->get('birthday') ? date('Y-m-d H:m:s', (int)$request->get('birthday')) : null;
 
-        $user->updateProfile([
+        $result = $user->updateProfile([
             'nickname' => $request->get('nickname'),
             'signature' => $request->get('signature'),
             'sex' => $request->get('sex'),
@@ -187,6 +187,10 @@ class UserController extends Controller
             'birthday' => $birthday,
             'birth_secret' => $request->get('birth_secret')
         ]);
+        if (!$result)
+        {
+            return $this->resErrBad('更新失败');
+        }
 
         return $this->resOK();
     }
