@@ -27,19 +27,28 @@ class RefreshRelationCache
     public function handle(\App\Events\User\ToggleFollowUser $event)
     {
         $userRepository = new UserRepository();
-        // TODO：会出现缓存频繁读写的问题
-        if ($event->followMe)
+        $mineSlug = $event->user->slug;
+        $targetSlug = $event->target->slug;
+
+        if ($event->result)
         {
-            // 无论我是否取消关注，都刷新彼此朋友列表的缓存
-            $userRepository->friends($event->target->slug, true);
-            $userRepository->friends($event->user->slug, true);
+            $userRepository->SortAdd($userRepository->followers_cache_key($targetSlug), $mineSlug);
+            $userRepository->ListInsertBefore($userRepository->followings_cache_key($mineSlug), $targetSlug);
+            if ($event->followMe)
+            {
+                $userRepository->ListInsertBefore($userRepository->friends_cache_key($targetSlug), $mineSlug);
+                $userRepository->ListInsertBefore($userRepository->friends_cache_key($mineSlug), $targetSlug);
+            }
         }
         else
         {
-            // 刷新TA的粉丝列表
-            $userRepository->followers($event->target->slug, true);
-            // 刷新我的关注列表
-            $userRepository->followings($event->user->slug, true);
+            $userRepository->SortRemove($userRepository->followers_cache_key($targetSlug), $mineSlug);
+            $userRepository->ListRemove($userRepository->followings_cache_key($mineSlug), $targetSlug);
+            if ($event->followMe)
+            {
+                $userRepository->ListRemove($userRepository->friends_cache_key($targetSlug), $mineSlug);
+                $userRepository->ListRemove($userRepository->friends_cache_key($mineSlug), $targetSlug);
+            }
         }
     }
 }

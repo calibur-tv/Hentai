@@ -46,7 +46,7 @@ class UserRepository extends Repository
     public function followers($slug, $refresh = false, $seenIds = [], $count = 15)
     {
         // 动态有序要分页
-        $ids = $this->RedisSort("user-followers:{$slug}", function () use ($slug)
+        $ids = $this->RedisSort($this->followers_cache_key($slug), function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -71,7 +71,7 @@ class UserRepository extends Repository
     public function followings($slug, $refresh = false)
     {
         // 动态有序不分页
-        $ids = $this->RedisList("user-followings:{$slug}", function () use ($slug)
+        $ids = $this->RedisList($this->followings_cache_key($slug), function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -99,7 +99,7 @@ class UserRepository extends Repository
     public function friends($slug, $refresh = false)
     {
         // 动态有序不分页
-        $ids = $this->RedisList("user-friends:{$slug}", function () use ($slug)
+        $ids = $this->RedisList($this->friends_cache_key($slug), function () use ($slug)
         {
             $user = User
                 ::where('slug', $slug)
@@ -110,8 +110,8 @@ class UserRepository extends Repository
                 return [];
             }
 
-            $userFollowers = $this->followers($slug, true, [], 99999999);
-            $userFollowings = $this->followings($slug, true);
+            $userFollowers = $this->followers($slug, false, [], 99999999);
+            $userFollowings = $this->followings($slug, false);
 
             return array_intersect($userFollowers['result'], $userFollowings['result']);
         }, $refresh);
@@ -176,5 +176,20 @@ class UserRepository extends Repository
             'total' => $idsObj['total'],
             'no_more' => $idsObj['no_more']
         ];
+    }
+
+    public function followers_cache_key($slug)
+    {
+        return "user-followers:{$slug}";
+    }
+
+    public function followings_cache_key($slug)
+    {
+        return "user-followings:{$slug}";
+    }
+
+    public function friends_cache_key($slug)
+    {
+        return "user-friends:{$slug}";
     }
 }

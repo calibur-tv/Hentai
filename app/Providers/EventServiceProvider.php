@@ -72,5 +72,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Comment\Create\UpdatePinCounter',
             'App\Listeners\Comment\Create\UpdateListCache',
         ],
+        'App\Events\Comment\Delete' => [
+            'App\Listeners\Comment\Delete\UpdatePinCounter',
+            'App\Listeners\Comment\Delete\UpdateListCache',
+            'App\Listeners\Comment\Delete\RefreshCache',
+        ],
     ];
 }

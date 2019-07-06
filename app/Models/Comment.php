@@ -76,4 +76,11 @@ class Comment extends Model
 
         return $comment;
     }
+
+    public function deleteComment($user)
+    {
+        $this->delete();
+
+        event(new \App\Events\Comment\Delete($this, $user));
+    }
 }

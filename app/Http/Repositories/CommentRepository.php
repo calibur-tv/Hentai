@@ -41,6 +41,11 @@ class CommentRepository extends Repository
             return null;
         }
 
+        if ($result->deleted_at != null)
+        {
+            return null;
+        }
+
         if ($result->trial_type != 0)
         {
             return null;

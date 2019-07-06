@@ -169,7 +169,25 @@ class CommentController extends Controller
      */
     public function delete(Request $request)
     {
+        $commentId = $request->get('comment_id');
 
+        $comment = Comment
+            ::where('id', $commentId)
+            ->first();
+        if (is_null($comment))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $user = $request->user();
+        if ($comment->from_user_slug != $user->slug)
+        {
+            return $this->resErrRole();
+        }
+
+        $comment->deleteComment($user);
+
+        return $this->resNoContent();
     }
 
     public function trials(Request $request)
