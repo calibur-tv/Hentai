@@ -70,6 +70,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Comment\Create' => [
             'App\Listeners\Comment\Create\UpdatePinCounter',
+            'App\Listeners\Comment\Create\UpdateListCache',
         ],
     ];
 }

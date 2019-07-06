@@ -79,29 +79,6 @@ class PinRepository extends Repository
         return $this->filterIdsByPage($ids, $page, $take, true);
     }
 
-    public function comments($slug, $sort, $count, $specId, $refresh = false)
-    {
-        if ($refresh)
-        {
-            $this->hottest_comment($slug, true);
-            $this->timeline_comment($slug, $sort, true);
-            return [];
-        }
-
-        if ($sort === 'hottest')
-        {
-            $ids = $this->hottest_comment($slug);
-            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $count);
-        }
-        else
-        {
-            $ids = $this->timeline_comment($slug, $sort);
-            $idsObj = $this->filterIdsByMaxId($ids, $specId, $count);
-        }
-
-        return $idsObj;
-    }
-
     public function decrypt($request)
     {
         $key = $request->get('key');
@@ -128,64 +105,5 @@ class PinRepository extends Repository
     {
         $ts = time();
         return $slug . '?key=' . (md5(config('app.md5') . $slug . $ts)) . '&ts=' . $ts;
-    }
-
-    private function hottest_comment($slug, $refresh = false)
-    {
-        return $this->RedisSort("pin:{$slug}:comments-hottest", function () use ($slug)
-        {
-            $pin = Pin
-                ::where('slug', $slug)
-                ->first();
-
-            if (is_null($pin))
-            {
-                return [];
-            }
-
-            $list = $pin
-                ->comments()
-                ->orderBy('like_count', 'DESC')
-                ->orderBy('created_at', 'DESC')
-                ->select('like_count', 'created_at', 'id')
-                ->get()
-                ->toArray();
-
-            $result = [];
-            foreach ($list as $row)
-            {
-                $result[$row['id']] = $row['like_count'] * 10000000000 + strtotime($row['created_at']);
-            }
-
-            return $result;
-        }, ['force' => $refresh]);
-    }
-
-    private function timeline_comment($slug, $sort, $refresh = false)
-    {
-        $ids = $this->RedisList("pin:{$slug}:comments-{$sort}", function () use ($slug)
-        {
-            $pin = Pin
-                ::where('slug', $slug)
-                ->first();
-
-            if (is_null($pin))
-            {
-                return [];
-            }
-
-            return $pin
-                ->comments()
-                ->orderBy('created_at', 'ASC')
-                ->pluck('id')
-                ->toArray();
-        }, $refresh);
-
-        if ($sort === 'time_desc')
-        {
-            return array_reverse($ids);
-        }
-
-        return $ids;
     }
 }

@@ -44,13 +44,13 @@ class CommentController extends Controller
             return $this->resErrNotFound();
         }
 
-        $idsObj = $pinRepository->comments($slug, $sort, $count, $specId);
+        $commentRepository = new CommentRepository();
+        $idsObj = $commentRepository->flow($slug, $sort, $count, $specId);
         if (!$idsObj['total'])
         {
             return $this->resOK($idsObj);
         }
 
-        $commentRepository = new CommentRepository();
         $result = $commentRepository->list($idsObj['result']);
         $comments = array_filter($result, function ($item)
         {
