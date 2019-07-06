@@ -26,8 +26,8 @@ class TagPatchCounter extends HashCounter
 
         return [
             'pin_count' => $tag->pins()->where('visit_type', '<>', 1)->count(),
-            'seen_user_count' => $tag->bookmarks()->count(),
-            'followers_count' => $tag->followings()->count(),
+            'seen_user_count' => $tag->bookmarkers()->count(),
+            'followers_count' => $tag->followers()->count(),
             'activity_stat' => $tag->activity_stat
         ];
     }
