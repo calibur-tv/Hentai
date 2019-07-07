@@ -31,10 +31,8 @@ class UserAuthResource extends JsonResource
                 'bind_wechat' => !!$this->wechat_unique_id,
                 'bind_phone' => !!$this->phone
             ],
-            'wallet' => [
-                'coin' => (float)$this->virtual_coin,
-                'money' => (float)$this->money_coin,
-            ]
+            'wallet_coin' => (float)$this->virtual_coin,
+            'wallet_money' => (float)$this->money_coin,
         ];
     }
 }
