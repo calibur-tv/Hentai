@@ -21,13 +21,14 @@ class PinResource extends JsonResource
 
         $title = [
             'banner' => null,
-            'text' => ''
+            'text' => '标题什么的不重要~'
         ];
 
         $content = $richContentService->parseRichContent($this->content->text);
         if ($content[0]['type'] === 'title')
         {
             $title = array_shift($content)['data'];
+            $title['text'] = $title['text'] ?: '标题什么的不重要~';
         }
 
         return [
