@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\VirtualCoinService;
 use App\Models\Comment;
 use App\Models\Pin;
 use App\Models\Tag;
@@ -75,6 +76,18 @@ class ToggleController extends Controller
             return $this->resErrBad();
         }
 
+        $errorMessage = $this->preValidator($object, $target, $targetType, $methodType);
+        if ($errorMessage)
+        {
+            return $this->resErrBad($errorMessage);
+        }
+
+        $result = $this->preToggleAction($object, $target, $targetType, $methodType, $targetSlug);
+        if (!$result)
+        {
+            return $this->resErrServiceUnavailable();
+        }
+
         $result = $this->toggleAction($object, $target, $targetClass, $methodType);
         if (null === $result)
         {
@@ -85,6 +98,38 @@ class ToggleController extends Controller
         $this->emitToggleEvent($object, $target, $targetType, $methodType, $result);
 
         return $this->resOK($result);
+    }
+
+    protected function preToggleAction($object, $target, $targetType, $methodType, $targetSlug)
+    {
+        if ($targetType === 'pin')
+        {
+            if ($methodType === 'favorite')
+            {
+                $virtualCoinService = new VirtualCoinService();
+                return $virtualCoinService->rewardPin(
+                    $object->slug,
+                    $this->convertTargetCreatorSlug($targetType, $target),
+                    $targetSlug
+                );
+            }
+        }
+        return true;
+    }
+
+    protected function preValidator($object, $target, $targetType, $methodType)
+    {
+        if ($targetType === 'pin')
+        {
+            if ($methodType === 'favorite')
+            {
+                if ($object->virtual_coin <= 0 && $object->money_coin <= 0)
+                {
+                    return '没有足够的团子';
+                }
+            }
+        }
+        return '';
     }
 
     protected function getCreatorSlug($target, $type)
@@ -124,6 +169,10 @@ class ToggleController extends Controller
             if ($method === 'up_vote')
             {
                 event(new \App\Events\Pin\UpVote($target, $object, $result));
+            }
+            else if ($method === 'favorite')
+            {
+                event(new \App\Events\Pin\Reward($target, $object));
             }
         }
     }
@@ -189,6 +238,22 @@ class ToggleController extends Controller
                 return Pin::where('slug', $slug)->first();
             case 'comment':
                 return Comment::where('id', $slug)->first();
+            default:
+                return null;
+        }
+    }
+
+    protected function convertTargetCreatorSlug($type, $target)
+    {
+        switch ($type) {
+            case 'user':
+                return $target->slug;
+            case 'tag':
+                return $target->creator_slug;
+            case 'pin':
+                return $target->user_slug;
+            case 'comment':
+                return $target->from_user_slug;
             default:
                 return null;
         }

@@ -56,46 +56,60 @@ class VirtualCoinService
     // 每日签到送团子
     public function daySign($userSlug, $amount = 1)
     {
-        $this->addCoin($userSlug, $amount, 0, 0, 0);
+        $this->addCoin($userSlug, $amount, 0, '', 0);
     }
 
     // 邀请用户注册赠送团子
     public function inviteUser($oldUserSlug, $newUserSlug, $amount = 5)
     {
-        $this->addCoin($oldUserSlug, $amount, 1, 0, $newUserSlug);
+        $this->addCoin($oldUserSlug, $amount, 1, '', $newUserSlug);
     }
 
     // 被邀请注册用户送团子
     public function invitedNewbieCoinGift($oldUserSlug, $newUserSlug, $amount = 2)
     {
-        $this->addCoin($newUserSlug, $amount, 20, 0, $oldUserSlug);
+        $this->addCoin($newUserSlug, $amount, 20, '', $oldUserSlug);
     }
 
     // 用户活跃送团子
     public function userActivityReward($userSlug)
     {
-        $this->addCoin($userSlug, 1, 2, 0, 0);
+        $this->addCoin($userSlug, 1, 2, '', 0);
     }
 
     // 管理活跃送光玉
     public function adminActiveReward($userSlug)
     {
-        $this->addMoney($userSlug, 1, 19, 0, 0);
+        $this->addMoney($userSlug, 1, 19, '', 0);
     }
 
     // 给用户赠送团子
     public function coinGift($toUserId, $amount)
     {
-        $this->addCoin($toUserId, $amount, 16, 0, 0);
+        $this->addCoin($toUserId, $amount, 16, '', 0);
     }
 
     // 给用户赠送光玉
     public function lightGift($toUserId, $amount)
     {
-        $this->addMoney($toUserId, $amount, 17, 0, 0);
+        $this->addMoney($toUserId, $amount, 17, '', 0);
     }
 
-    private function useCoinFirst($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
+    // 给帖子投食
+    public function rewardPin($fromUserSlug, $toUserSlug, $productSlug, $amount = 1)
+    {
+        $channelType = 1;
+        $result = $this->useCoinFirst($fromUserSlug, $amount, $channelType, $productSlug, $toUserSlug);
+        if (!$result)
+        {
+            return false;
+        }
+        $this->addMoney($toUserSlug, $amount, $channelType, $productSlug, $fromUserSlug);
+
+        return true;
+    }
+
+    private function useCoinFirst($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
     {
         if ($amount > 0)
         {
@@ -118,7 +132,7 @@ class VirtualCoinService
             'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
-            'product_id' => $product_id,
+            'product_slug' => $product_slug,
             'about_user_slug' => $about_user_slug
         ]);
 
@@ -145,7 +159,7 @@ class VirtualCoinService
         return true;
     }
 
-    private function useMoneyFirst($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
+    private function useMoneyFirst($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
     {
         if ($amount > 0)
         {
@@ -168,7 +182,7 @@ class VirtualCoinService
             'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
-            'product_id' => $product_id,
+            'product_slug' => $product_slug,
             'about_user_slug' => $about_user_slug
         ]);
 
@@ -195,7 +209,7 @@ class VirtualCoinService
         return true;
     }
 
-    private function addCoin($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
+    private function addCoin($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
     {
         if ($amount < 0)
         {
@@ -206,7 +220,7 @@ class VirtualCoinService
             'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
-            'product_id' => $product_id,
+            'product_slug' => $product_slug,
             'about_user_slug' => $about_user_slug
         ]);
 
@@ -216,7 +230,7 @@ class VirtualCoinService
             ->increment('virtual_coin', $amount);
     }
 
-    private function addMoney($user_slug, $amount, $channel_type, $product_id, $about_user_slug)
+    private function addMoney($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
     {
         if ($amount < 0)
         {
@@ -227,7 +241,7 @@ class VirtualCoinService
             'user_slug' => $user_slug,
             'amount' => $amount,
             'channel_type' => $channel_type,
-            'product_id' => $product_id,
+            'product_slug' => $product_slug,
             'about_user_slug' => $about_user_slug
         ]);
 

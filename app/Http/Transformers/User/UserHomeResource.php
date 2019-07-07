@@ -30,10 +30,6 @@ class UserHomeResource extends JsonResource
             'followers_count' => $this->followers_count,
             'following_count' => $this->following_count,
             'visit_count' => $this->visit_count,
-            'balance' => [
-                'coin' => (float)$this->virtual_coin,
-                'money' => (float)$this->money_coin,
-            ],
             'daily_signed' => $userDailySign->check($this->slug),
             'sign' => [
                 'continuous_sign_count' => $this->continuous_sign_count,

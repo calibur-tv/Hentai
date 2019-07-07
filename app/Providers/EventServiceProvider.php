@@ -84,5 +84,8 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Pin\UpVote' => [
             'App\Listeners\Pin\UpVote\UpdateLikeCounter',
         ],
+        'App\Events\Pin\Reward' => [
+            'App\Listeners\Pin\Reward\UpdateLikeCounter',
+        ],
     ];
 }
