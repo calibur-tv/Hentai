@@ -123,11 +123,16 @@ class Pin extends Model
         }
 
         $publish = $this->visit_type === 0 && $visit_type !== 0;
-
-        $this->update([
+        $data = [
             'last_edit_at' => Carbon::now(),
             'visit_type' => $visit_type
-        ]);
+        ];
+        if ($publish)
+        {
+            $data['created_at'] = Carbon::now();
+        }
+
+        $this->update($data);
 
         $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
