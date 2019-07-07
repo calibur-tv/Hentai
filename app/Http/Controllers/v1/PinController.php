@@ -102,7 +102,7 @@ class PinController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
-            'area' => 'required|string',
+            'area' => 'present|string',
             'topic' => 'required|string',
             'notebook' => 'required|string',
             'publish' => 'required|boolean'
@@ -116,14 +116,18 @@ class PinController extends Controller
         $tagRepository = new TagRepository();
         $user = $request->user();
 
-        $area = $tagRepository->getMarkedTag($request->get('area'), $user);
-        if (null === $area)
+        $area = $request->get('area');
+        if ($area)
         {
-            return $this->resErrNotFound('不能存在的分区');
-        }
-        if (false === $area)
-        {
-            return $this->resErrRole('未解锁的分区');
+            $area = $tagRepository->getMarkedTag($request->get('area'), $user);
+            if (null === $area)
+            {
+                return $this->resErrNotFound('不能存在的分区');
+            }
+            if (false === $area)
+            {
+                return $this->resErrRole('未解锁的分区');
+            }
         }
 
         $topic = $tagRepository->getMarkedTag($request->get('topic'), $user);

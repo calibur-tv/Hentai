@@ -25,7 +25,10 @@ class AddPinTagRelation
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        $event->pin->tags()->save($event->area);
+        if ($event->area)
+        {
+            $event->pin->tags()->save($event->area);
+        }
         $event->pin->tags()->save($event->topic);
         $event->pin->tags()->save($event->notebook);
     }

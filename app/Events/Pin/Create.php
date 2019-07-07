@@ -22,7 +22,7 @@ class Create
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, Tag $area, Tag $topic, Tag $notebook)
+    public function __construct(Pin $pin, User $user, $area, Tag $topic, Tag $notebook)
     {
         $this->pin = $pin;
         $this->user = $user;
