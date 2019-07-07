@@ -14,6 +14,7 @@ class Create
     public $pin;
     public $user;
     public $area;
+    public $topic;
     public $notebook;
 
     /**
@@ -21,11 +22,12 @@ class Create
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, Tag $area, Tag $notebook)
+    public function __construct(Pin $pin, User $user, Tag $area, Tag $topic, Tag $notebook)
     {
         $this->pin = $pin;
         $this->user = $user;
         $this->area = $area;
+        $this->topic = $topic;
         $this->notebook = $notebook;
     }
 }

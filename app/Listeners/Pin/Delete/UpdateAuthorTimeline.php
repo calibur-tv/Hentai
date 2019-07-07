@@ -2,7 +2,6 @@
 
 namespace App\Listeners\Pin\Delete;
 
-use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Queue\InteractsWithQueue;
@@ -23,7 +22,7 @@ class UpdateAuthorTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Delete  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Delete $event)

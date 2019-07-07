@@ -103,6 +103,7 @@ class PinController extends Controller
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
             'area' => 'required|string',
+            'topic' => 'required|string',
             'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
@@ -125,6 +126,16 @@ class PinController extends Controller
             return $this->resErrRole('未解锁的分区');
         }
 
+        $topic = $tagRepository->getMarkedTag($request->get('topic'), $user);
+        if (null === $topic)
+        {
+            return $this->resErrNotFound('不能存在的话题');
+        }
+        if (false === $topic)
+        {
+            return $this->resErrRole('未关注的话题');
+        }
+
         $notebook = $tagRepository->getMarkedTag($request->get('notebook'), $user);
         if (null === $notebook)
         {
@@ -145,6 +156,7 @@ class PinController extends Controller
             $request->get('publish') ? 0 : 1,
             $user,
             $area,
+            $topic,
             $notebook
         );
 

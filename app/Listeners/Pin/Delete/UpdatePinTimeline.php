@@ -20,7 +20,7 @@ class UpdatePinTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Delete  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Delete $event)

@@ -59,11 +59,6 @@ class Tag extends Model
         return $this->morphedByMany('App\Models\Pin', 'taggable');
     }
 
-    public function users()
-    {
-        return $this->morphedByMany('App\Models\Pin', 'taggable');
-    }
-
     public function content()
     {
         return $this->morphOne('App\Models\Content', 'contentable');

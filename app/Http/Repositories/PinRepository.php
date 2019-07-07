@@ -47,9 +47,14 @@ class PinRepository extends Repository
                 ->tags()
                 ->whereIn('parent_slug', [
                     config('app.tag.bangumi'),
-                    config('app.tag.topic'),
                     config('app.tag.game')
                 ])
+                ->orderBy('id', 'ASC')
+                ->first();
+
+            $pin->topic = $pin
+                ->tags()
+                ->where('parent_slug', config('app.tag.topic'))
                 ->orderBy('id', 'ASC')
                 ->first();
 

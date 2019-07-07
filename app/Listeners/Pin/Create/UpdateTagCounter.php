@@ -28,7 +28,8 @@ class UpdateTagCounter
     {
         if ($event->pin->visit_type != 1)
         {
-            $list = $event->pin->tags()
+            $list = $event->pin
+                ->tags()
                 ->pluck('slug')
                 ->toArray();
 

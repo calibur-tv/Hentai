@@ -82,7 +82,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $visit_type, $user, $area, $notebook)
+    public static function createPin($content, $content_type, $visit_type, $user, $area, $topic, $notebook)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -107,7 +107,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Create($pin, $user, $area, $notebook));
+        event(new \App\Events\Pin\Create($pin, $user, $area, $topic, $notebook));
 
         return $pin;
     }
