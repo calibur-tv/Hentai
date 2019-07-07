@@ -277,6 +277,29 @@ class PinController extends Controller
         return $this->resOK($pin);
     }
 
+    public function getMarkedTag(Request $request)
+    {
+        $userSlug = $request->get('user_slug');
+        $pinSlug = $request->get('pin_slug');
+        $pin = Pin
+            ::where('slug', $pinSlug)
+            ->first();
+
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $result = $pin
+            ->tags()
+            ->where('parent_slug', config('app.tag.notebook'))
+            ->where('creator_slug', $userSlug)
+            ->pluck('slug')
+            ->first();
+
+        return $this->resOK($result);
+    }
+
     public function fetchSiteMeta(Request $request)
     {
         $validator = Validator::make($request->all(), [

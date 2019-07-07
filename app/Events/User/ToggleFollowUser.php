@@ -10,9 +10,9 @@ class ToggleFollowUser extends ToggleEvent
 {
     public $followMe;
 
-    public function __construct(User $user, User $target, bool $result)
+    public function __construct(User $target, User $user, bool $result)
     {
-        parent::__construct($user, $target, $result);
+        parent::__construct($target, $user, $result);
 
         $this->followMe = $user->isFollowedBy($target);
     }

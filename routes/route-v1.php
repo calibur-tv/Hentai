@@ -90,6 +90,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 {
     $route->get('show', 'PinController@show');
 
+    $route->get('marked_tag', 'PinController@getMarkedTag');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'PinController@patch');

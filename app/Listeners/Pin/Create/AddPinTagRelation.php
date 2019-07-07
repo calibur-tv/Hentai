@@ -25,11 +25,14 @@ class AddPinTagRelation
      */
     public function handle(\App\Events\Pin\Create $event)
     {
+        $arr = [
+            $event->topic->id,
+            $event->notebook->id
+        ];
         if ($event->area)
         {
-            $event->pin->tags()->save($event->area);
+            $arr[] = $event->area->id;
         }
-        $event->pin->tags()->save($event->topic);
-        $event->pin->tags()->save($event->notebook);
+        $event->pin->tags()->attach($arr);
     }
 }

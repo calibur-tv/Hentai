@@ -44,11 +44,6 @@ class Tag extends Model
         return $this->belongsTo('App\User', 'id', 'user_id');
     }
 
-    public function fakers()
-    {
-        return $this->hasMany('App\Models\Tag', 'redirect_slug', 'slug');
-    }
-
     public function children()
     {
         return $this->hasMany('App\Models\Tag', 'parent_slug', 'slug');
@@ -133,5 +128,18 @@ class Tag extends Model
         event(new \App\Events\Tag\Delete($this, $user));
 
         return $this;
+    }
+
+    public function removePin($pin, $user)
+    {
+        $this->pins()->detach($pin->id);
+
+        event(new \App\Events\Tag\RemovePin($this, $pin, $user));
+    }
+
+    public function addPin(Pin $pin, $user)
+    {
+        $this->pins()->attach($pin->id);
+        event(new \App\Events\Tag\AddPin($this, $pin, $user));
     }
 }

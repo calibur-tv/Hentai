@@ -15,11 +15,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\User\Register' => [
             'App\Listeners\User\Register\InitUserTimeline',
             'App\Listeners\User\Register\AddDefaultTagRelation',
-            // TODO gift for invitor
         ],
         'App\Events\User\UpdateProfile' => [
             'App\Listeners\User\UpdateProfile\RefreshCache',
-            // TODO trial user info
         ],
         'App\Events\User\DailySign' => [
             'App\Listeners\User\DailySign\UpdateUserActivity',
@@ -86,6 +84,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Pin\Reward' => [
             'App\Listeners\Pin\Reward\UpdateLikeCounter',
+        ],
+        'App\Events\Tag\RemovePin' => [
+            'App\Listeners\Tag\RemovePin\UpdatePinCache',
+        ],
+        'App\Events\Tag\AddPin' => [
+            'App\Listeners\Tag\AddPin\UpdatePinCache',
         ],
     ];
 }

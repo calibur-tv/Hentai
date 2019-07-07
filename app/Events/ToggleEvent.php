@@ -10,18 +10,18 @@ class ToggleEvent
 {
     use SerializesModels;
 
-    public $user;
     public $target;
+    public $user;
     public $result;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user, User $target, bool $result)
+    public function __construct(User $target, User $user, bool $result)
     {
-        $this->user = $user;
         $this->target = $target;
+        $this->user = $user;
         $this->result = $result;
     }
 }
