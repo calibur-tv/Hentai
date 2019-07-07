@@ -11,15 +11,17 @@ class AsyncCounter
     protected $table;
     protected $field;
     protected $timeout = 3600; // 一小时写一次数据库
+    protected $force;
     /**
-     * 使用场景：需要定期将数据回写数据，没有关联表
+     * 使用场景：需要定期将数据回写数据
      * 1. 但是这里的数据在缓存超时之后，还未写入的情况下就会丢失，导致数据库的数据小于真实值
      * 2. 并发 add 的时候，只会增加一次，导致数据库的数据小于真实值
      */
-    public function __construct($tableName, $filedName)
+    public function __construct($tableName, $filedName, $forceMigration = false)
     {
         $this->table = $tableName;
         $this->field = $filedName;
+        $this->force = $forceMigration;
     }
 
     public function add($slug, $num = 1)
@@ -57,6 +59,10 @@ class AsyncCounter
         }
 
         $count = $this->readDB($slug);
+        if ($this->force)
+        {
+            $this->setDB($slug, $count);
+        }
 
         $valueKey = $this->cacheKey($slug);
         Redis::SET($valueKey, $count);

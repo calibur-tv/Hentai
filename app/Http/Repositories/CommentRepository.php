@@ -89,8 +89,6 @@ class CommentRepository extends Repository
 
             $list = $pin
                 ->comments()
-                ->orderBy('like_count', 'DESC')
-                ->orderBy('created_at', 'DESC')
                 ->select('like_count', 'created_at', 'id')
                 ->get()
                 ->toArray();
@@ -98,7 +96,7 @@ class CommentRepository extends Repository
             $result = [];
             foreach ($list as $row)
             {
-                $result[$row['id']] = $row['like_count'] * 10000 + strtotime($row['created_at']);
+                $result[$row['id']] = $row['like_count'] + (int)(strtotime($row['created_at']) / 10000);
             }
 
             return $result;

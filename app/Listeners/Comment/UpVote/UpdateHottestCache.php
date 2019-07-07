@@ -30,7 +30,7 @@ class UpdateHottestCache
 
         $commentRepository->SortAdd(
             $commentRepository->hottest_comment_cache_key($event->comment->pin_slug),
-            $event->comment->id, $event->result ? 10000 : -10000
+            $event->comment->id, $event->result ? 1 : -1
         );
     }
 }

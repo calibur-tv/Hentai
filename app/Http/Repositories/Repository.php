@@ -147,11 +147,11 @@ class Repository
         {
             if ($opts['desc'])
             {
-                $opts['with_score'] ? Redis::ZREVRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZREVRANGE($key, 0, -1);
+                $cache = $opts['with_score'] ? Redis::ZREVRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZREVRANGE($key, 0, -1);
             }
             else
             {
-                $opts['with_score'] ? Redis::ZRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZRANGE($key, 0, -1);
+                $cache = $opts['with_score'] ? Redis::ZRANGE($key, 0, -1, 'WITHSCORES') : Redis::ZRANGE($key, 0, -1);
             }
         }
 

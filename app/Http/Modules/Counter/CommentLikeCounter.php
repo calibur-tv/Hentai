@@ -10,7 +10,7 @@ class CommentLikeCounter extends AsyncCounter
 {
     public function __construct()
     {
-        parent::__construct('comments', 'like_count');
+        parent::__construct('comments', 'like_count', true);
     }
 
     public function setDB($id, $result)
