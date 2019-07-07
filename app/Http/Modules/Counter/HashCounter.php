@@ -61,20 +61,6 @@ class HashCounter
     }
 
     /**
-     * 写入某个值
-     */
-    public function set($slug, $key, $value)
-    {
-        $cacheKey = $this->cacheKey($slug);
-        if (!Redis::HEXISTS($cacheKey, $key))
-        {
-            $this->save($slug, $this->boot($slug));
-        }
-
-        Redis::HSET($cacheKey, $key, $value);
-    }
-
-    /**
      * 加减某个值
      */
     public function add($slug, $key, $value = 1)
@@ -106,6 +92,12 @@ class HashCounter
     public function save($slug, $value)
     {
         $value = gettype($value) === 'array' ? $value : json_decode(json_encode($value), true);
+
+        DB
+            ::table($this->table)
+            ->where($this->uniqueKey, $slug)
+            ->update($value);
+
         $value['migrate_at'] = time();
 
         $key = $this->cacheKey($slug);
