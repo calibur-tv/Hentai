@@ -23,9 +23,7 @@ class TagBodyResource extends JsonResource
                 'name' => $content['name'],
                 'avatar' => patchImage($content['avatar'], 'default-poster'),
                 'alias' => $content['alias'],
-                'intro' => $content['intro'],
-                'is_followed' => false,
-                'is_marked' => false
+                'intro' => $content['intro']
             ],
             'children' => TagItemResource::collection($this->children)
         ];

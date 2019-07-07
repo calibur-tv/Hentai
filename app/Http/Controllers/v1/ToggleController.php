@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\v1;
 
-use App\Events\Comment\UpVote;
-use App\Events\User\ToggleFollowUser;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Pin;
@@ -111,14 +109,21 @@ class ToggleController extends Controller
         {
             if ($method === 'follow')
             {
-                event(new ToggleFollowUser($object, $target, $result));
+                event(new \App\Events\User\ToggleFollowUser($object, $target, $result));
             }
         }
         else if ($targetType === 'comment')
         {
             if ($method === 'up_vote')
             {
-                event(new UpVote($target, $object, $result));
+                event(new \App\Events\Comment\UpVote($target, $object, $result));
+            }
+        }
+        else if ($targetType === 'pin')
+        {
+            if ($method === 'up_vote')
+            {
+                event(new \App\Events\Pin\UpVote($target, $object, $result));
             }
         }
     }

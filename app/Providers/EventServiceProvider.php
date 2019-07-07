@@ -81,5 +81,8 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Comment\UpVote\UpdateLikeCounter',
             'App\Listeners\Comment\UpVote\UpdateHottestCache'
         ],
+        'App\Events\Pin\UpVote' => [
+            'App\Listeners\Pin\UpVote\UpdateLikeCounter',
+        ],
     ];
 }
