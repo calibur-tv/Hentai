@@ -226,9 +226,13 @@ class RichContentService
         }
 
         $banner = $title['banner'];
-        if (!$banner && $firstImage)
+        if ($banner)
         {
-            $banner = $firstImage;
+            $imageCount++;
+        }
+        else if ($firstImage)
+        {
+            $banner = $firstImage['data']['file'];
         }
 
         return [
