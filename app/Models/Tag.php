@@ -117,7 +117,7 @@ class Tag extends Model
 
         foreach ($newData as $key => $val)
         {
-            $newData[$key] = Purifier::clean($val);
+            $newData[$key] = trim(Purifier::clean($val));
         }
 
         $this

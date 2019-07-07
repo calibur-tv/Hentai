@@ -22,7 +22,7 @@ class RichContentService
                 $result[] = [
                     'type' => $type,
                     'data' => [
-                        'text' => Purifier::clean($row['data']['text'])
+                        'text' => trim(Purifier::clean($row['data']['text']))
                     ]
                 ];
             }
@@ -32,7 +32,7 @@ class RichContentService
                     'type' => $type,
                     'data' => [
                         'level' => $row['data']['level'],
-                        'text' => Purifier::clean($row['data']['text'])
+                        'text' => trim(Purifier::clean($row['data']['text']))
                     ]
                 ];
             }
@@ -42,7 +42,7 @@ class RichContentService
                     'type' => $type,
                     'data' => array_merge(
                         $row['data'],
-                        ['caption' => Purifier::clean($row['data']['caption'])]
+                        ['caption' => trim(Purifier::clean($row['data']['caption']))]
                     )
                 ];
             }
@@ -52,7 +52,7 @@ class RichContentService
                     'type' => $type,
                     'data' => array_merge(
                         $row['data'],
-                        ['text' => Purifier::clean($row['data']['text'])]
+                        ['text' => trim(Purifier::clean($row['data']['text']))]
                     )
                 ];
             }
@@ -65,8 +65,8 @@ class RichContentService
                     'data' => [
                         'link' => $row['data']['link'],
                         'meta' => [
-                            'title' => Purifier::clean($meta['title']),
-                            'description' => Purifier::clean($meta['description']),
+                            'title' => trim(Purifier::clean($meta['title'])),
+                            'description' => trim(Purifier::clean($meta['description'])),
                             'image' => $meta['image']
                         ]
                     ]
@@ -84,7 +84,7 @@ class RichContentService
                         'style' => $row['data']['style'],
                         'items' => array_map(function ($item)
                         {
-                            return Purifier::clean($item);
+                            return trim(Purifier::clean($item));
                         }, $row['data']['items'])
                     ]
                 ];
@@ -97,7 +97,7 @@ class RichContentService
                         'items' => array_map(function ($item)
                         {
                             return [
-                                'text' => Purifier::clean($item['text']),
+                                'text' => trim(Purifier::clean($item['text'])),
                                 'checked' => $item['checked']
                             ];
                         }, $row['data']['items'])
@@ -109,7 +109,7 @@ class RichContentService
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
-                        'caption' => Purifier::clean($row['data']['caption'])
+                        'caption' => trim(Purifier::clean($row['data']['caption']))
                     ])
                 ];
             }
@@ -118,7 +118,7 @@ class RichContentService
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
-                        'caption' => Purifier::clean($row['data']['caption'])
+                        'caption' => trim(Purifier::clean($row['data']['caption']))
                     ])
                 ];
             }

@@ -75,12 +75,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function setNicknameAttribute($name)
     {
-        $this->attributes['nickname'] = Purifier::clean($name);
+        $this->attributes['nickname'] = trim(Purifier::clean($name));
     }
 
     public function setSignatureAttribute($signature)
     {
-        $this->attributes['signature'] = Purifier::clean($signature);
+        $this->attributes['signature'] = trim(Purifier::clean($signature));
     }
 
     public function setAvatarAttribute($url)
