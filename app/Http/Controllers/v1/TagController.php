@@ -60,7 +60,7 @@ class TagController extends Controller
 
     public function batchPatch(Request $request)
     {
-        $list = $request->get('slug') ?: [];
+        $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];
         $tagPatchCounter = new TagPatchCounter();
 
         $result = [];
