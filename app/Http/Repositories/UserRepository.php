@@ -165,6 +165,7 @@ class UserRepository extends Repository
         {
             $event = explode('#', $key);
             $result[] = [
+                'id' => $key,
                 'type' => $event[0],
                 'slug' => $event[1],
                 'created_at' => $val
