@@ -58,11 +58,19 @@ class TagController extends Controller
         return $this->resOK($patch);
     }
 
-    public function mixinPatch(Request $request)
+    public function batchPatch(Request $request)
     {
-        $field = $request->get('field');
-    }
+        $list = $request->get('slug') ?: [];
+        $tagPatchCounter = new TagPatchCounter();
 
+        $result = [];
+        foreach ($list as $slug)
+        {
+            $result[$slug] = $tagPatchCounter->all($slug);
+        }
+
+        return $this->resOK($result);
+    }
 
     /**
      * 获取用户的收藏版区

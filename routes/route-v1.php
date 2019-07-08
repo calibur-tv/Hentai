@@ -150,7 +150,7 @@ $route->group(['prefix' => 'tag'], function () use ($route)
         $route->get('patch', 'TagController@patch');
     });
 
-    $route->get('mixin_patch', 'TagController@mixinPatch');
+    $route->get('batch_patch', 'TagController@batchPatch');
 
     $route->get('bookmarks', 'TagController@bookmarks');
 
