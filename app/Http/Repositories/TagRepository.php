@@ -68,15 +68,16 @@ class TagRepository extends Repository
                         },
                         'children' => function ($query)
                         {
-                            $query->with(['content' => function ($q)
-                            {
-                                $q
-                                    ->orderBy('pin_count', 'desc')
-                                    ->orderBy('activity_stat', 'desc')
-                                    ->orderBy('followers_count', 'desc')
-                                    ->orderBy('seen_user_count', 'desc')
-                                    ->take(10);
-                            }]);
+                            $query
+                                ->with(['content' => function ($q)
+                                {
+                                    $q->orderBy('created_at', 'desc');
+                                }])
+                                ->orderBy('activity_stat', 'desc')
+                                ->orderBy('pin_count', 'desc')
+                                ->orderBy('followers_count', 'desc')
+                                ->orderBy('seen_user_count', 'desc')
+                                ->take(10);
                         }
                     ]
                 )

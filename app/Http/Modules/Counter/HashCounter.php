@@ -11,13 +11,12 @@ class HashCounter
     protected $table;
     protected $fields = [];
     protected $timeout = 3600; // 一小时写一次数据库
-    protected $uniqueKey;
+    protected $uniqueKey = 'slug';
 
-    public function __construct(string $table, array $fields, string $uniqueKey = 'slug')
+    public function __construct(string $table, array $fields)
     {
         $this->table = $table;
         $this->fields = $fields;
-        $this->uniqueKey = $uniqueKey;
     }
 
     /**
