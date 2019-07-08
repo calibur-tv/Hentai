@@ -54,7 +54,8 @@ class TagRepository extends Repository
         if (!$slug)
         {
             return null;
-}
+        }
+
         $result = $this->RedisItem("tag-category:{$slug}", function () use ($slug)
         {
             $tag = Tag
@@ -69,7 +70,12 @@ class TagRepository extends Repository
                         {
                             $query->with(['content' => function ($q)
                             {
-                                $q->orderBy('created_at', 'desc');
+                                $q
+                                    ->orderBy('pin_count', 'desc')
+                                    ->orderBy('activity_stat', 'desc')
+                                    ->orderBy('followers_count', 'desc')
+                                    ->orderBy('seen_user_count', 'desc')
+                                    ->take(10);
                             }]);
                         }
                     ]
@@ -114,11 +120,6 @@ class TagRepository extends Repository
         }
 
         return $tag;
-    }
-
-    public function getMyNotebook($slug, $user)
-    {
-
     }
 
     public function bookmarks($slug, $refresh = false)
