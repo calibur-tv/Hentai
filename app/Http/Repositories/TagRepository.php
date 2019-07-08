@@ -142,6 +142,10 @@ class TagRepository extends Repository
                 {
                     $query->orderBy('created_at', 'desc');
                 }])
+                ->orderBy('activity_stat', 'desc')
+                ->orderBy('pin_count', 'desc')
+                ->orderBy('followers_count', 'desc')
+                ->orderBy('seen_user_count', 'desc')
                 ->get();
 
             if (empty($list))
