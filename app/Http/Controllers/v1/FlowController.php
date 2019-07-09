@@ -22,7 +22,7 @@ class FlowController extends Controller
             ],
             'loop' => 'required|integer|max:2|min:0',
             'time' => 'required',
-                Rule::in(['daily', 'three-day', 'weekly', 'a-month', 'all']),
+                Rule::in(['daily', 'weekly', 'month', 'all']),
             'take' => 'required|integer',
             'is_up' => 'required|integer',
             'spec_id' => 'present|string'
@@ -39,13 +39,13 @@ class FlowController extends Controller
         $take = $request->get('take');
         $loop = $request->get('loop');
         $isUp = $request->get('is_up');
-        if ($sort === 'hottest')
+        if ($sort === 'newest')
         {
-            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
+            $specId = $request->get('spec_id');
         }
         else
         {
-            $specId = $request->get('spec_id');
+            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
         }
 
         $tagRepository = new TagRepository();

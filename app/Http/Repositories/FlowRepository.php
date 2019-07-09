@@ -4,14 +4,185 @@
 namespace App\Http\Repositories;
 
 
+use App\Models\Tag;
+use Illuminate\Support\Carbon;
+
 class FlowRepository extends Repository
 {
     public function pins($tags, $sort, $isUp, $specId, $time, $take)
     {
-        return [
-            'result' => [],
-            'total' => 0,
-            'no_more' => true
-        ];
+        if ($sort === 'hottest')
+        {
+            $ids = $this->hottest_ids($tags, $time);
+            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
+        }
+        else if ($sort === 'active')
+        {
+            $ids = $this->active_ids($tags);
+            $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
+        }
+        else
+        {
+            $ids = $this->newest_ids($tags);
+            $idsObj = $this->filterIdsByMaxId($ids, $specId, $take, false, $isUp);
+        }
+
+        return $idsObj;
+    }
+
+    public function hottest_ids($tags, $time, $refresh = false)
+    {
+        return $this->RedisSort($this->hottest_cache_key($tags, $time), function () use ($tags, $time)
+        {
+            $relations = Tag
+                ::whereIn('slug', $tags)
+                ->where('pin_count', '>', 0)
+                ->with(['pins' => function($query) use ($time)
+                {
+                    $query
+                        ->when($time !== 'all', function ($q) use ($time)
+                        {
+                            if ($time === 'daily')
+                            {
+                                $date = Carbon::now()->addDays(-1);
+                            }
+                            else if ($time === 'weekly')
+                            {
+                                $date = Carbon::now()->addDays(-7);
+                            }
+                            else if ($time === 'month')
+                            {
+                                $date = Carbon::now()->addDays(-30);
+                            }
+                            else
+                            {
+                                $date = Carbon::now()->addDays(-1);
+                            }
+                            return $q->where('created_at', '>=', $date);
+                        })
+                        ->where('visit_type', 0)
+                        ->where('trial_type', 0)
+                        ->whereNull('last_top_at')
+                        ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at');
+                }])
+                ->select('id')
+                ->get()
+                ->toArray();
+
+            $result = [];
+            if ($time === 'daily')
+            {
+                $i = 1.0;
+            }
+            else if ($time === 'weekly')
+            {
+                $i = 0.5;
+            }
+            else if ($time === 'month')
+            {
+                $i = 0.3;
+            }
+            else
+            {
+                $i = 0.1;
+            }
+            // https://segmentfault.com/a/1190000004253816
+            foreach ($relations as $list)
+            {
+                foreach ($list['pins'] as $pin)
+                {
+                    $result[$pin['slug']] = (
+                        log(($pin['visit_count'] + 1), 10) * 4 +
+                        log(($pin['comment_count'] * 4 + 1), M_E) +
+                        log(($pin['like_count'] * 2 + $pin['mark_count'] * 3 + $pin['reward_count'] * 10 + 1), 10)
+                    ) / pow(((time() - strtotime($pin['created_at'])) + 1), $i);
+                }
+            }
+
+            return $result;
+        }, ['force' => $refresh]);
+    }
+
+    public function newest_ids($tags, $refresh = false)
+    {
+        return $this->RedisSort($this->newest_cache_key($tags), function () use ($tags)
+        {
+            $relations = Tag
+                ::whereIn('slug', $tags)
+                ->where('pin_count', '>', 0)
+                ->with(['pins' => function($query)
+                {
+                    $query
+                        ->where('visit_type', 0)
+                        ->where('trial_type', 0)
+                        ->whereNull('last_top_at')
+                        ->select('slug', 'created_at');
+                }])
+                ->select('id')
+                ->get()
+                ->toArray();
+
+            $result = [];
+            foreach ($relations as $list)
+            {
+                foreach ($list['pins'] as $pin)
+                {
+                    $result[$pin['slug']] = $pin['created_at'];
+                }
+            }
+            return $result;
+        }, ['force' => $refresh, 'is_time' => true]);
+    }
+
+    public function active_ids($tags, $refresh = false)
+    {
+        return $this->RedisSort($this->newest_cache_key($tags), function () use ($tags)
+        {
+            $relations = Tag
+                ::whereIn('slug', $tags)
+                ->where('pin_count', '>', 0)
+                ->with(['pins' => function($query)
+                {
+                    $query
+                        ->where('visit_type', 0)
+                        ->where('trial_type', 0)
+                        ->whereNull('last_top_at')
+                        ->select('slug', 'updated_at');
+                }])
+                ->select('id')
+                ->get()
+                ->toArray();
+
+            $result = [];
+            foreach ($relations as $list)
+            {
+                foreach ($list['pins'] as $pin)
+                {
+                    $result[$pin['slug']] = $pin['updated_at'];
+                }
+            }
+            return $result;
+        }, ['force' => $refresh, 'is_time' => true]);
+    }
+
+    public function hottest_cache_key(array $tags, $time)
+    {
+        sort($tags);
+        $tags = implode($tags, '-');
+        return "tag-hottest-{$tags}-{$time}";
+    }
+
+    public function newest_cache_key(array $tags)
+    {
+        sort($tags);
+        $tags = implode($tags, '-');
+        return "tag-newest-{$tags}-all";
+    }
+
+    public function active_cache_key(array $tags)
+    {
+        sort($tags);
+        $tags = implode($tags, '-');
+        return "tag-active-{$tags}-all";
     }
 }

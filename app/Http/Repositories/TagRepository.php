@@ -218,7 +218,7 @@ class TagRepository extends Repository
             return [$parentSlug];
         }
 
-        return $this->RedisItem("tag-children-{$parentSlug}-loop-{$loop}", function () use ($parentSlug, $loop)
+        return $this->RedisList("tag-children-{$parentSlug}-loop-{$loop}", function () use ($parentSlug, $loop)
         {
             $i = 0;
             $result = [$parentSlug];
