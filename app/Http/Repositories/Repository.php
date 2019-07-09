@@ -188,6 +188,15 @@ class Repository
             });
         }
 
+        if ($opts['desc'])
+        {
+            arsort($cache);
+        }
+        else
+        {
+            asort($cache);
+        }
+
         return $opts['with_score'] ? $cache : array_keys($cache);
     }
 
