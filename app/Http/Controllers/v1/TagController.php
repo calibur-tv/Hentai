@@ -7,6 +7,7 @@ use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Tag;
+use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -91,15 +92,7 @@ class TagController extends Controller
     }
 
     /**
-     * 设置班长
-     */
-    public function toggle_master(Request $request)
-    {
-
-    }
-
-    /**
-     * 创建 tag（走先审后发流程）
+     * 创建 tag
      */
     public function create(Request $request)
     {
@@ -177,11 +170,29 @@ class TagController extends Controller
             return $this->resErrRole();
         }
 
+        $name = $request->get('name');
+        $intro = $request->get('intro');
+        $alias = $request->get('alias');
+
+        $wordsFilter = new WordsFilter();
+        if ($wordsFilter->count($name . $intro . $alias))
+        {
+            return $this->resErrBad('请修改文字');
+        }
+
+        $image = $request->get('avatar');
+        $imageFilter = new ImageFilter();
+        $imageFilter->check($image);
+        if ($imageFilter['delete'] || $imageFilter['review'])
+        {
+            return $this->resErrBad('请更换图片');
+        }
+
         $tag->updateTag([
-            'avatar' => trimImage($request->get('avatar')),
-            'name' => $request->get('name'),
-            'intro' => $request->get('intro'),
-            'alias' => $request->get('alias')
+            'avatar' => trimImage($image),
+            'name' => $name,
+            'intro' => $intro,
+            'alias' => $alias
         ], $user);
 
         return $this->resNoContent();
@@ -231,6 +242,7 @@ class TagController extends Controller
     /**
      * 所有的子标签迁移到目标标签
      * 该标签下的内容和关注关系迁移到目标标签
+     * // TODO：events
      */
     public function combine(Request $request)
     {
@@ -284,6 +296,7 @@ class TagController extends Controller
 
     /**
      * 将近义词 tag 重定向过去
+     * // TODO：events
      */
     public function relink(Request $request)
     {

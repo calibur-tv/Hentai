@@ -3,56 +3,65 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\FlowRepository;
+use App\Http\Repositories\PinRepository;
+use App\Http\Repositories\TagRepository;
 use Illuminate\Http\Request;
-use Mews\Purifier\Facades\Purifier;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class FlowController extends Controller
 {
-    /**
-     * 推荐列表，支持多个分类
-     * 瀑布流，按照推荐的时间做创建时间来计算热度
-     * seen_ids
-     */
-    public function recommended()
+    public function pins(Request $request)
     {
-        return $this->resOK(Purifier::clean('<<>>/<p>123</p><br><div style="font-size: 12px">66</div>&lt;script&gt;alert(123)&lt;/script&gt;'));
-    }
+        $validator = Validator::make($request->all(), [
+            'slug' => 'required|string',
+            'sort' => [
+                'required',
+                Rule::in(['newest', 'hottest', 'active']),
+            ],
+            'loop' => 'required|integer|max:2|min:0',
+            'time' => 'required',
+                Rule::in(['daily', 'three-day', 'weekly', 'a-month', 'all']),
+            'take' => 'required|integer',
+            'is_up' => 'required|integer',
+            'spec_id' => 'present|string'
+        ]);
 
-    /**
-     * 热门列表，支持多个分类（一日、三日、一周...?）
-     * Twitter 信息流，按照创建时间来计算热度
-     * seen_ids
-     */
-    public function hottest()
-    {
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
 
-    }
+        $slug = $request->get('slug');
+        $sort = $request->get('sort');
+        $time = $request->get('time');
+        $take = $request->get('take');
+        $loop = $request->get('loop');
+        $isUp = $request->get('is_up');
+        if ($sort === 'hottest')
+        {
+            $specId = $request->get('spec_id') ? explode(',', $request->get('spec_id')) : [];
+        }
+        else
+        {
+            $specId = $request->get('spec_id');
+        }
 
-    /**
-     * 最新的内容，按照创建时间排序，Twitter 信息流
-     * last_id
-     */
-    public function newest()
-    {
+        $tagRepository = new TagRepository();
+        $slugArr = $tagRepository->getChildrenSlugByLoop($slug, $loop);
 
-    }
+        $flowRepository = new FlowRepository();
+        $idsObj = $flowRepository->pins($slugArr, $sort, $isUp, $specId, $time, $take);
 
-    /**
-     * 按照 tag 来选择，提供最新，热门，推荐
-     * 只有推荐的是瀑布流，其它的都是 Twitter 信息流
-     * 最新用 last_id，其余用 seen_ids
-     */
-    public function category()
-    {
+        if (!$idsObj['total'])
+        {
+            return $this->resOK($idsObj);
+        }
 
-    }
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
 
-    /**
-     * 用户的内容，Twitter 信息流
-     * page
-     */
-    public function users()
-    {
-
+        return $this->resOK($idsObj);
     }
 }

@@ -83,6 +83,20 @@ class UserController extends Controller
         return $this->resOK($patch);
     }
 
+    public function batchPatch(Request $request)
+    {
+        $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];
+        $userPatchCounter = new UserPatchCounter();
+
+        $result = [];
+        foreach ($list as $slug)
+        {
+            $result[$slug] = $userPatchCounter->all($slug);
+        }
+
+        return $this->resOK($result);
+    }
+
     public function timeline(Request $request)
     {
         $validator = Validator::make($request->all(), [

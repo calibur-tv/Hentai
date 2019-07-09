@@ -98,6 +98,20 @@ class PinController extends Controller
         return $this->resOK($patch);
     }
 
+    public function batchPatch(Request $request)
+    {
+        $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];
+        $pinPatchCounter = new PinPatchCounter();
+
+        $result = [];
+        foreach ($list as $slug)
+        {
+            $result[$slug] = $pinPatchCounter->all($slug);
+        }
+
+        return $this->resOK($result);
+    }
+
     public function createStory(Request $request)
     {
         $validator = Validator::make($request->all(), [

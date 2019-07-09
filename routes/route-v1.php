@@ -46,6 +46,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->get('patch', 'UserController@patch');
     });
 
+    $route->get('batch_patch', 'UserController@batchPatch');
+
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
         $route->post('update_info', 'UserController@updateProfile');
@@ -96,6 +98,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     {
         $route->get('patch', 'PinController@patch');
     });
+
+    $route->get('batch_patch', 'PinController@batchPatch');
 
     $route->group(['prefix' => 'update', 'middleware' => ['auth']], function () use ($route)
     {
@@ -200,22 +204,7 @@ $route->group(['prefix' => 'comment'], function () use ($route)
 
 $route->group(['prefix' => 'flow'], function () use ($route)
 {
-    $route->get('recommended', 'FlowController@recommended');
-
-    $route->group(['prefix' => 'hottest'], function () use ($route)
-    {
-        $route->get('weekly', 'FlowController@weekly');
-
-        $route->get('daily', 'FlowController@daily');
-
-        $route->get('monthly', 'FlowController@monthly');
-    });
-
-    $route->get('newest', 'FlowController@newest');
-
-    $route->get('category', 'FlowController@category');
-
-    $route->get('users', 'FlowController@users');
+    $route->get('pins', 'FlowController@pins');
 });
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
