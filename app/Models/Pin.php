@@ -34,6 +34,7 @@ class Pin extends Model
         'content_type',     // 内容类型：0 普通图文贴，1 专栏
         'last_top_at',      // 最后置顶时间
         'last_edit_at',     // 最后编辑时间
+        'published_at',     // 发布时间
         'recommended_at',   // 推荐的时间
         'visit_count',      // 访问数
         'comment_count',    // 评论数
@@ -93,12 +94,19 @@ class Pin extends Model
             return null;
         }
 
-        $pin = self::create([
+        $now = Carbon::now();
+        $data = [
             'user_slug' => $user->slug,
             'content_type' => $content_type,
             'visit_type' => $visit_type,
-            'last_edit_at' => Carbon::now()
-        ]);
+            'last_edit_at' => $now
+        ];
+        if ($visit_type == 0)
+        {
+            $data['published_at'] = $now;
+        }
+
+        $pin = self::create($data);
 
         $pin->update([
             'slug' => id2slug($pin->id)
@@ -124,13 +132,14 @@ class Pin extends Model
         }
 
         $publish = $this->visit_type === 0 && $visit_type !== 0;
+        $now = Carbon::now();
         $data = [
-            'last_edit_at' => Carbon::now(),
+            'last_edit_at' => $now,
             'visit_type' => $visit_type
         ];
         if ($publish)
         {
-            $data['created_at'] = Carbon::now();
+            $data['published_at'] = $now;
         }
 
         $this->update($data);
