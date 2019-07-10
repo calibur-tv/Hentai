@@ -42,15 +42,15 @@ class FlowRepository extends Repository
                     $query
                         ->when($time !== 'all', function ($q) use ($time)
                         {
-                            if ($time === 'daily')
+                            if ($time === '3-day')
                             {
-                                $date = Carbon::now()->addDays(-1);
+                                $date = Carbon::now()->addDays(-3);
                             }
-                            else if ($time === 'weekly')
+                            else if ($time === '7-day')
                             {
                                 $date = Carbon::now()->addDays(-7);
                             }
-                            else if ($time === 'month')
+                            else if ($time === '30-day')
                             {
                                 $date = Carbon::now()->addDays(-30);
                             }
@@ -70,15 +70,15 @@ class FlowRepository extends Repository
                 ->toArray();
 
             $result = [];
-            if ($time === 'daily')
+            if ($time === '3-day')
             {
-                $i = 1.0;
+                $i = 0.8;
             }
-            else if ($time === 'weekly')
+            else if ($time === '7-day')
             {
                 $i = 0.5;
             }
-            else if ($time === 'month')
+            else if ($time === '30-day')
             {
                 $i = 0.3;
             }

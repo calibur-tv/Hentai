@@ -22,7 +22,7 @@ class FlowController extends Controller
             ],
             'loop' => 'required|integer|max:2|min:0',
             'time' => 'required',
-                Rule::in(['daily', 'weekly', 'month', 'all']),
+                Rule::in(['3-day', '7-day', '30-day', 'all']),
             'take' => 'required|integer',
             'is_up' => 'required|integer',
             'spec_id' => 'present|string'
