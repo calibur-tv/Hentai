@@ -12,6 +12,7 @@ class Delete
 
     public $pin;
     public $user;
+    public $published;
 
     /**
      * Create a new event instance.
@@ -22,5 +23,6 @@ class Delete
     {
         $this->pin = $pin;
         $this->user = $user;
+        $this->published = $pin->visit_type != 1;
     }
 }

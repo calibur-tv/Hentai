@@ -26,7 +26,7 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->pin->visit_type != 1)
+        if ($event->doPublish)
         {
             $list = $event->pin
                 ->tags()

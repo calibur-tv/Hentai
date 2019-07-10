@@ -26,13 +26,12 @@ class RefreshUserDrafts
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        $pin = $event->pin;
-        if ($pin->visit_type == 0)
+        if ($event->doPublish)
         {
             return;
         }
 
         $pinRepository = new PinRepository();
-        $pinRepository->drafts($pin->user_slug, 0, 0, true);
+        $pinRepository->drafts($event->pin->user_slug, 0, 0, true);
     }
 }

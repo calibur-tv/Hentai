@@ -27,7 +27,7 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->pin->visit_type != 1)
+        if ($event->doPublish)
         {
             $event->user->timeline()->create([
                 'event_type' => 3,

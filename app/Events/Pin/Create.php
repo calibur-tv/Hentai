@@ -16,6 +16,7 @@ class Create
     public $area;
     public $topic;
     public $notebook;
+    public $doPublish;
 
     /**
      * Create a new event instance.
@@ -29,5 +30,6 @@ class Create
         $this->area = $area;
         $this->topic = $topic;
         $this->notebook = $notebook;
+        $this->doPublish = $pin->visit_type == 0;
     }
 }

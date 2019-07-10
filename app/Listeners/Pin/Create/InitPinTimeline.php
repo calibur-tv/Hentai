@@ -31,5 +31,13 @@ class InitPinTimeline
             'event_type' => 0,
             'event_slug' => $pin->user_slug
         ]);
+
+        if ($event->doPublish)
+        {
+            $pin->timeline()->create([
+                'event_type' => 3,
+                'event_slug' => $pin->user_slug
+            ]);
+        }
     }
 }

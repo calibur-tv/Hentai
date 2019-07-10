@@ -136,7 +136,7 @@ class PinController extends Controller
             $area = $tagRepository->getMarkedTag($request->get('area'), $user);
             if (null === $area)
             {
-                return $this->resErrNotFound('不能存在的分区');
+                return $this->resErrNotFound('不存在的分区');
             }
             if (false === $area)
             {
@@ -147,7 +147,7 @@ class PinController extends Controller
         $topic = $tagRepository->getMarkedTag($request->get('topic'), $user);
         if (null === $topic)
         {
-            return $this->resErrNotFound('不能存在的话题');
+            return $this->resErrNotFound('不存在的话题');
         }
         if (false === $topic)
         {
@@ -157,7 +157,7 @@ class PinController extends Controller
         $notebook = $tagRepository->getMarkedTag($request->get('notebook'), $user);
         if (null === $notebook)
         {
-            return $this->resErrNotFound('不能存在的专栏');
+            return $this->resErrNotFound('不存在的专栏');
         }
         if (false === $notebook)
         {
@@ -197,6 +197,9 @@ class PinController extends Controller
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
+            'area' => 'present|string',
+            'topic' => 'required|string',
+            'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
 
@@ -222,10 +225,17 @@ class PinController extends Controller
             return $this->resErrRole('不能修改别人的文章');
         }
 
+        $tags = [
+            'area' => $request->get('area'),
+            'topic' => $request->get('topic'),
+            'notebook' => $request->get('notebook')
+        ];
+
         $result = $pin->updatePin(
             $request->get('content'),
             $request->get('publish') ? 0 : $pin->visit_type,
-            $user
+            $user,
+            $tags
         );
 
         if (!$result)

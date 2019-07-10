@@ -22,12 +22,12 @@ class UpdateAuthorTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Update  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->publish)
+        if ($event->doPublish)
         {
             $event->user->timeline()->create([
                 'event_type' => 3,

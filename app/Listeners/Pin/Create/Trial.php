@@ -25,13 +25,9 @@ class Trial
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        $pin = $event->pin;
-
-        if ($pin->visit_type == 1)
+        if ($event->doPublish)
         {
-            return;
+            dispatch(new \App\Jobs\Trial\PinTrial($event->pin->slug, 0));
         }
-
-        dispatch(new \App\Jobs\Trial\PinTrial($pin->slug, 0));
     }
 }

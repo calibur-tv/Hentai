@@ -30,7 +30,7 @@ class RefreshCache
         $pinRepository = new PinRepository();
         $pinRepository->item($pin->slug, true);
 
-        if ($pin->visit_type == 1)
+        if (!$event->published)
         {
             $pinRepository->drafts($pin->user_slug, 0, 0, true);
         }

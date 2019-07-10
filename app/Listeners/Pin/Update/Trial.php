@@ -20,18 +20,14 @@ class Trial
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Update  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        $pin = $event->pin;
-
-        if ($pin->visit_type == 1)
+        if ($event->published)
         {
-            return;
+            dispatch(new \App\Jobs\Trial\PinTrial($event->pin->slug, 1));
         }
-
-        dispatch(new \App\Jobs\Trial\PinTrial($pin->slug, 1));
     }
 }

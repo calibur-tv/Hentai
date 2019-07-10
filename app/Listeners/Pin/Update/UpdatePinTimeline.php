@@ -20,7 +20,7 @@ class UpdatePinTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Update  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Update $event)
@@ -30,5 +30,13 @@ class UpdatePinTimeline
             'event_type' => 1,
             'event_slug' => $pin->user_slug
         ]);
+
+        if ($event->doPublish)
+        {
+            $pin->timeline()->create([
+                'event_type' => 3,
+                'event_slug' => $pin->user_slug
+            ]);
+        }
     }
 }

@@ -21,15 +21,18 @@ class RefreshCache
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Pin\Update  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Update $event)
     {
         $pin = $event->pin;
         $pinRepository = new PinRepository();
-
         $pinRepository->item($pin->slug, true);
-        $pinRepository->drafts($pin->user_slug, 0, 0, true);
+
+        if ($event->doPublish)
+        {
+            $pinRepository->drafts($pin->user_slug, 0, 0, true);
+        }
     }
 }

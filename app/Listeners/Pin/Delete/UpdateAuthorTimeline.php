@@ -27,9 +27,9 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        $pin = $event->pin;
-        if ($pin->visit_type != 1)
+        if ($event->published)
         {
+            $pin = $event->pin;
             $user = User
                 ::where('slug', $pin->user_slug)
                 ->first();

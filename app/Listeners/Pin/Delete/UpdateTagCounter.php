@@ -26,7 +26,7 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        if ($event->pin->visit_type != 1)
+        if ($event->published)
         {
             $list = $event->pin->tags()
                 ->pluck('slug')

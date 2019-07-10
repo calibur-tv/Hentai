@@ -12,17 +12,21 @@ class Update
 
     public $pin;
     public $user;
-    public $publish;
+    public $tags;
+    public $doPublish;
+    public $published;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, bool $publish)
+    public function __construct(Pin $pin, User $user, array $tags, bool $publish)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->publish = $publish;
+        $this->tags = $tags;
+        $this->doPublish = $publish;
+        $this->published = $pin->visit_type != 1;
     }
 }

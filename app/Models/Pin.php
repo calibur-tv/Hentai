@@ -68,6 +68,7 @@ class Pin extends Model
          * 0 => 创建帖子
          * 1 => 更新帖子
          * 2 => 作者删除
+         * 3 => 公开帖子
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
@@ -112,7 +113,7 @@ class Pin extends Model
         return $pin;
     }
 
-    public function updatePin($content, $visit_type, $user)
+    public function updatePin($content, $visit_type, $user, $tags)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -138,7 +139,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        event(new \App\Events\Pin\Update($this, $user, $publish));
+        event(new \App\Events\Pin\Update($this, $user, $tags, $publish));
 
         return true;
     }
