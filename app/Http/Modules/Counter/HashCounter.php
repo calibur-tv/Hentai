@@ -38,6 +38,10 @@ class HashCounter
         }
 
         unset($result['migrate_at']);
+        $result = array_map(function ($item)
+        {
+            return (float)$item;
+        }, $result);
 
         return $result;
     }
@@ -56,7 +60,7 @@ class HashCounter
             $result = Redis::HGET($cacheKey, $key);
         }
 
-        return $result;
+        return (float)$result;
     }
 
     /**

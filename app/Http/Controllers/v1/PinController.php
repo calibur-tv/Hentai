@@ -81,6 +81,7 @@ class PinController extends Controller
         if ($user && $user->slug !== $pin->author->slug)
         {
             $pinId = slug2id($slug);
+            $patch['visit_count']++;
             $patch['down_vote_status'] = false;
             $patch['up_vote_status'] = $user->hasUpvoted($pinId, Pin::class);
             $patch['mark_status'] = $user->hasBookmarked($pinId, Pin::class);
