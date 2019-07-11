@@ -20,7 +20,6 @@ class FlowController extends Controller
                 'required',
                 Rule::in(['newest', 'hottest', 'active']),
             ],
-            'loop' => 'required|integer|max:2|min:0',
             'time' => 'required',
                 Rule::in(['3-day', '7-day', '30-day', 'all']),
             'take' => 'required|integer',
@@ -37,7 +36,6 @@ class FlowController extends Controller
         $sort = $request->get('sort');
         $time = $request->get('time');
         $take = $request->get('take');
-        $loop = $request->get('loop');
         $isUp = $request->get('is_up');
         if ($sort === 'newest')
         {
@@ -49,9 +47,18 @@ class FlowController extends Controller
         }
 
         $tagRepository = new TagRepository();
-        $slugArr = $tagRepository->getChildrenSlugByLoop($slug, $loop);
+        $tag = $tagRepository->item($slug);
+        if (is_null($tag))
+        {
+            return $this->resOK([
+                'result' => [],
+                'total' => 0,
+                'no_more' => true
+            ]);
+        }
 
         $flowRepository = new FlowRepository();
+        $slugArr = $tagRepository->getChildrenSlugByLoop($slug, $flowRepository->tag_flow_max_loop($tag->deep));
         $idsObj = $flowRepository->pins($slugArr, $sort, $isUp, $specId, $time, $take);
 
         if (!$idsObj['total'])

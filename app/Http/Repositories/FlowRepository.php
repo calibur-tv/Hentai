@@ -9,6 +9,10 @@ use Illuminate\Support\Carbon;
 
 class FlowRepository extends Repository
 {
+    public $times = [
+        'all', '3-day', '7-day', '30-day'
+    ];
+
     public function pins($tags, $sort, $isUp, $specId, $time, $take)
     {
         if ($sort === 'hottest')
@@ -165,21 +169,76 @@ class FlowRepository extends Repository
         }, ['force' => $refresh, 'is_time' => true]);
     }
 
-    public function hottest_cache_key(array $tags, $time)
+    public function add_pin($tag, $slug)
+    {
+        if (!$tag)
+        {
+            return;
+        }
+
+        $i = 0;
+        $tagRepository = new TagRepository();
+        $loopTag = $tag;
+        while ($i < $tag->deep)
+        {
+            $tags = $tagRepository->getChildrenSlugByLoop($loopTag->slug, $this->tag_flow_max_loop($loopTag->deep));
+
+            $this->SortAdd($this->newest_cache_key($tags), $slug);
+            $this->SortAdd($this->active_cache_key($tags), $slug);
+
+            $loopTag = $tagRepository->item($loopTag->parent_slug);
+
+            $i++;
+        }
+    }
+
+    public function del_pin($tag, $slug)
+    {
+        if (!$tag)
+        {
+            return;
+        }
+
+        $i = 0;
+        $tagRepository = new TagRepository();
+        $loopTag = $tag;
+        while ($i < $tag->deep)
+        {
+            $tags = $tagRepository->getChildrenSlugByLoop($loopTag->slug, $this->tag_flow_max_loop($loopTag->deep));
+
+            $this->SortRemove($this->newest_cache_key($tags), $slug);
+            $this->SortRemove($this->active_cache_key($tags), $slug);
+            foreach ($this->times as $time)
+            {
+                $this->SortRemove($this->hottest_cache_key($tags, $time), $slug);
+            }
+
+            $loopTag = $tagRepository->item($loopTag->parent_slug);
+
+            $i++;
+        }
+    }
+
+    public function tag_flow_max_loop($deep)
+    {
+        return 3 - $deep;
+    }
+
+    protected function hottest_cache_key(array $tags, $time)
     {
         sort($tags);
         $tags = implode($tags, '-');
         return "tag-hottest-{$tags}-{$time}";
     }
 
-    public function newest_cache_key(array $tags)
+    protected function newest_cache_key(array $tags)
     {
         sort($tags);
         $tags = implode($tags, '-');
         return "tag-newest-{$tags}-all";
     }
 
-    public function active_cache_key(array $tags)
+    protected function active_cache_key(array $tags)
     {
         sort($tags);
         $tags = implode($tags, '-');
