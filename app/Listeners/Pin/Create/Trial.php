@@ -27,7 +27,7 @@ class Trial
     {
         if ($event->doPublish)
         {
-            dispatch(new \App\Jobs\Trial\PinTrial($event->pin->slug, 0));
+            dispatch(new \App\Jobs\Trial\PinTrial($event->pin, 0));
         }
     }
 }

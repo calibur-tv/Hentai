@@ -389,7 +389,7 @@ class RichContentService
                     $detect = $imageFilter->check($url);
                     if ($detect['review'] || $detect['delete'])
                     {
-                        $riskImage[] = $imageBlock['url'];
+                        $riskImage[] = $url;
                     }
                     if ($detect['delete'])
                     {

@@ -8,7 +8,7 @@ use App\Models\Pin;
 
 class PinTrial extends Job
 {
-    protected $slug;
+    protected $pin;
     /**
      * 0 => 帖子创建
      * 1 => 更新帖子
@@ -20,9 +20,9 @@ class PinTrial extends Job
      *
      * @return void
      */
-    public function __construct($slug, $type)
+    public function __construct(Pin $pin, $type)
     {
-        $this->slug = $slug;
+        $this->pin = $pin;
         $this->type = $type;
     }
 
@@ -33,17 +33,12 @@ class PinTrial extends Job
      */
     public function handle()
     {
-        $pin = Pin::where('slug', $this->slug)->first();
-        if (is_null($pin))
-        {
-            return;
-        }
-
-        $content = $pin->content()->first();
+        $pin = $this->pin;
+        $content = $pin->content;
 
         $richContentService = new RichContentService();
 
-        $risk = $richContentService->detectContentRisk($content->text);
+        $risk = $richContentService->detectContentRisk($content);
 
         if ($risk['risk_score'] > 0)
         {

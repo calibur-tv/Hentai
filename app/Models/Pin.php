@@ -112,9 +112,10 @@ class Pin extends Model
             'slug' => id2slug($pin->id)
         ]);
 
-        $pin->content()->create([
+        $richContent = $pin->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
+        $pin->content = $richContent->text;
 
         event(new \App\Events\Pin\Create($pin, $user, $area, $topic, $notebook));
 
@@ -144,9 +145,10 @@ class Pin extends Model
 
         $this->update($data);
 
-        $this->content()->create([
+        $richContent = $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
         ]);
+        $this->content = $richContent->text;
 
         event(new \App\Events\Pin\Update($this, $user, $tags, $publish));
 
