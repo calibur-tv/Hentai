@@ -106,6 +106,10 @@ class RichContentService
             }
             else if ($type === 'video')
             {
+                if (!preg_match('/https?:\/\/(www|m)\.bilibili\.com/', $row['data']['source']))
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
@@ -115,6 +119,10 @@ class RichContentService
             }
             else if ($type === 'music')
             {
+                if (!preg_match('/https?:\/\/music\.163\.com/', $row['data']['source']))
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
@@ -124,6 +132,10 @@ class RichContentService
             }
             else if ($type === 'baidu')
             {
+                if (!preg_match('/https?:\/\/pan\.baidu\.com/', $row['data']['url']))
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => $row['data']
