@@ -122,6 +122,13 @@ class RichContentService
                     ])
                 ];
             }
+            else if ($type === 'baidu')
+            {
+                $result[] = [
+                    'type' => $type,
+                    'data' => $row['data']
+                ];
+            }
         }
 
         return json_encode($result, JSON_UNESCAPED_UNICODE);
