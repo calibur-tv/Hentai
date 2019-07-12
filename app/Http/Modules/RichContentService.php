@@ -4,7 +4,6 @@
 namespace App\Http\Modules;
 
 
-use App\Models\Image;
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
 use Mews\Purifier\Facades\Purifier;
@@ -19,54 +18,72 @@ class RichContentService
             $type = $row['type'];
             if ($type === 'paragraph')
             {
+                $text = trim($row['data']['text']);
+                if (!$text)
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => [
-                        'text' => trim(Purifier::clean($row['data']['text']))
+                        'text' => Purifier::clean($text)
                     ]
                 ];
             }
             else if ($type === 'header')
             {
+                $text = trim($row['data']['text']);
+                if (!$text)
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => [
                         'level' => $row['data']['level'],
-                        'text' => trim(Purifier::clean($row['data']['text']))
+                        'text' => Purifier::clean($text)
                     ]
                 ];
             }
             else if ($type === 'image')
             {
+                $text = trim($row['data']['caption']);
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge(
                         $row['data'],
-                        ['caption' => trim(Purifier::clean($row['data']['caption']))]
+                        ['caption' => $text ? Purifier::clean($text) : '']
                     )
                 ];
             }
             else if ($type === 'title')
             {
+                $text = trim($row['data']['text']);
+                if (!$text)
+                {
+                    continue;
+                }
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge(
                         $row['data'],
-                        ['text' => trim(Purifier::clean($row['data']['text']))]
+                        ['text' => Purifier::clean($text)]
                     )
                 ];
             }
             else if ($type === 'link')
             {
                 $meta = $row['data']['meta'];
+                $title = trim($meta['title']);
+                $description = trim($meta['description']);
 
                 $result[] = [
                     'type' => $type,
                     'data' => [
                         'link' => $row['data']['link'],
                         'meta' => [
-                            'title' => trim(Purifier::clean($meta['title'])),
-                            'description' => trim(Purifier::clean($meta['description'])),
+                            'title' => Purifier::clean($title),
+                            'description' => Purifier::clean($description),
                             'image' => $meta['image']
                         ]
                     ]
@@ -78,29 +95,37 @@ class RichContentService
             }
             else if ($type === 'list')
             {
+                $items = array_filter($row['data']['items'], function ($item)
+                {
+                    return !!trim($item);
+                });
                 $result[] = [
                     'type' => $type,
                     'data' => [
                         'style' => $row['data']['style'],
                         'items' => array_map(function ($item)
                         {
-                            return trim(Purifier::clean($item));
-                        }, $row['data']['items'])
+                            return Purifier::clean(trim($item));
+                        }, $items)
                     ]
                 ];
             }
             else if ($type === 'checklist')
             {
+                $items = array_filter($row['data']['items'], function ($item)
+                {
+                    return !!trim($item['text']);
+                });
                 $result[] = [
                     'type' => $type,
                     'data' => [
                         'items' => array_map(function ($item)
                         {
                             return [
-                                'text' => trim(Purifier::clean($item['text'])),
+                                'text' => Purifier::clean(trim($item['text'])),
                                 'checked' => $item['checked']
                             ];
-                        }, $row['data']['items'])
+                        }, $items)
                     ]
                 ];
             }
@@ -110,10 +135,11 @@ class RichContentService
                 {
                     continue;
                 }
+                $text = trim($row['data']['caption']);
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
-                        'caption' => trim(Purifier::clean($row['data']['caption']))
+                        'caption' => $text ? Purifier::clean($text) : ''
                     ])
                 ];
             }
@@ -123,22 +149,27 @@ class RichContentService
                 {
                     continue;
                 }
+                $text = trim($row['data']['caption']);
                 $result[] = [
                     'type' => $type,
                     'data' => array_merge($row['data'], [
-                        'caption' => trim(Purifier::clean($row['data']['caption']))
+                        'caption' => $text ? Purifier::clean($text) : ''
                     ])
                 ];
             }
             else if ($type === 'baidu')
             {
-                if (!preg_match('/https?:\/\/pan\.baidu\.com/', $row['data']['url']))
+                $url = trim($row['data']['url']);
+                if (!preg_match('/https?:\/\/pan\.baidu\.com/', $url))
                 {
                     continue;
                 }
                 $result[] = [
                     'type' => $type,
-                    'data' => $row['data']
+                    'data' => [
+                        'url' => $url,
+                        'password' => trim($row['data']['password'])
+                    ]
                 ];
             }
         }
