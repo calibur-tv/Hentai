@@ -20,10 +20,10 @@ class QueryLogServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-//        if (!config('app.debug'))
-//        {
-//            return;
-//        }
+        if (!config('app.debug'))
+        {
+            return;
+        }
 
         DB::listen(function (QueryExecuted $query) {
             $sqlWithPlaceholders = str_replace(['%', '?'], ['%%', '%s'], $query->sql);
