@@ -59,7 +59,7 @@ class RichContentService
             else if ($type === 'title')
             {
                 $text = trim($row['data']['text']);
-                if (!$text)
+                if (!$text && (!isset($row['data']['banner']) || !$row['data']['banner']))
                 {
                     continue;
                 }
