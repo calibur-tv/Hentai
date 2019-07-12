@@ -67,7 +67,7 @@ class RichContentService
                     'type' => $type,
                     'data' => array_merge(
                         $row['data'],
-                        ['text' => Purifier::clean($text)]
+                        ['text' => $text ? Purifier::clean($text) : '']
                     )
                 ];
             }
