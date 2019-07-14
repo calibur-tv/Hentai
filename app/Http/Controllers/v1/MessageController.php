@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\UnreadMessageCounter;
+use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
@@ -130,6 +131,9 @@ class MessageController extends Controller
 
         $channel = Message::roomCacheKey($type, $getterSlug, $senderSlug);
 
+        /**
+         * 如果之前没聊过天，那么缓存里就没有这个 roomId，要加上
+         */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         Redis::ZADD(
             $cacheKey,
@@ -163,6 +167,9 @@ class MessageController extends Controller
             ->where('getter_slug', $getterSlug)
             ->delete();
 
+        /**
+         * 删掉自己列表的缓存
+         */
         $cacheKey = MessageMenu::messageListCacheKey($getterSlug);
         if (Redis::EXISTS($cacheKey))
         {
@@ -226,6 +233,10 @@ class MessageController extends Controller
         $unreadMessageCounter = new UnreadMessageCounter();
         $count = $unreadMessageCounter->get($getterSlug);
         $unreadMessageCounter->add($getterSlug, -$count);
+
+        $webSocketPusher = new WebSocketPusher();
+        $webSocketPusher->pushUnreadMessage($getterSlug);
+        $webSocketPusher->pushUserMessageList($getterSlug);
 
         return $this->resNoContent();
     }
