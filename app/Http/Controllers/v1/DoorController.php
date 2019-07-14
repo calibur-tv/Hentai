@@ -562,11 +562,17 @@ class DoorController extends Controller
     // 微信小程序注册用户或获取当前用户的 token
     public function wechatMiniAppLogin(Request $request)
     {
+        $appName = $request->get('app_name');
+        if (!in_array($appName, ['moe_idol', 'search_bad_history']))
+        {
+            return $this->resErrBad();
+        }
         $user = $request->get('user');
         $encryptedData = $request->get('encrypted_data');
         $iv = $request->get('iv');
         $sessionKey = $request->get('session_key');
-        $appId = config('app.oauth2.wechat_mini_app.app_id');
+
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.app_id");
 
         $tool = new WXBizDataCrypt($appId, $sessionKey);
         $code = $tool->decryptData($encryptedData, $iv, $data);
@@ -614,14 +620,15 @@ class DoorController extends Controller
     public function wechatMiniAppToken(Request $request)
     {
         $code = $request->get('code');
-        if (!$code)
+        $appName = $request->get('app_name');
+        if (!$code || !in_array($appName, ['moe_idol', 'search_bad_history']))
         {
             return $this->resErrBad();
         }
 
         $client = new Client();
-        $appId = config('app.oauth2.wechat_mini_app.app_id');
-        $appSecret = config('app.oauth2.wechat_mini_app.app_secret');
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.app_id");
+        $appSecret = config("app.oauth2.wechat_mini_app.{$appName}.app_secret");
         $resp = $client->get(
             "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
             [

@@ -165,8 +165,14 @@ return [
         ],
         // 微信小程序
         'wechat_mini_app' => [
-            'app_id' => env('WECHAT_MINI_APP_ID'),
-            'app_secret' => env('WECHAT_MINI_APP_SECRET')
+            'moe_idol' => [
+                'client_id' => env('WECHAT_APP_MOE_IDOL_OPEN_ID'),
+                'client_secret' => env('WECHAT_APP_MOE_IDOL_OPEN_SECRET'),
+            ],
+            'search_bad_history' => [
+                'client_id' => env('WECHAT_APP_SEARCH_BAD_HISTORY_OPEN_ID'),
+                'client_secret' => env('WECHAT_APP_SEARCH_BAD_HISTORY_SECRET'),
+            ]
         ]
     ]
 ];
