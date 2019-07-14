@@ -15,6 +15,8 @@ class Update
     public $tags;
     public $doPublish;
     public $published;
+    public $attachTags;
+    public $detachTags;
 
     /**
      * Create a new event instance.
@@ -28,5 +30,13 @@ class Update
         $this->tags = $tags;
         $this->doPublish = $publish;
         $this->published = $pin->visit_type != 1;
+
+        $oldTags = $pin
+            ->tags()
+            ->pluck('slug')
+            ->toArray();
+
+        $this->attachTags = array_diff($tags, $oldTags);
+        $this->detachTags = array_diff($oldTags, $tags);
     }
 }

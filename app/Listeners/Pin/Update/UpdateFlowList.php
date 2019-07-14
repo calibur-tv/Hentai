@@ -27,21 +27,20 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->doPublish)
+        if ($event->published)
         {
             $flowRepository = new FlowRepository();
-            $tagRepository = new TagRepository();
+            $pinSlug = $event->pin->slug;
 
-            $tags = $event->tags;
-            $slug = $event->pin->slug;
+            foreach ($event->detachTags as $tagSlug)
+            {
+                $flowRepository->del_pin($tagSlug, $pinSlug);
+            }
 
-            $notebook = $tagRepository->item($tags['notebook']);
-            $area = $tagRepository->item($tags['area']);
-            $topic = $tagRepository->item($tags['topic']);
-
-            $flowRepository->add_pin($notebook, $slug);
-            $flowRepository->add_pin($area, $slug);
-            $flowRepository->add_pin($topic, $slug);
+            foreach ($event->attachTags as $tagSlug)
+            {
+                $flowRepository->add_pin($tagSlug, $pinSlug);
+            }
         }
     }
 }

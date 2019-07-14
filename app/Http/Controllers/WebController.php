@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\UserRepository;
+use App\Models\Pin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,11 @@ class WebController extends Controller
 {
     public function index()
     {
+        $pins = Pin::get();
+        foreach ($pins as $pin)
+        {
+            $pin->tags()->attach(slug2id('3p6'));
+        }
         return response('<html lang="en" class="">
 <head>
     <meta charset="UTF-8">

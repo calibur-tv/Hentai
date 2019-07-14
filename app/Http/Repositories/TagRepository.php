@@ -102,20 +102,18 @@ class TagRepository extends Repository
     /**
      * @param $slug
      * @param $user
-     * @return bool|null|Tag
+     * @return bool|null|object
      */
-    public function getMarkedTag($slug, $user)
+    public function checkTagIsMarked($slug, $user)
     {
-        $tag = Tag
-            ::where('slug', $slug)
-            ->first();
+        $tag = $this->item($slug);
 
         if (is_null($tag))
         {
             return null;
         }
 
-        if (!$user->hasBookmarked($tag))
+        if (!$user->hasBookmarked(slug2id($slug), Tag::class))
         {
             return false;
         }

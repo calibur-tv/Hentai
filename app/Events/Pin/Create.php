@@ -3,7 +3,6 @@
 namespace App\Events\Pin;
 
 use App\Models\Pin;
-use App\Models\Tag;
 use App\User;
 use Illuminate\Queue\SerializesModels;
 
@@ -13,9 +12,7 @@ class Create
 
     public $pin;
     public $user;
-    public $area;
-    public $topic;
-    public $notebook;
+    public $tags;
     public $doPublish;
 
     /**
@@ -23,13 +20,11 @@ class Create
      *
      * @return void
      */
-    public function __construct(Pin $pin, User $user, $area, Tag $topic, Tag $notebook)
+    public function __construct(Pin $pin, User $user, array $tags, bool $doPublish)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->area = $area;
-        $this->topic = $topic;
-        $this->notebook = $notebook;
-        $this->doPublish = $pin->visit_type == 0;
+        $this->tags = $tags;
+        $this->doPublish = $doPublish;
     }
 }

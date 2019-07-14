@@ -31,9 +31,10 @@ class UpdateFlowList
             $flowRepository = new FlowRepository();
             $slug = $event->pin->slug;
 
-            $flowRepository->add_pin($event->notebook, $slug);
-            $flowRepository->add_pin($event->area, $slug);
-            $flowRepository->add_pin($event->topic, $slug);
+            foreach ($event->tags as $tagSlug)
+            {
+                $flowRepository->add_pin($tagSlug, $slug);
+            }
         }
     }
 }

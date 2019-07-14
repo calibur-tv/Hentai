@@ -3,7 +3,6 @@
 namespace App\Listeners\Pin\Delete;
 
 use App\Http\Repositories\FlowRepository;
-use App\Http\Repositories\TagRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -30,18 +29,16 @@ class UpdateFlowList
         if ($event->published)
         {
             $flowRepository = new FlowRepository();
-            $tagRepository = new TagRepository();
 
             $tags = $event->pin
                 ->tags()
                 ->pluck('slug')
-                ->toArray();;
-            $slug = $event->pin->slug;
+                ->toArray();
+            $pinSlug = $event->pin->slug;
 
-            foreach ($tags as $item)
+            foreach ($tags as $tagSlug)
             {
-                $tag = $tagRepository->item($item);
-                $flowRepository->del_pin($tag, $slug);
+                $flowRepository->del_pin($tagSlug, $pinSlug);
             }
         }
     }

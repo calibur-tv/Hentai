@@ -28,56 +28,23 @@ class UpdatePinTagRelation
     public function handle(\App\Events\Pin\Update $event)
     {
         $pin = $event->pin;
-        $tagRepository = new TagRepository();
-        $pinRepository = new PinRepository();
-        $oldPin = $pinRepository->item($pin->slug);
-        $newTag = $event->tags;
 
-        if ($event->doPublish || !$event->published)
+        if (!empty($event->detachTags))
         {
-            $oldAreaSlug = $oldPin->area ? $oldPin->area->slug : '';
-            if ($newTag['area'] != $oldAreaSlug)
+            $detachIds = array_map(function ($slug)
             {
-                $newArea = $tagRepository->item($newTag['area']);
-                if ($newArea)
-                {
-                    if ($oldAreaSlug)
-                    {
-                        $pin->tags()->detach(slug2id($oldAreaSlug));
-                    }
-                    $pin->tags()->attach(slug2id($newTag['area']));
-                }
-            }
-
-            $oldTopicSlug = $oldPin->topic ? $oldPin->topic->slug : '';
-            if ($newTag['topic'] != $oldTopicSlug)
-            {
-                $newTopic = $tagRepository->item($newTag['topic']);
-                if ($newTopic)
-                {
-                    if ($oldTopicSlug)
-                    {
-                        $pin->tags()->detach(slug2id($oldTopicSlug));
-                    }
-                    $pin->tags()->attach(slug2id($newTag['topic']));
-                }
-            }
+                return slug2id($slug);
+            }, $event->detachTags);
+            $pin->tags()->detach($detachIds);
         }
 
-        $oldNotebookSlug = $oldPin->notebook ? $oldPin->notebook->slug : '';
-        if ($newTag['notebook'] != $oldNotebookSlug)
+        if (!empty($event->attachTags))
         {
-            $newNotebook = $tagRepository->item($newTag['notebook']);
-            if ($newNotebook)
+            $attachIds = array_map(function ($slug)
             {
-                if ($oldNotebookSlug)
-                {
-                    $pin->tags()->detach(slug2id($oldNotebookSlug));
-                }
-                $pin->tags()->attach(slug2id($newTag['notebook']));
-            }
-
-            $tagRepository->bookmarks($event->user->slug, true);
+                return slug2id($slug);
+            }, $event->attachTags);
+            $pin->tags()->attach($attachIds);
         }
     }
 }

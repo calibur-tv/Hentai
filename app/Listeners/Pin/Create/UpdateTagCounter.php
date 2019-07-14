@@ -28,13 +28,8 @@ class UpdateTagCounter
     {
         if ($event->doPublish)
         {
-            $list = $event->pin
-                ->tags()
-                ->pluck('slug')
-                ->toArray();
-
             $tagPatchCounter = new TagPatchCounter();
-            foreach ($list as $slug)
+            foreach ($event->tags as $slug)
             {
                 $tagPatchCounter->add($slug, 'pin_count');
             }

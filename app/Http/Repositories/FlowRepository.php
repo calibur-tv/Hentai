@@ -13,34 +13,33 @@ class FlowRepository extends Repository
         'all', '3-day', '7-day', '30-day'
     ];
 
-    public function pins($tags, $sort, $isUp, $specId, $time, $take)
+    public function pins($slug, $sort, $isUp, $specId, $time, $take)
     {
         if ($sort === 'hottest')
         {
-            $ids = $this->hottest_ids($tags, $time);
+            $ids = $this->hottest_ids($slug, $time);
             $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
         }
         else if ($sort === 'active')
         {
-            $ids = $this->active_ids($tags);
+            $ids = $this->active_ids($slug);
             $idsObj = $this->filterIdsBySeenIds($ids, $specId, $take);
         }
         else
         {
-            $ids = $this->newest_ids($tags);
+            $ids = $this->newest_ids($slug);
             $idsObj = $this->filterIdsByMaxId($ids, $specId, $take, false, $isUp);
         }
 
         return $idsObj;
     }
 
-    public function hottest_ids($tags, $time, $refresh = false)
+    public function hottest_ids($slug, $time, $refresh = false)
     {
-        return $this->RedisSort($this->hottest_cache_key($tags, $time), function () use ($tags, $time)
+        return $this->RedisSort($this->hottest_cache_key($slug, $time), function () use ($slug, $time)
         {
             $relations = Tag
-                ::whereIn('slug', $tags)
-                ->where('pin_count', '>', 0)
+                ::where('slug', $slug)
                 ->with(['pins' => function($query) use ($time)
                 {
                     $query
@@ -107,13 +106,12 @@ class FlowRepository extends Repository
         }, ['force' => $refresh]);
     }
 
-    public function newest_ids($tags, $refresh = false)
+    public function newest_ids($slug, $refresh = false)
     {
-        return $this->RedisSort($this->newest_cache_key($tags), function () use ($tags)
+        return $this->RedisSort($this->newest_cache_key($slug), function () use ($slug)
         {
             $relations = Tag
-                ::whereIn('slug', $tags)
-                ->where('pin_count', '>', 0)
+                ::where('slug', $slug)
                 ->with(['pins' => function($query)
                 {
                     $query
@@ -138,13 +136,12 @@ class FlowRepository extends Repository
         }, ['force' => $refresh, 'is_time' => true]);
     }
 
-    public function active_ids($tags, $refresh = false)
+    public function active_ids($slug, $refresh = false)
     {
-        return $this->RedisSort($this->newest_cache_key($tags), function () use ($tags)
+        return $this->RedisSort($this->newest_cache_key($slug), function () use ($slug)
         {
             $relations = Tag
-                ::whereIn('slug', $tags)
-                ->where('pin_count', '>', 0)
+                ::where('slug', $slug)
                 ->with(['pins' => function($query)
                 {
                     $query
@@ -169,79 +166,34 @@ class FlowRepository extends Repository
         }, ['force' => $refresh, 'is_time' => true]);
     }
 
-    public function add_pin($tag, $slug)
+    public function add_pin($tagSlug, $pinSlug)
     {
-        if (!$tag)
+        $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
+        $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
+    }
+
+    public function del_pin($tagSlug, $pinSlug)
+    {
+        $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);
+        $this->SortRemove($this->active_cache_key($tagSlug), $pinSlug);
+        foreach ($this->times as $time)
         {
-            return;
-        }
-
-        $i = 0;
-        $tagRepository = new TagRepository();
-        $loopTag = $tag;
-        while ($i < $tag->deep)
-        {
-            $tags = $tagRepository->getChildrenSlugByLoop($loopTag->slug, $this->tag_flow_max_loop($loopTag->deep));
-
-            $this->SortAdd($this->newest_cache_key($tags), $slug);
-            $this->SortAdd($this->active_cache_key($tags), $slug);
-
-            $loopTag = $tagRepository->item($loopTag->parent_slug);
-
-            $i++;
+            $this->SortRemove($this->hottest_cache_key($tagSlug, $time), $pinSlug);
         }
     }
 
-    public function del_pin($tag, $slug)
+    protected function hottest_cache_key(string $slug, $time)
     {
-        if (!$tag)
-        {
-            return;
-        }
-
-        $i = 0;
-        $tagRepository = new TagRepository();
-        $loopTag = $tag;
-        while ($i < $tag->deep)
-        {
-            $tags = $tagRepository->getChildrenSlugByLoop($loopTag->slug, $this->tag_flow_max_loop($loopTag->deep));
-
-            $this->SortRemove($this->newest_cache_key($tags), $slug);
-            $this->SortRemove($this->active_cache_key($tags), $slug);
-            foreach ($this->times as $time)
-            {
-                $this->SortRemove($this->hottest_cache_key($tags, $time), $slug);
-            }
-
-            $loopTag = $tagRepository->item($loopTag->parent_slug);
-
-            $i++;
-        }
+        return "tag-hottest-{$slug}-{$time}";
     }
 
-    public function tag_flow_max_loop($deep)
+    protected function newest_cache_key(string $slug)
     {
-        return 3 - $deep;
+        return "tag-newest-{$slug}-all";
     }
 
-    protected function hottest_cache_key(array $tags, $time)
+    protected function active_cache_key(string $slug)
     {
-        sort($tags);
-        $tags = implode($tags, '-');
-        return "tag-hottest-{$tags}-{$time}";
-    }
-
-    protected function newest_cache_key(array $tags)
-    {
-        sort($tags);
-        $tags = implode($tags, '-');
-        return "tag-newest-{$tags}-all";
-    }
-
-    protected function active_cache_key(array $tags)
-    {
-        sort($tags);
-        $tags = implode($tags, '-');
-        return "tag-active-{$tags}-all";
+        return "tag-active-{$slug}-all";
     }
 }

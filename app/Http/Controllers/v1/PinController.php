@@ -134,7 +134,7 @@ class PinController extends Controller
         $area = $request->get('area');
         if ($area)
         {
-            $area = $tagRepository->getMarkedTag($request->get('area'), $user);
+            $area = $tagRepository->checkTagIsMarked($request->get('area'), $user);
             if (null === $area)
             {
                 return $this->resErrNotFound('不存在的分区');
@@ -145,7 +145,7 @@ class PinController extends Controller
             }
         }
 
-        $topic = $tagRepository->getMarkedTag($request->get('topic'), $user);
+        $topic = $tagRepository->checkTagIsMarked($request->get('topic'), $user);
         if (null === $topic)
         {
             return $this->resErrNotFound('不存在的话题');
@@ -155,7 +155,7 @@ class PinController extends Controller
             return $this->resErrRole('未关注的话题');
         }
 
-        $notebook = $tagRepository->getMarkedTag($request->get('notebook'), $user);
+        $notebook = $tagRepository->checkTagIsMarked($request->get('notebook'), $user);
         if (null === $notebook)
         {
             return $this->resErrNotFound('不存在的专栏');
@@ -169,14 +169,23 @@ class PinController extends Controller
             return $this->resErrBad('非法的专栏');
         }
 
+        $tags = [
+            $notebook->slug,
+            $topic->slug,
+            config('app.tag.topic')
+        ];
+        if ($area)
+        {
+            $tags[] = $area->slug;
+            $tags[] = $area->parent_slug;
+        }
+
         $pin = Pin::createPin(
             $request->get('content'),
             1,
             $request->get('publish') ? 0 : 1,
             $user,
-            $area,
-            $topic,
-            $notebook
+            $tags
         );
 
         if (is_null($pin))
@@ -226,11 +235,57 @@ class PinController extends Controller
             return $this->resErrRole('不能修改别人的文章');
         }
 
+        $tagRepository = new TagRepository();
+        $user = $request->user();
+
+        $area = $request->get('area');
+        if ($area)
+        {
+            $area = $tagRepository->checkTagIsMarked($request->get('area'), $user);
+            if (null === $area)
+            {
+                return $this->resErrNotFound('不存在的分区');
+            }
+            if (false === $area)
+            {
+                return $this->resErrRole('未解锁的分区');
+            }
+        }
+
+        $topic = $tagRepository->checkTagIsMarked($request->get('topic'), $user);
+        if (null === $topic)
+        {
+            return $this->resErrNotFound('不存在的话题');
+        }
+        if (false === $topic)
+        {
+            return $this->resErrRole('未关注的话题');
+        }
+
+        $notebook = $tagRepository->checkTagIsMarked($request->get('notebook'), $user);
+        if (null === $notebook)
+        {
+            return $this->resErrNotFound('不存在的专栏');
+        }
+        if (false === $notebook)
+        {
+            return $this->resErrRole('不属于自己的专栏');
+        }
+        if ($notebook->parent_slug !== config('app.tag.notebook'))
+        {
+            return $this->resErrBad('非法的专栏');
+        }
+
         $tags = [
-            'area' => $request->get('area'),
-            'topic' => $request->get('topic'),
-            'notebook' => $request->get('notebook')
+            $notebook->slug,
+            $topic->slug,
+            config('app.tag.topic')
         ];
+        if ($area)
+        {
+            $tags[] = $area->slug;
+            $tags[] = $area->parent_slug;
+        }
 
         $result = $pin->updatePin(
             $request->get('content'),

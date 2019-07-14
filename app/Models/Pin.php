@@ -84,7 +84,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $visit_type, $user, $area, $topic, $notebook)
+    public static function createPin($content, $content_type, $visit_type, $user, $tags)
     {
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
@@ -117,7 +117,7 @@ class Pin extends Model
         ]);
         $pin->content = $richContent->text;
 
-        event(new \App\Events\Pin\Create($pin, $user, $area, $topic, $notebook));
+        event(new \App\Events\Pin\Create($pin, $user, $tags, $visit_type == 0));
 
         return $pin;
     }
@@ -132,13 +132,13 @@ class Pin extends Model
             return false;
         }
 
-        $publish = $this->visit_type === 0 && $visit_type !== 0;
+        $doPublish = $this->visit_type === 0 && $visit_type !== 0;
         $now = Carbon::now();
         $data = [
             'last_edit_at' => $now,
             'visit_type' => $visit_type
         ];
-        if ($publish)
+        if ($doPublish)
         {
             $data['published_at'] = $now;
         }
@@ -150,7 +150,7 @@ class Pin extends Model
         ]);
         $this->content = $richContent->text;
 
-        event(new \App\Events\Pin\Update($this, $user, $tags, $publish));
+        event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
 
         return true;
     }

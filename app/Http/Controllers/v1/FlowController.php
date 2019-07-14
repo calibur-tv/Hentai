@@ -58,8 +58,7 @@ class FlowController extends Controller
         }
 
         $flowRepository = new FlowRepository();
-        $slugArr = $tagRepository->getChildrenSlugByLoop($slug, $flowRepository->tag_flow_max_loop($tag->deep));
-        $idsObj = $flowRepository->pins($slugArr, $sort, $isUp, $specId, $time, $take);
+        $idsObj = $flowRepository->pins($slug, $sort, $isUp, $specId, $time, $take);
 
         if (!$idsObj['total'])
         {
