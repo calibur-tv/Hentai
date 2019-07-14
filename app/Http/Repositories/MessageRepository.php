@@ -9,7 +9,7 @@
 namespace App\Http\Repositories;
 
 
-use App\Http\Modules\RichContentService;
+use App\Http\Transformers\Message\MessageItemResource;
 use App\Models\Message;
 use App\Models\MessageMenu;
 
@@ -33,22 +33,11 @@ class MessageRepository extends Repository
                 return [];
             }
 
-            $richContentService = new RichContentService();
+            $messages = MessageItemResource::collection($messages);
             $result = [];
             foreach ($messages as $msg)
             {
-                $data = [
-                    'user' => [
-                        'slug' => $msg->sender->slug,
-                        'avatar' => $msg->sender->avatar,
-                        'nickname' => $msg->sender->nickname,
-                        'sex' => $msg->sender->sex
-                    ],
-                    'content' => $richContentService->parseRichContent($msg->content->text),
-                    'created_at' => $msg->created_at
-                ];
-
-                $result[json_encode($data)] = $msg->id;
+                $result[json_encode($msg)] = $msg->id;
             }
 
             return $result;

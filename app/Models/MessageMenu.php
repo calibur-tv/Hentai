@@ -14,36 +14,6 @@ class MessageMenu extends Model
         'type',             // 消息的类型
     ];
 
-    public function updateGetterMenu($roomKey)
-    {
-        $this->increment('count');
-        $cacheKey = $this->messageListCacheKey($this->getter_slug);
-        if (Redis::EXISTS($cacheKey))
-        {
-            Redis::ZADD(
-                $cacheKey,
-                $this->generateCacheScore(),
-                $roomKey
-            );
-        }
-    }
-
-    public function updateSenderMenu($roomKey)
-    {
-        $this->update([
-            'count' => 0
-        ]);
-        $cacheKey = $this->messageListCacheKey($this->getter_slug);
-        if (Redis::EXISTS($cacheKey))
-        {
-            Redis::ZADD(
-                $cacheKey,
-                $this->generateCacheScore(),
-                $roomKey
-            );
-        }
-    }
-
     public function generateCacheScore()
     {
         if (intval($this->count) > 999)

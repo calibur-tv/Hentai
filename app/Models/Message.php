@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Http\Modules\Counter\UnreadMessageCounter;
 use App\Http\Modules\RichContentService;
+use App\Http\Transformers\Message\MessageItemResource;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Redis;
 
 class Message extends Model
 {
@@ -40,6 +39,7 @@ class Message extends Model
         $senderSlug = $data['sender_slug'];
         $messageType = $data['type'];
         $sender = $data['sender'];
+
         $message = self::create([
             'sender_slug' => $senderSlug,
             'getter_slug' => $getterSlug,
@@ -50,43 +50,14 @@ class Message extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
 
-        $roomCacheKey = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
+        $roomId = self::roomCacheKey($messageType, $getterSlug, $senderSlug);
+        $message->content = $content;
+        $message->sender = $sender;
+        $message->channel = $roomId;
 
-        $getterMenu = MessageMenu::firstOrCreate([
-            'sender_slug' => $senderSlug,
-            'getter_slug' => $getterSlug,
-            'type' => $messageType
-        ]);
-        $getterMenu->updateGetterMenu($roomCacheKey);
+        event(new \App\Events\Message\Create($message, $sender, $roomId));
 
-        $senderMenu = MessageMenu::firstOrCreate([
-            'sender_slug' => $getterSlug,
-            'getter_slug' => $senderSlug,
-            'type' => $messageType
-        ]);
-        $senderMenu->updateSenderMenu($roomCacheKey);
-
-        $UnreadMessageCounter = new UnreadMessageCounter();
-        $UnreadMessageCounter->add($getterSlug);
-
-        $messageData = [
-            'user' => [
-                'slug' => $sender->slug,
-                'nickname' => $sender->nickname,
-                'avatar' => $sender->avatar,
-                'sex' => $sender->sex
-            ],
-            'content' => $richContentService->parseRichContent($content->text),
-            'created_at' => $message->created_at
-        ];
-        if (Redis::EXISTS($roomCacheKey))
-        {
-            Redis::ZADD($roomCacheKey, $message->id, json_encode($messageData));
-        }
-        $messageData['id'] = $message->id;
-        $messageData['channel'] = $roomCacheKey;
-
-        return $messageData;
+        return new MessageItemResource($message);
     }
 
     public static function roomCacheKey($type, $getterSlug, $senderSlug)

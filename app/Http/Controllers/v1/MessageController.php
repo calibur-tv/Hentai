@@ -4,7 +4,6 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\UnreadMessageCounter;
-use App\Http\Modules\WebSocketPusher;
 use App\Http\Repositories\MessageRepository;
 use App\Models\Message;
 use App\Models\MessageMenu;
@@ -75,11 +74,6 @@ class MessageController extends Controller
         {
             return $this->resErrBad();
         }
-
-        $webSocketPusher = new WebSocketPusher();
-        $webSocketPusher->pushUnreadMessage($getterSlug);
-        $webSocketPusher->pushUserMessageList($getterSlug);
-        $webSocketPusher->pushChatMessage($getterSlug, $message);
 
         return $this->resCreated($message);
     }
