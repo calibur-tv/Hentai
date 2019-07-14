@@ -169,9 +169,4 @@ class Pin extends Model
             'trial_type' => $type
         ]);
     }
-
-    public function reflowPin()
-    {
-        // 进入信息流
-    }
 }
