@@ -3,7 +3,7 @@
 namespace App\Listeners\Comment\Create;
 
 use App\Http\Repositories\FlowRepository;
-use App\Http\Repositories\PinRepository;
+use App\Models\Pin;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -27,10 +27,9 @@ class UpdateFlowListCache
      */
     public function handle(\App\Events\Comment\Create $event)
     {
-        $pinRepository = new PinRepository();
         $comment = $event->comment;
         $slug = $comment->pin_slug;
-        $pin = $pinRepository->item($slug);
+        $pin = Pin::where('slug', $slug)->first();
 
         if (is_null($pin))
         {
@@ -44,9 +43,12 @@ class UpdateFlowListCache
         }
         */
 
+        $tags = $pin->tags()->pluck('slug')->toArray();
         $flowRepository = new FlowRepository();
-        $flowRepository->add_pin($pin->notebook, $slug);
-        $flowRepository->add_pin($pin->area, $slug);
-        $flowRepository->add_pin($pin->topic, $slug);
+
+        foreach ($tags as $tagSlug)
+        {
+            $flowRepository->add_pin($tagSlug, $slug);
+        }
     }
 }
