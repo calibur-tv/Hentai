@@ -25,6 +25,8 @@ $route->group(['prefix' => 'door'], function () use ($route)
 
     $route->group(['prefix' => '/oauth2'], function () use ($route)
     {
+        $route->get('/ticket', 'DoorController@shareTicket');
+
         $route->post('/qq', 'DoorController@qqAuthRedirect');
 
         $route->post('/wechat', 'DoorController@wechatAuthRedirect');

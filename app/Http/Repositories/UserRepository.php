@@ -10,6 +10,7 @@ namespace App\Http\Repositories;
 
 
 use App\Http\Transformers\User\UserHomeResource;
+use App\Services\Qiniu\Http\Client;
 use App\User;
 
 class UserRepository extends Repository
@@ -176,6 +177,76 @@ class UserRepository extends Repository
             'result' => $result,
             'total' => $idsObj['total'],
             'no_more' => $idsObj['no_more']
+        ];
+    }
+
+    public function getWechatAccessToken()
+    {
+        return $this->RedisItem('wechat_js_sdk_access_token', function ()
+        {
+            $client = new Client();
+            $appId = config('app.oauth2.weixin.client_id');
+            $appSecret = config('app.oauth2.weixin.client_secret');
+            $resp = $client->get(
+                "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appId}&secret={$appSecret}",
+                [
+                    'Accept' => 'application/json'
+                ]
+            );
+
+            try
+            {
+                $body = $resp->body;
+                $token = json_decode($body, true)['access_token'];
+            }
+            catch (\Exception $e)
+            {
+                $token = '';
+            }
+
+            return $token;
+        }, 'h');
+    }
+
+    public function getWechatJsApiTicket()
+    {
+        return $this->RedisItem('wechat_js_sdk_api_ticket', function ()
+        {
+            $client = new Client();
+            $token = $this->getWechatAccessToken();
+            $resp = $client->get(
+                "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={$token}&type=jsapi",
+                [
+                    'Accept' => 'application/json'
+                ]
+            );
+
+            try
+            {
+                $body = $resp->body;
+                $ticket = json_decode($body, true)['ticket'];
+            }
+            catch (\Exception $e)
+            {
+                $ticket = '';
+            }
+
+            return $ticket;
+        }, 'h');
+    }
+
+    public function getWechatJsSDKConfig($url)
+    {
+        $jsapi_ticket = $this->getWechatJsApiTicket();
+        $noncestr = str_rand(16);
+        $timestamp = time();
+        $signature = sha1("jsapi_ticket={$jsapi_ticket}&noncestr={$noncestr}&timestamp={$timestamp}&url={$url}");
+
+        return [
+            'appId' => config('app.oauth2.weixin.client_id'),
+            'timestamp' => $timestamp,
+            'nonceStr' => $noncestr,
+            'signature' => $signature
         ];
     }
 

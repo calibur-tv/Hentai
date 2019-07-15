@@ -718,6 +718,19 @@ class DoorController extends Controller
         return $this->resOK('密码重置成功');
     }
 
+    public function shareTicket(Request $request)
+    {
+        $url = $request->get('url');
+        if (!$url)
+        {
+            return $this->resErrBad();
+        }
+
+        $userRepository = new UserRepository();
+
+        return $this->resOK($userRepository->getWechatJsSDKConfig($url));
+    }
+
     private function accessIsNew($method, $access)
     {
         return User::withTrashed()->where($method, $access)->count() === 0;
