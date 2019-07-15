@@ -36,12 +36,10 @@ class UpdateFlowListCache
             return;
         }
 
-        /* 自己无法顶贴
-        if ($pin->author->slug == $comment->from_user_slug && !$comment->to_user_slug)
+        if ($pin->user_slug == $comment->from_user_slug && !$comment->to_user_slug)
         {
             return;
         }
-        */
 
         $tags = $pin->tags()->pluck('slug')->toArray();
         $flowRepository = new FlowRepository();
