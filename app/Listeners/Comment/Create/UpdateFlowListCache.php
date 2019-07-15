@@ -4,6 +4,7 @@ namespace App\Listeners\Comment\Create;
 
 use App\Http\Repositories\FlowRepository;
 use App\Models\Pin;
+use Carbon\Carbon;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -48,5 +49,9 @@ class UpdateFlowListCache
         {
             $flowRepository->add_pin($tagSlug, $slug);
         }
+
+        $pin->update([
+            'updated_at' => Carbon::now()
+        ]);
     }
 }

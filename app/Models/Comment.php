@@ -22,8 +22,6 @@ class Comment extends Model
         'like_count',       // 喜欢和反对最后算出的值
     ];
 
-    protected $touches = ['pin'];
-
     public function author()
     {
         return $this->belongsTo('App\User', 'from_user_slug', 'slug');
