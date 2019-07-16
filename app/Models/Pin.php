@@ -79,6 +79,11 @@ class Pin extends Model
         return $this->hasMany('App\Models\Comment', 'pin_slug', 'slug');
     }
 
+    public function answers()
+    {
+        return $this->hasMany('App\Models\PinAnswer', 'pin_slug', 'slug');
+    }
+
     public function reports()
     {
         return $this->morphMany('App\Models\Report', 'reportable');

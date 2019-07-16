@@ -26,6 +26,11 @@ class CreateQuestionRule
     public function handle(\App\Events\Tag\Create $event)
     {
         $tag = $event->tag;
+        if ($tag->parent_slug === config('app.tag.notebook'))
+        {
+            return;
+        }
+
         $tag->rule()->create([
             'question_count' => 30,
             'qa_minutes' => 30,
