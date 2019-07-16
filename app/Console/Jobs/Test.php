@@ -29,19 +29,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $tags = Tag::where('migration_state', 1)
-            ->where('parent_slug', config('app.tag.notebook'))
-            ->take(500)
-            ->get();
-
-        foreach ($tags as $tag)
-        {
-            $tag->rule()->delete();
-
-            $tag->update([
-                'migration_state' => 2
-            ]);
-        }
         return true;
     }
 }
