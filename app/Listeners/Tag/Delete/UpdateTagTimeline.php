@@ -20,7 +20,7 @@ class UpdateTagTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Tag\Delete  $event
      * @return void
      */
     public function handle(\App\Events\Tag\Delete $event)

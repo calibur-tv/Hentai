@@ -77,6 +77,7 @@ class UserController extends Controller
         $userExposure->set($targetSlug);
         $userPatchCounter->add($targetSlug, 'visit_count');
 
+        $patch['visit_count']++;
         $patch['is_following'] = $visitor->isFollowing($targetId);
         $patch['is_followed_by'] = $visitor->isFollowedBy($targetId);
 

@@ -12,12 +12,13 @@ namespace App\Models;
 use App\Services\Relation\Traits\CanBeBookmarked;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Mews\Purifier\Facades\Purifier;
 use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
 {
-    use CanBeFollowed, CanBeBookmarked, HasRoles;
+    use CanBeFollowed, CanBeBookmarked, HasRoles, SoftDeletes;
 
     protected $guard_name = 'api';
 
@@ -47,6 +48,11 @@ class Tag extends Model
     public function children()
     {
         return $this->hasMany('App\Models\Tag', 'parent_slug', 'slug');
+    }
+
+    public function rule()
+    {
+        return $this->hasOne('App\Models\QuestionRule', 'tag_slug', 'slug');
     }
 
     public function pins()

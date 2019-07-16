@@ -53,6 +53,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Tag\Create\InitTagTimeline',
             'App\Listeners\Tag\Create\UpdateCreatorBookmark',
             'App\Listeners\Tag\Create\UpdateCreatorTimeline',
+            'App\Listeners\Tag\Create\CreateQuestionRule',
             'App\Listeners\Tag\Create\RefreshParentCache',
         ],
         'App\Events\Tag\Update' => [

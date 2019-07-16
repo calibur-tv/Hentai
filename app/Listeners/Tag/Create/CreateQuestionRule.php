@@ -5,7 +5,7 @@ namespace App\Listeners\Tag\Create;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class InitTagTimeline
+class CreateQuestionRule
 {
     /**
      * Create the event listener.
@@ -26,9 +26,10 @@ class InitTagTimeline
     public function handle(\App\Events\Tag\Create $event)
     {
         $tag = $event->tag;
-        $tag->timeline()->create([
-            'event_type' => 1,
-            'event_slug' => $event->user->slug
+        $tag->rule()->create([
+            'question_count' => 30,
+            'qa_minutes' => 30,
+            'right_rate' => 100
         ]);
     }
 }
