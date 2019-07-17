@@ -636,7 +636,7 @@ class DoorController extends Controller
             ]
         );
         $body = json_decode($resp->body, true);
-        $uniqueId = isset($body['unionid']) ?? '';
+        $uniqueId = $body['unionid'] ?? '';
         if (!$uniqueId)
         {
             return $this->resOK([
