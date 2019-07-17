@@ -182,8 +182,8 @@ class TagController extends Controller
 
         $image = $request->get('avatar');
         $imageFilter = new ImageFilter();
-        $imageFilter->check($image);
-        if ($imageFilter['delete'] || $imageFilter['review'])
+        $result = $imageFilter->check($image);
+        if ($result['delete'] || $result['review'])
         {
             return $this->resErrBad('请更换图片');
         }

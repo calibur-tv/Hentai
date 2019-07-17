@@ -109,7 +109,7 @@ class Tag extends Model
             ->first();
 
         $text = json_decode($text, true);
-        $newData = array_merge($data, $text);
+        $newData = array_merge($text, $data);
 
         foreach ($newData as $key => $val)
         {
