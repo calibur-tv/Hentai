@@ -239,6 +239,11 @@ class TagController extends Controller
         return $this->resNoContent();
     }
 
+    public function createQA(Request $request)
+    {
+        return $this->resErrRole();
+    }
+
     /**
      * 所有的子标签迁移到目标标签
      * 该标签下的内容和关注关系迁移到目标标签

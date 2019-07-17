@@ -85,7 +85,7 @@ $route->group(['prefix' => 'image'], function () use ($route)
     $route->get('uptoken', 'ImageController@uptoken');
 });
 
-$route->group(['prefix' => 'social'], function () use ($route)
+$route->group(['prefix' => 'social', 'middleware' => 'auth'], function () use ($route)
 {
     $route->post('toggle', 'ToggleController@toggle');
 });
@@ -154,6 +154,25 @@ $route->group(['prefix' => 'tag'], function () use ($route)
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'TagController@patch');
+    });
+
+    $route->group(['prefix' => 'qa', 'middleware' => 'auth'], function () use ($route)
+    {
+        $route->post('create', 'TagController@createQA');
+
+        $route->post('update', 'TagController@updateQA');
+
+        $route->post('delete', 'TagController@deleteQA');
+
+        $route->post('begin', 'TagController@beginQA');
+
+        $route->post('check', 'TagController@checkQA');
+
+        $route->post('vote', 'TagController@voteQA');
+
+        $route->get('list', 'TagController@Questions');
+
+        $route->get('item', 'TagController@showQA');
     });
 
     $route->get('batch_patch', 'TagController@batchPatch');
