@@ -24,7 +24,12 @@ class TagBodyResource extends JsonResource
                 'parent_slug' => $this->parent_slug,
                 'avatar' => patchImage($content['avatar'], 'default-poster'),
                 'alias' => $content['alias'],
-                'intro' => $content['intro']
+                'intro' => $content['intro'],
+                'pin_count' => $this->pin_count,
+                'seen_user_count' => $this->seen_user_count,
+                'activity_stat' => $this->activity_stat,
+                'followers_count' => $this->followers_count,
+                'question_count' => $this->question_count,
             ],
             'children' => TagItemResource::collection($this->children)
         ];

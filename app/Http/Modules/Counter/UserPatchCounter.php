@@ -14,7 +14,8 @@ class UserPatchCounter extends HashCounter
         parent::__construct('users', [
             'visit_count',
             'followers_count',
-            'following_count'
+            'following_count',
+            'friends_count'
         ]);
     }
 

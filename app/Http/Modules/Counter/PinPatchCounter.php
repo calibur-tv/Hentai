@@ -28,14 +28,7 @@ class PinPatchCounter extends HashCounter
         return [
             'visit_count' => $pin->visit_count,
             'comment_count' => $pin->comments()->count(),
-            'mark_count' => $pin
-                ->tags()
-                ->whereNotIn('parent_slug', [
-                    config('app.tag.bangumi'),
-                    config('app.tag.game'),
-                    config('app.tag.topic')
-                ])
-                ->count() - 1, // 自己的专栏要减1
+            'mark_count' => $pin->bookmarkers()->count(),
             'reward_count' => $pin->favoriters()->count(),
             'like_count' => $pin->upvoters()->count()
         ];

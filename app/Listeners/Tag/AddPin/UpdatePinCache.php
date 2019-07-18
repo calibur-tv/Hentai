@@ -28,19 +28,15 @@ class UpdatePinCache
     public function handle(\App\Events\Tag\AddPin $event)
     {
         $tag = $event->tag;
-        if (in_array($tag->slug, [
-            config('app.tag.bangumi'),
-            config('app.tag.game'),
-            config('app.tag.topic')
-        ]))
-        {
-            $pinRepository = new PinRepository();
-            $pinRepository->item($event->pin->slug, true);
-        }
-        else
+        if ($tag->parent_slug == config('app.tag.notebook'))
         {
             $pinPatchCounter = new PinPatchCounter();
             $pinPatchCounter->add($event->pin->slug, 'mark_count', 1);
+        }
+        else
+        {
+            $pinRepository = new PinRepository();
+            $pinRepository->item($event->pin->slug, true);
         }
     }
 }

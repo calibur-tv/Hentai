@@ -15,6 +15,7 @@ class TagPatchCounter extends HashCounter
             'seen_user_count',
             'followers_count',
             'activity_stat',
+            'question_count'
         ]);
     }
 

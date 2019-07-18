@@ -29,6 +29,7 @@ class UserHomeResource extends JsonResource
             'birthday' => $this->birth_secret ? -1 : $this->birthday,
             'followers_count' => $this->followers_count,
             'following_count' => $this->following_count,
+            'friends_count' => $this->friends_count,
             'visit_count' => $this->visit_count,
             'daily_signed' => $userDailySign->check($this->slug),
             'sign' => [
