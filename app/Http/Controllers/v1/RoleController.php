@@ -118,6 +118,14 @@ class RoleController extends Controller
             'title' => json_encode($target->getRoleNames(), JSON_UNESCAPED_UNICODE)
         ]);
 
+        // 管理员
+        if ($roleId == 2)
+        {
+            $target->update([
+                'is_admin' => $isDelete ? 0 : 1
+            ]);
+        }
+
         $userRepository = new UserRepository();
         $userRepository->item($userSlug, true);
 

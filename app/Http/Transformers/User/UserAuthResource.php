@@ -33,6 +33,7 @@ class UserAuthResource extends JsonResource
             ],
             'wallet_coin' => (float)$this->virtual_coin,
             'wallet_money' => (float)$this->money_coin,
+            'is_admin' => (bool)$this->is_admin
         ];
     }
 }

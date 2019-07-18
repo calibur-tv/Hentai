@@ -30,5 +30,6 @@ class UpdateRelationCounter
         $num = $event->result ? 1 : -1;
         $userPatchCounter->add($event->user->slug, 'following_count', $num);
         $userPatchCounter->add($event->target->slug, 'followers_count', $num);
+        $userPatchCounter->add($event->target->slug, 'friends_count', $num);
     }
 }

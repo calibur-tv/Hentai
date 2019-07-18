@@ -24,10 +24,22 @@ class TagPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->first();
 
+        $questionCount = $tag
+            ->pins()
+            ->where('content_type', 2)
+            ->count();
+
+        $pinCount = $tag
+            ->pins()
+            ->where('visit_type', '<>', 1)
+            ->where('content_type', '<>', 2)
+            ->count();
+
         return [
-            'pin_count' => $tag->pins()->where('visit_type', '<>', 1)->count(),
+            'pin_count' => $pinCount,
             'seen_user_count' => $tag->bookmarkers()->count(),
             'followers_count' => $tag->followers()->count(),
+            'question_count' => $questionCount,
             'activity_stat' => $tag->activity_stat
         ];
     }

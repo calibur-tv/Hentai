@@ -4,6 +4,7 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Http\Repositories\UserRepository;
 use App\User;
 
 class UserPatchCounter extends HashCounter
@@ -23,10 +24,14 @@ class UserPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->first();
 
+        $userRepository = new UserRepository();
+        $friends = $userRepository->friends($slug);
+
         return [
             'visit_count' => $user->visit_count,
             'followers_count' => $user->followers()->count(),
-            'following_count' => $user->followings()->count()
+            'following_count' => $user->followings()->count(),
+            'friends_count' => $friends['total']
         ];
     }
 }
