@@ -16,6 +16,7 @@ use App\Services\Relation\Traits\CanBeBookmarked;
 use App\Services\Relation\Traits\CanBeFavorited;
 use App\Services\Relation\Traits\CanBeVoted;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Traits\HasRoles;
 
 class Pin extends Model
@@ -91,8 +92,10 @@ class Pin extends Model
 
     public static function createPin($content, $content_type, $visit_type, $user, $tags)
     {
+        Log::info('create-pin-content', $content);
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
+        Log::info('detected-pin-content', $content);
 
         if ($risk['risk_score'] > 0)
         {
@@ -129,8 +132,10 @@ class Pin extends Model
 
     public function updatePin($content, $visit_type, $user, $tags)
     {
+        Log::info('update-pin-content', $content);
         $richContentService = new RichContentService();
         $risk = $richContentService->detectContentRisk($content, false);
+        Log::info('detected-pin-content', $content);
 
         if ($risk['risk_score'] > 0)
         {
