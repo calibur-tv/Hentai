@@ -308,9 +308,16 @@ class DoorController extends Controller
             'access_token' => $code
         ]);
 
-        $user = $socialite
-            ->driver('qq')
-            ->user($accessToken);
+        try
+        {
+            $user = $socialite
+                ->driver('qq')
+                ->user($accessToken);
+        }
+        catch (\Exception $e)
+        {
+            return $this->resErrServiceUnavailable();
+        }
 
         $openId = $user['id'];
         $uniqueId = $user['unionid'];
@@ -411,9 +418,16 @@ class DoorController extends Controller
             'openid' => $open_id
         ]);
 
-        $user = $socialite
-            ->driver('weixin')
-            ->user($accessToken);
+        try
+        {
+            $user = $socialite
+                ->driver('weixin')
+                ->user($accessToken);
+        }
+        catch (\Exception $e)
+        {
+            return $this->resErrServiceUnavailable();
+        }
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -456,7 +470,7 @@ class DoorController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'sex' => $user['sex'],
+                'sex' => $user['sex'] ?: 0,
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
                 'password' => str_rand()
@@ -593,7 +607,7 @@ class DoorController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'sex' => $user['sex'],
+                'sex' => $user['sex'] ?: 0,
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
                 'password' => str_rand()

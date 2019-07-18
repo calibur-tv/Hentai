@@ -68,9 +68,16 @@ class AuthController extends Controller
 
         $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
-        $user = $socialite
-            ->driver('qq')
-            ->user();
+        try
+        {
+            $user = $socialite
+                ->driver('qq')
+                ->user();
+        }
+        catch (\Exception $e)
+        {
+            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '服务异常请重试');
+        }
 
         $openId = $user['id'];
         $uniqueId = $user['unionid'];
@@ -146,9 +153,16 @@ class AuthController extends Controller
 
         $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
-        $user = $socialite
-            ->driver('wechat')
-            ->user();
+        try
+        {
+            $user = $socialite
+                ->driver('wechat')
+                ->user();
+        }
+        catch (\Exception $e)
+        {
+            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '服务异常请重试');
+        }
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -189,7 +203,7 @@ class AuthController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'sex' => $user['sex'],
+                'sex' => $user['sex'] ?: 0,
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
                 'password' => str_rand()
@@ -219,9 +233,16 @@ class AuthController extends Controller
 
         $socialite = new SocialiteManager(config('app.oauth2', []), $request);
 
-        $user = $socialite
-            ->driver('weixin')
-            ->user();
+        try
+        {
+            $user = $socialite
+                ->driver('weixin')
+                ->user();
+        }
+        catch (\Exception $e)
+        {
+            return redirect('https://www.calibur.tv/callback/auth-error?message=' . '服务异常请重试');
+        }
 
         $openId = $user['original']['openid'];
         $uniqueId = $user['original']['unionid'];
@@ -262,7 +283,7 @@ class AuthController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'sex' => $user['sex'],
+                'sex' => $user['sex'] ?: 0,
                 'wechat_open_id' => $openId,
                 'wechat_unique_id' => $uniqueId,
                 'password' => str_rand()
