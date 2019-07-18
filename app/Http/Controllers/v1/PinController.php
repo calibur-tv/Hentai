@@ -322,7 +322,7 @@ class PinController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($pin->user_slug != $user->slug)
+        if ($pin->user_slug != $user->slug && !$user->is_admin)
         {
             return $this->resErrRole();
         }

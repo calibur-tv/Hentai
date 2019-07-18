@@ -345,8 +345,11 @@ class RichContentService
             else if ($type === 'link')
             {
                 $words .= $row['data']['link'];
-                $words .= $row['data']['meta']['title'];
-                $words .= $row['data']['meta']['description'];
+                if (isset($row['data']['meta']))
+                {
+                    $words .= $row['data']['meta']['title'];
+                    $words .= $row['data']['meta']['description'];
+                }
             }
             else if ($type === 'list')
             {

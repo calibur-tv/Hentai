@@ -217,7 +217,7 @@ class CommentController extends Controller
         }
 
         $user = $request->user();
-        if ($comment->from_user_slug != $user->slug)
+        if ($comment->from_user_slug != $user->slug && !$user->is_admin)
         {
             return $this->resErrRole();
         }
