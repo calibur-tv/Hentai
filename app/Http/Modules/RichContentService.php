@@ -6,7 +6,6 @@ namespace App\Http\Modules;
 
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
-use Illuminate\Support\Facades\Log;
 use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
@@ -174,9 +173,6 @@ class RichContentService
                 ];
             }
         }
-        Log::info('save-content', [
-            'content' => json_encode($result, JSON_UNESCAPED_UNICODE)
-        ]);
         return json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 
@@ -347,8 +343,8 @@ class RichContentService
                 $words .= $row['data']['link'];
                 if (isset($row['data']['meta']))
                 {
-                    $words .= $row['data']['meta']['title'];
-                    $words .= $row['data']['meta']['description'];
+                    $words .= $row['data']['meta']['title'] ?? '';
+                    $words .= $row['data']['meta']['description'] ?? '';
                 }
             }
             else if ($type === 'list')
