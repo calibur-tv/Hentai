@@ -25,6 +25,17 @@ class PinPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->first();
 
+        if (is_null($pin))
+        {
+            return [
+                'visit_count' => 0,
+                'comment_count' => 0,
+                'mark_count' => 0,
+                'reward_count' => 0,
+                'like_count' => 0
+            ];
+        }
+
         return [
             'visit_count' => $pin->visit_count,
             'comment_count' => $pin->comments()->count(),

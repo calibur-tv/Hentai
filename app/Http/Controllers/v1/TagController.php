@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
+use App\Models\Pin;
 use App\Models\QuestionRule;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
@@ -235,6 +236,11 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
+        if ($tag->parent_slug === config('app.tag.calibur'))
+        {
+            return $this->resNoContent();
+        }
+
         $tag->deleteTag($user);
 
         return $this->resNoContent();
@@ -296,7 +302,81 @@ class TagController extends Controller
      */
     public function createQA(Request $request)
     {
-        return $this->resErrRole();
+        $validator = Validator::make($request->all(), [
+            'tag_slug' => 'required|string',
+            'title' => 'required|string|max:50',
+            'answers' => 'required|array',
+            'right_index' => 'required|integer|min:0|max:3'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $user = $request->user();
+        $tag = Tag
+            ::where('slug', $request->get('tag_slug'))
+            ->first();
+
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (
+            $user->cant('create_tag_qa') &&
+            !$user->is_admin &&
+            !$user->hasBookmarked($tag, Tag::class)
+        )
+        {
+            return $this->resErrRole();
+        }
+
+        $content = [
+            [
+                'type' => 'title',
+                'data' => [
+                    'text' => $request->get('title')
+                ]
+            ]
+        ];
+        $answers = $request->get('answers');
+        $items = [];
+        $ids = [];
+        foreach ($answers as $i => $ans)
+        {
+            $id = str_rand();
+            $items[] = [
+                'id' => $id,
+                'text' => $ans
+            ];
+            $ids[] = $id;
+        }
+        $content[] = [
+            'type' => 'vote',
+            'data' => [
+                'items' => $items,
+                'right_id' => [$ids[$request->get('right_index')]]
+            ]
+        ];
+
+        $contentType = 2;
+        $visitType = 0;
+        $tags = [
+            config('app.tag.qa'),
+            $tag->slug
+        ];
+
+        $qa = Pin::createPin(
+            $content,
+            $contentType,
+            $visitType,
+            $user,
+            $tags
+        );
+
+        return $this->resCreated($qa);
     }
 
     /**

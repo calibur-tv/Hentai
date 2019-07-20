@@ -25,6 +25,16 @@ class UserPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->first();
 
+        if (is_null($user))
+        {
+            return [
+                'visit_count' => 0,
+                'followers_count' => 0,
+                'following_count' => 0,
+                'friends_count' => 0
+            ];
+        }
+
         $userRepository = new UserRepository();
         $friends = $userRepository->friends($slug);
 

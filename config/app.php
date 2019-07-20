@@ -111,6 +111,7 @@ return [
     'cipher' => 'AES-256-CBC',
 
     'tag' => [
+        'calibur' => '1e1',             // 根节点
         'bangumi' => '2he',
         'game' => '285',
         'topic' => '3p6',
@@ -118,6 +119,7 @@ return [
         'trash' => 'fa0',               // 垃圾箱
         'notebook' => 'uh4f',           // 用户专栏
         'pin' => '1o2bqt',              // 文章标签
+        'qa' => '1o34sa',               // 答题
     ],
 
     'qiniu' => [

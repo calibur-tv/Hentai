@@ -268,7 +268,7 @@ class RichContentService
             !$firstImage &&
             !$firstVideo &&
             !$firstMusic &&
-            !$title['banner']
+            !isset($title['banner'])
         )
         {
             return null;

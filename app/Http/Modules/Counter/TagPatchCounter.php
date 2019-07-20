@@ -25,6 +25,17 @@ class TagPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->first();
 
+        if (is_null($tag))
+        {
+            return [
+                'pin_count' => 0,
+                'seen_user_count' => 0,
+                'followers_count' => 0,
+                'question_count' => 0,
+                'activity_stat' => 0
+            ];
+        }
+
         $questionCount = $tag
             ->pins()
             ->where('content_type', 2)
