@@ -214,47 +214,4 @@ class TagRepository extends Repository
 
         return $result;
     }
-
-    public function getChildrenSlugByLoop($parentSlug, $loop)
-    {
-        if (!$parentSlug || $loop < 0)
-        {
-            return [];
-        }
-
-        if ($loop === 0)
-        {
-            return [$parentSlug];
-        }
-
-        return $this->RedisList("tag-children-{$parentSlug}-loop-{$loop}", function () use ($parentSlug, $loop)
-        {
-            $i = 0;
-            $result = [$parentSlug];
-            $lastDeepSlug = [$parentSlug];
-            while ($i < $loop)
-            {
-                $childrenSlug = [];
-                foreach ($lastDeepSlug as $pSlug)
-                {
-                    $list = $this->getChildrenSlug($pSlug);
-                    $childrenSlug = array_merge($childrenSlug, $list);
-                }
-                $lastDeepSlug = $childrenSlug;
-                $result = array_merge($result, $childrenSlug);
-                $i++;
-            }
-
-            return $result;
-        });
-    }
-
-    protected function getChildrenSlug($parentSlug)
-    {
-        return Tag
-            ::where('parent_slug', $parentSlug)
-            ->orderBy('activity_stat', 'DESC')
-            ->pluck('slug')
-            ->toArray();
-    }
 }

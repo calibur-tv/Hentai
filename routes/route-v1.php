@@ -178,8 +178,6 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 
         $route->post('check', 'TagController@checkQA');
 
-        $route->post('vote', 'TagController@voteQA');
-
         $route->get('list', 'TagController@Questions');
 
         $route->get('item', 'TagController@showQA');

@@ -22,8 +22,7 @@ class TagItemResource extends JsonResource
             'avatar' => patchImage($content['avatar'], 'default-poster'),
             'intro' => $content['intro'],
             'alias' => $content['alias'],
-            'parent_slug' => $this->parent_slug,
-            'deep' => $this->deep
+            'parent_slug' => $this->parent_slug
         ];
     }
 }

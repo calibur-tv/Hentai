@@ -24,7 +24,6 @@ class Tag extends Model
 
     protected $fillable = [
         'slug',
-        'deep',
         'redirect_slug',
         'creator_slug',
         'parent_slug',
@@ -79,8 +78,7 @@ class Tag extends Model
     {
         $tag = self::create([
             'creator_slug' => $user->slug,
-            'parent_slug' => $parent->slug,
-            'deep' => $parent->deep + 1
+            'parent_slug' => $parent->slug
         ]);
         $slug = id2slug($tag->id);
         $tag->update([

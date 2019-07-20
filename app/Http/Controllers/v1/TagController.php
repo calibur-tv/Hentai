@@ -291,112 +291,59 @@ class TagController extends Controller
         return $this->resNoContent();
     }
 
+    /**
+     * 为题库添加题目
+     */
     public function createQA(Request $request)
     {
         return $this->resErrRole();
     }
 
     /**
-     * 所有的子标签迁移到目标标签
-     * 该标签下的内容和关注关系迁移到目标标签
-     * // TODO：events
+     * 更新某个题目
      */
-    public function combine(Request $request)
+    public function updateQA(Request $request)
     {
-        $user = $request->user();
-        if ($user->cant('combine_tag'))
-        {
-            return $this->resErrRole();
-        }
 
-        $validator = Validator::make($request->all(), [
-            'slug' => 'required|string',
-            'target_slug' => 'required|string'
-        ]);
-
-        if ($validator->fails())
-        {
-            return $this->resErrParams($validator);
-        }
-
-        $slug = $request->get('slug');
-        $tag = Tag
-            ::where('slug', $request->get('slug'))
-            ->first();
-
-        if (is_null($tag))
-        {
-            return $this->resErrNotFound();
-        }
-
-        $targetSlug = $request->get('target_slug');
-        $target = Tag
-            ::where('slug', $targetSlug)
-            ->first();
-
-        if (is_null($target))
-        {
-            return $this->resErrNotFound();
-        }
-
-        Tag
-            ::where('parent_slug', $slug)
-            ->update([
-                'parent_slug' => $targetSlug,
-                'deep' => $target + 1
-            ]);
-
-        // TODO cache
-
-        return $this->resNoContent();
     }
 
     /**
-     * 将近义词 tag 重定向过去
-     * // TODO：events
+     * 删除某个题目
      */
-    public function relink(Request $request)
+    public function deleteQA(Request $request)
     {
-        $user = $request->user();
-        if ($user->cant('relink_tag'))
-        {
-            return $this->resErrRole();
-        }
 
-        $validator = Validator::make($request->all(), [
-            'slug' => 'required|string',
-            'target_slug' => 'required|string'
-        ]);
+    }
 
-        if ($validator->fails())
-        {
-            return $this->resErrParams($validator);
-        }
+    /**
+     * 用户开始答题，给他发卷
+     */
+    public function beginQA(Request $request)
+    {
 
-        $tag = Tag
-            ::where('slug', $request->get('slug'))
-            ->first();
+    }
 
-        if (is_null($tag))
-        {
-            return $this->resErrNotFound();
-        }
+    /**
+     * 检查某道题是否答对
+     */
+    public function checkQA(Request $request)
+    {
 
-        $target = Tag
-            ::where('slug', $request->get('target_slug'))
-            ->first();
+    }
 
-        if (is_null($target))
-        {
-            return $this->resErrNotFound();
-        }
+    /**
+     * 获取题目列表，不包括选项
+     */
+    public function Questions(Request $request)
+    {
 
-        $tag->update([
-            'parent_slug' => $request->get('target_slug'),
-            'deep' => $target->deep + 1
-        ]);
-        // TODO cache
+    }
 
-        return $this->resNoContent();
+    /**
+     * 获取题目，包括问题和选项
+     */
+    public function showQA(Request $request)
+    {
+
     }
 }
