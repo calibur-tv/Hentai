@@ -267,7 +267,8 @@ class TagController extends Controller
             'question_count' => 'required|integer|max:100|min:30',
             'right_rate' => 'required|integer|max:100|min:50',
             'qa_minutes' => 'required|integer|max:120|min:30',
-            'rule_type' => 'required|integer'
+            'rule_type' => 'required|integer',
+            'result_type' => 'required|integer',
         ]);
 
         if ($validator->fails())
@@ -289,6 +290,7 @@ class TagController extends Controller
                 'right_rate' => $request->get('right_rate'),
                 'qa_minutes' => $request->get('qa_minutes'),
                 'rule_type' => $request->get('rule_type'),
+                'result_type' => $request->get('result_type')
             ]);
 
         $tagRepository = new TagRepository();
