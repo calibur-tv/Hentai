@@ -110,6 +110,23 @@ class RichContentService
                     ]
                 ];
             }
+            else if ($type === 'vote')
+            {
+                $items = array_filter($row['data']['items'], function ($item)
+                {
+                    return !!trim($item['text']);
+                });
+                $result[] = [
+                    'type' => $type,
+                    'data' => [
+                        'right_id' => $row['data']['right_id'],
+                        'items' => array_map(function ($item)
+                        {
+                            return Purifier::clean(trim($item['text']));
+                        }, $items)
+                    ]
+                ];
+            }
             else if ($type === 'checklist')
             {
                 $items = array_filter($row['data']['items'], function ($item)
@@ -178,7 +195,26 @@ class RichContentService
 
     public function parseRichContent(string $data)
     {
-        return json_decode($data, true);
+        $data = json_decode($data, true);
+        $result = [];
+        foreach ($data as $row)
+        {
+            if ($row['type'] === 'vote')
+            {
+                // 过滤掉答案
+                $result[] = [
+                    'type' => 'vote',
+                    'data' => [
+                        'items' => $row['data']['items']
+                    ]
+                ];
+            }
+            else
+            {
+                $result[] = $row;
+            }
+        }
+        return $result;
     }
 
     public function paresPureContent(array $data)
@@ -352,6 +388,13 @@ class RichContentService
                 foreach ($row['data']['items'] as $item)
                 {
                     $words .= $item;
+                }
+            }
+            else if ($type === 'vote')
+            {
+                foreach ($row['data']['items'] as $item)
+                {
+                    $words .= $item['text'];
                 }
             }
             else if ($type === 'checklist')

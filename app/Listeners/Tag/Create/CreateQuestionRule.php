@@ -26,7 +26,13 @@ class CreateQuestionRule
     public function handle(\App\Events\Tag\Create $event)
     {
         $tag = $event->tag;
-        if ($tag->parent_slug === config('app.tag.notebook'))
+        if (
+            !in_array($tag->parent_slug, [
+                config('app.tag.topic'),
+                config('app.tag.bangumi'),
+                config('app.tag.game')
+            ])
+        )
         {
             return;
         }
@@ -34,7 +40,8 @@ class CreateQuestionRule
         $tag->rule()->create([
             'question_count' => 30,
             'qa_minutes' => 30,
-            'right_rate' => 100
+            'right_rate' => 100,
+            'result_type' => $tag->parent_slug === config('app.tag.topic') ? 1 : 0
         ]);
     }
 }
