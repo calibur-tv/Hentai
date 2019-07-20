@@ -26,7 +26,7 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->doPublish && $event->dontAddFlow)
+        if ($event->doPublish)
         {
             $tagPatchCounter = new TagPatchCounter();
             foreach ($event->tags as $slug)

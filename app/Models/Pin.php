@@ -122,7 +122,10 @@ class Pin extends Model
         ]);
         $pin->content = $richContent->text;
 
-        event(new \App\Events\Pin\Create($pin, $user, $tags, $visit_type == 0));
+        if ($content_type === 1)
+        {
+            event(new \App\Events\Pin\Create($pin, $user, $tags, $visit_type == 0));
+        }
 
         return $pin;
     }
@@ -155,7 +158,10 @@ class Pin extends Model
         ]);
         $this->content = $richContent->text;
 
-        event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
+        if ($this->content_type === 1)
+        {
+            event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
+        }
 
         return true;
     }
@@ -164,7 +170,10 @@ class Pin extends Model
     {
         $this->delete();
 
-        event(new \App\Events\Pin\Delete($this, $user));
+        if ($this->content_type === 1)
+        {
+            event(new \App\Events\Pin\Delete($this, $user));
+        }
     }
 
     public function reviewPin($type)

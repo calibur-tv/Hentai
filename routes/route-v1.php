@@ -88,6 +88,8 @@ $route->group(['prefix' => 'image'], function () use ($route)
 $route->group(['prefix' => 'social', 'middleware' => 'auth'], function () use ($route)
 {
     $route->post('toggle', 'ToggleController@toggle');
+
+    $route->post('vote', 'ToggleController@vote');
 });
 
 $route->group(['prefix' => 'pin'], function () use ($route)
@@ -95,6 +97,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     $route->get('show', 'PinController@show');
 
     $route->get('marked_tag', 'PinController@getMarkedTag');
+
+    $route->get('vote_stat', 'PinController@voteStat');
 
     $route->group(['middleware' => 'user'], function () use ($route)
     {

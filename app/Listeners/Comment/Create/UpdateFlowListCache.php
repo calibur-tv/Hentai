@@ -32,7 +32,7 @@ class UpdateFlowListCache
         $slug = $comment->pin_slug;
         $pin = Pin::where('slug', $slug)->first();
 
-        if (is_null($pin))
+        if (is_null($pin) || $pin->visit_type !== 0)
         {
             return;
         }

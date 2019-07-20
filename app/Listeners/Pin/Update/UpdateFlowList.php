@@ -27,7 +27,7 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->published && !$event->dontAddFlow)
+        if ($event->published)
         {
             $flowRepository = new FlowRepository();
             $pinSlug = $event->pin->slug;

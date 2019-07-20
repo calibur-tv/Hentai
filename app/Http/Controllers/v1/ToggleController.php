@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\RichContentService;
 use App\Http\Modules\VirtualCoinService;
 use App\Models\Comment;
 use App\Models\Pin;
+use App\Models\PinAnswer;
 use App\Models\Tag;
 use App\User;
 use Illuminate\Http\Request;
@@ -77,6 +79,78 @@ class ToggleController extends Controller
         $this->emitToggleEvent($user, $target, $targetType, $methodType, $result);
 
         return $this->resOK($result ? 1 : -1);
+    }
+
+    public function vote(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pin_slug' => 'required|string',
+            'answer_hash' => 'required|array'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $pinSlug = $request->get('pin_slug');
+        $pin = Pin
+            ::where('slug', $pinSlug)
+            ->with(['content' => function ($query)
+            {
+                $query->orderBy('created_at', 'desc');
+            }])
+            ->first();
+
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $richContentService = new RichContentService();
+        $vote = $richContentService->getFirstType($pin->content->text, 'vote');
+        if (is_null($vote))
+        {
+            return $this->resErrBad('投票已删除');
+        }
+
+        $answers = array_map(function ($item)
+        {
+            return $item['id'];
+        }, $vote['items']);
+
+        $requestAnswers = $request->get('answer_hash');
+        if (!empty(array_diff($requestAnswers, $answers)))
+        {
+            return $this->resErrBad('投票已过期');
+        }
+
+        if ($vote['expired_at'] && $vote['expired_at'] < time())
+        {
+            return $this->resErrBad($vote['expired_at']);
+        }
+
+        $user = $request->user();
+        $pinAnswer = PinAnswer
+            ::where('pin_slug', $pinSlug)
+            ->where('user_slug', $user->slug)
+            ->first();
+
+        if (!is_null($pinAnswer))
+        {
+            return $this->resErrBad('已投过票');
+        }
+
+        PinAnswer::create([
+            'pin_slug' => $pinSlug,
+            'user_slug' => $user->slug,
+            'selected_uuid' => json_encode($requestAnswers),
+            'is_right' => (bool)count(array_intersect($requestAnswers, $vote['right_ids']))
+        ]);
+
+        event(new \App\Events\Pin\Vote($pin, $user, $requestAnswers));
+
+        return $this->resNoContent();
     }
 
     protected function preToggleAction($user, $target, $targetType, $methodType, $targetSlug, $actionSlug)

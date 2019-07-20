@@ -4,9 +4,11 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\PinPatchCounter;
+use App\Http\Modules\Counter\PinVoteCounter;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
+use App\Models\PinAnswer;
 use App\Services\Spider\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -76,6 +78,7 @@ class PinController extends Controller
         $patch['recommended_at'] = $pin->recommended_at;
         $patch['last_top_at'] = $pin->last_top_at;
         $patch['deleted_at'] = $pin->deleted_at;
+        $patch['vote_hash'] = [];
 
         $user = $request->user();
         if ($user && $user->slug !== $pin->author->slug)
@@ -96,7 +99,31 @@ class PinController extends Controller
             $patch['reward_status'] = false;
         }
 
+        if ($pin->content_type == 2 && $user)
+        {
+            $hashStr = PinAnswer
+                ::where('pin_slug', $slug)
+                ->where('user_slug', $user->slug)
+                ->pluck('selected_uuid')
+                ->first();
+            $patch['vote_hash'] = json_decode($hashStr, true);
+        }
+
         return $this->resOK($patch);
+    }
+
+    public function voteStat(Request $request)
+    {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $pinVoteCounter = new PinVoteCounter();
+        $result = $pinVoteCounter->all($slug);
+
+        return $this->resOK($result);
     }
 
     public function batchPatch(Request $request)

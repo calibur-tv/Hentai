@@ -12,11 +12,13 @@ class HashCounter
     protected $fields = [];
     protected $timeout = 3600; // 一小时写一次数据库
     protected $uniqueKey = 'slug';
+    protected $migrate = true;
 
-    public function __construct(string $table, array $fields)
+    public function __construct(string $table, array $fields, bool $migrate = true)
     {
         $this->table = $table;
         $this->fields = $fields;
+        $this->migrate = $migrate;
     }
 
     /**
@@ -96,10 +98,13 @@ class HashCounter
     {
         $value = gettype($value) === 'array' ? $value : json_decode(json_encode($value), true);
 
-        DB
-            ::table($this->table)
-            ->where($this->uniqueKey, $slug)
-            ->update($value);
+        if ($this->migrate)
+        {
+            DB
+                ::table($this->table)
+                ->where($this->uniqueKey, $slug)
+                ->update($value);
+        }
 
         $value['migrate_at'] = time();
 
@@ -113,7 +118,7 @@ class HashCounter
      */
     public function migrate(string $slug, array $result)
     {
-        if (time() - $result['migrate_at'] < $this->timeout)
+        if (!$this->migrate || time() - $result['migrate_at'] < $this->timeout)
         {
             return;
         }

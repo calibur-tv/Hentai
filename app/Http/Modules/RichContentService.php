@@ -221,6 +221,22 @@ class RichContentService
         return $result;
     }
 
+    public function getFirstType($content, $type)
+    {
+        $array = gettype($content) === 'array' ? json_decode(json_encode($content), true) : json_decode($content, true);
+        $result = null;
+        foreach ($array as $row)
+        {
+            if ($row['type'] === $type)
+            {
+                $result = $row['data'];
+                break;
+            }
+        }
+
+        return $result;
+    }
+
     public function formatVote(array $answers, $right_index, int $max_select = 1, int $expired_at = 0)
     {
         $items = [];
