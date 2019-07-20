@@ -283,14 +283,15 @@ class TagController extends Controller
             return $this->resErrRole();
         }
 
+        $resultType = $request->get('result_type');
         QuestionRule
             ::where('tag_slug', $request->get('tag_slug'))
             ->update([
                 'question_count' => $request->get('question_count'),
-                'right_rate' => $request->get('right_rate'),
+                'right_rate' => $resultType === 1 ? 100 : $request->get('right_rate'),
                 'qa_minutes' => $request->get('qa_minutes'),
                 'rule_type' => $request->get('rule_type'),
-                'result_type' => $request->get('result_type')
+                'result_type' => $resultType
             ]);
 
         $tagRepository = new TagRepository();
