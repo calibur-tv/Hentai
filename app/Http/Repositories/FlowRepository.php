@@ -66,6 +66,7 @@ class FlowRepository extends Repository
                         ->where('visit_type', 0)
                         ->where('trial_type', 0)
                         ->whereNull('last_top_at')
+                        ->whereNotIn('content_type', [2])
                         ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at');
                 }])
                 ->select('id')
@@ -118,6 +119,7 @@ class FlowRepository extends Repository
                         ->where('visit_type', 0)
                         ->where('trial_type', 0)
                         ->whereNull('last_top_at')
+                        ->whereNotIn('content_type', [2])
                         ->select('slug', 'created_at');
                 }])
                 ->select('id')
@@ -148,6 +150,7 @@ class FlowRepository extends Repository
                         ->where('visit_type', 0)
                         ->where('trial_type', 0)
                         ->whereNull('last_top_at')
+                        ->whereNotIn('content_type', [2])
                         ->select('slug', 'updated_at');
                 }])
                 ->select('id')

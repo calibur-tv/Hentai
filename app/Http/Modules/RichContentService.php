@@ -121,7 +121,7 @@ class RichContentService
                     'data' => [
                         'right_ids' => $row['data']['right_ids'],
                         'max_select' => $row['data']['max_select'],
-                        're_select' => $row['data']['re_select'],
+                        'expired_at' => $row['data']['expired_at'],
                         'items' => array_map(function ($item)
                         {
                             return [
@@ -221,7 +221,7 @@ class RichContentService
         return $result;
     }
 
-    public function formatVote(array $answers, $right_index, int $max_select, bool $re_select)
+    public function formatVote(array $answers, $right_index, int $max_select = 1, int $expired_at = 0)
     {
         $items = [];
         foreach ($answers as $i => $ans)
@@ -259,7 +259,7 @@ class RichContentService
         return [
             'items' => $items,
             'right_ids' => $rights,
-            're_select' => $re_select,
+            'expired_at' => $expired_at,
             'max_select' => $max_select
         ];
     }

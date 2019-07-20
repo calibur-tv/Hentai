@@ -31,7 +31,7 @@ class Pin extends Model
         'visit_type',       // 访问类型，0 已发布，1 草稿箱, 2 仅好友可见
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
         'comment_type',     // 评论权限的类型，默认 0 允许所有人评论
-        'content_type',     // 内容类型：0 待定，1 帖子，2 分区题目
+        'content_type',     // 内容类型：0 待定，1 帖子，2 分区问答
         'last_top_at',      // 最后置顶时间
         'last_edit_at',     // 最后编辑时间
         'published_at',     // 发布时间

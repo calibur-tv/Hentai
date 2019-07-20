@@ -17,6 +17,7 @@ class Update
     public $published;
     public $attachTags;
     public $detachTags;
+    public $dontAddFlow;
 
     /**
      * Create a new event instance.
@@ -30,6 +31,7 @@ class Update
         $this->tags = $tags;
         $this->doPublish = $publish;
         $this->published = $pin->visit_type != 1;
+        $this->dontAddFlow = $pin->content_type === 2;
 
         $oldTags = $pin
             ->tags()

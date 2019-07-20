@@ -14,6 +14,7 @@ class Create
     public $user;
     public $tags;
     public $doPublish;
+    public $dontAddFlow;
 
     /**
      * Create a new event instance.
@@ -26,5 +27,6 @@ class Create
         $this->user = $user;
         $this->tags = $tags;
         $this->doPublish = $doPublish;
+        $this->dontAddFlow = $pin->content_type === 2;
     }
 }

@@ -348,14 +348,14 @@ class TagController extends Controller
 
         $richContextService = new RichContentService();
         $maxSelect = 1;
-        $re_select = true;
+        $expired_at = 0;
         $content[] = [
             'type' => 'vote',
             'data' => $richContextService->formatVote(
                 $request->get('answers'),
                 $request->get('right_index'),
                 $maxSelect,
-                $re_select
+                $expired_at
             )
         ];
 
