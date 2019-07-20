@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
+use App\Http\Modules\RichContentService;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\Pin;
@@ -344,24 +345,18 @@ class TagController extends Controller
                 ]
             ]
         ];
-        $answers = $request->get('answers');
-        $items = [];
-        $ids = [];
-        foreach ($answers as $i => $ans)
-        {
-            $id = str_rand();
-            $items[] = [
-                'id' => $id,
-                'text' => $ans
-            ];
-            $ids[] = $id;
-        }
+
+        $richContextService = new RichContentService();
+        $maxSelect = 1;
+        $re_select = true;
         $content[] = [
             'type' => 'vote',
-            'data' => [
-                'items' => $items,
-                'right_id' => [$ids[$request->get('right_index')]]
-            ]
+            'data' => $richContextService->formatVote(
+                $request->get('answers'),
+                $request->get('right_index'),
+                $maxSelect,
+                $re_select
+            )
         ];
 
         $contentType = 2;

@@ -119,10 +119,15 @@ class RichContentService
                 $result[] = [
                     'type' => $type,
                     'data' => [
-                        'right_id' => $row['data']['right_id'],
+                        'right_ids' => $row['data']['right_ids'],
+                        'max_select' => $row['data']['max_select'],
+                        're_select' => $row['data']['re_select'],
                         'items' => array_map(function ($item)
                         {
-                            return Purifier::clean(trim($item['text']));
+                            return [
+                                'text' => Purifier::clean(trim($item['text'])),
+                                'id' => $item['id']
+                            ];
                         }, $items)
                     ]
                 ];
@@ -202,11 +207,10 @@ class RichContentService
             if ($row['type'] === 'vote')
             {
                 // 过滤掉答案
+                unset($row['data']['right_ids']);
                 $result[] = [
                     'type' => 'vote',
-                    'data' => [
-                        'items' => $row['data']['items']
-                    ]
+                    'data' => $row['data']
                 ];
             }
             else
@@ -215,6 +219,49 @@ class RichContentService
             }
         }
         return $result;
+    }
+
+    public function formatVote(array $answers, $right_index, int $max_select, bool $re_select)
+    {
+        $items = [];
+        foreach ($answers as $i => $ans)
+        {
+            $id = $i . str_rand();
+            $items[] = [
+                'id' => $id,
+                'text' => $ans
+            ];
+            $ids[] = $id;
+        }
+
+        $rights = [];
+        if (gettype($right_index) !== 'array')
+        {
+            $rights[] = $ids[$right_index];
+        }
+        else
+        {
+            foreach ($right_index as $index)
+            {
+                $rights[] = $ids[$index];
+            }
+        }
+
+        if ($max_select < 1)
+        {
+            $max_select = 1;
+        }
+        else if ($max_select >= count($items))
+        {
+            $max_select = count($items) - 1;
+        }
+
+        return [
+            'items' => $items,
+            'right_ids' => $rights,
+            're_select' => $re_select,
+            'max_select' => $max_select
+        ];
     }
 
     public function paresPureContent(array $data)
