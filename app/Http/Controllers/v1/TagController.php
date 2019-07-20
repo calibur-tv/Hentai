@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
+use App\Models\QuestionRule;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
@@ -235,6 +236,57 @@ class TagController extends Controller
         }
 
         $tag->deleteTag($user);
+
+        return $this->resNoContent();
+    }
+
+    public function getJoinRule(Request $request)
+    {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
+
+        $tagRepository = new TagRepository();
+        $rule = $tagRepository->rule($slug);
+
+        return $this->resOK($rule);
+    }
+
+    public function updateJoinRule(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'tag_slug' => 'required|string',
+            'question_count' => 'required|integer|max:100|min:30',
+            'right_rate' => 'required|integer|max:100|min:50',
+            'qa_minutes' => 'required|integer|max:120|min:30',
+            'rule_type' => 'required|integer'
+        ]);
+
+        if ($validator->fails())
+        {
+            return $this->resErrParams($validator);
+        }
+
+        $user = $request->user();
+
+        if ($user->cant('update_tag_join_rule') && !$user->is_admin)
+        {
+            return $this->resErrRole();
+        }
+
+        QuestionRule
+            ::where('tag_slug', $request->get('tag_slug'))
+            ->update([
+                'question_count' => $request->get('question_count'),
+                'right_rate' => $request->get('right_rate'),
+                'qa_minutes' => $request->get('qa_minutes'),
+                'rule_type' => $request->get('rule_type'),
+            ]);
+
+        $tagRepository = new TagRepository();
+        $tagRepository->rule($request->get('tag_slug'), true);
 
         return $this->resNoContent();
     }

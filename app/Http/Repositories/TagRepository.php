@@ -11,6 +11,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Transformers\Tag\TagBodyResource;
 use App\Http\Transformers\Tag\TagItemResource;
+use App\Models\QuestionRule;
 use App\Models\Tag;
 use App\User;
 
@@ -97,6 +98,16 @@ class TagRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function rule($slug, $refresh = false)
+    {
+        return $this->RedisItem("tag-join-rule:{$slug}", function () use ($slug)
+        {
+            return QuestionRule
+                ::where('tag_slug', $slug)
+                ->first();
+        }, $refresh);
     }
 
     /**

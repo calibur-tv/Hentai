@@ -156,6 +156,16 @@ $route->group(['prefix' => 'tag'], function () use ($route)
         $route->get('patch', 'TagController@patch');
     });
 
+    $route->group(['prefix' => 'rule'], function () use ($route)
+    {
+        $route->get('show', 'TagController@getJoinRule');
+
+        $route->group(['prefix' => 'edit', 'middleware' => 'auth'], function () use ($route)
+        {
+            $route->post('update', 'TagController@updateJoinRule');
+        });
+    });
+
     $route->group(['prefix' => 'qa', 'middleware' => 'auth'], function () use ($route)
     {
         $route->post('create', 'TagController@createQA');
