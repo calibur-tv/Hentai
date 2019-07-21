@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Listeners\Comment\Create;
+namespace App\Listeners\Pin\Vote;
 
 use App\Http\Repositories\FlowRepository;
-use App\Models\Pin;
 use Carbon\Carbon;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,21 +22,13 @@ class UpdateFlowListCache
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Comment\Create  $event
+     * @param  \App\Events\Pin\Vote  $event
      * @return void
      */
-    public function handle(\App\Events\Comment\Create $event)
+    public function handle(\App\Events\Pin\Vote $event)
     {
-        $comment = $event->comment;
-        $slug = $comment->pin_slug;
-        $pin = Pin::where('slug', $slug)->first();
-
-        if (is_null($pin) || $pin->visit_type !== 0 || $pin->content_type !== 1)
-        {
-            return;
-        }
-
-        if ($pin->user_slug == $comment->from_user_slug && !$comment->to_user_slug)
+        $pin = $event->pin;
+        if ($pin->visit_type !== 0 || $pin->content_type !== 1)
         {
             return;
         }

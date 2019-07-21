@@ -90,9 +90,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Pin\Vote' => [
             'App\Listeners\Pin\Vote\UpdateVoteCounter',
+            'App\Listeners\Pin\Vote\UpdateFlowListCache',
         ],
         'App\Events\Pin\Reward' => [
             'App\Listeners\Pin\Reward\UpdateLikeCounter',
+            'App\Listeners\Pin\Reward\UpdateFlowListCache',
         ],
         'App\Events\Tag\RemovePin' => [
             'App\Listeners\Tag\RemovePin\UpdatePinCache',
