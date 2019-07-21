@@ -216,7 +216,8 @@ class RichContentService
                     'type' => $type,
                     'data' => [
                         'url' => $url,
-                        'password' => trim($row['data']['password'])
+                        'password' => trim($row['data']['password']),
+                        'visit_type' => $row['data']['visit_type']
                     ]
                 ];
             }
