@@ -92,6 +92,7 @@ class Pin extends Model
     public static function createPin($content, $content_type, $visit_type, $user, $tags)
     {
         $richContentService = new RichContentService();
+        $content = $richContentService->preFormatContent($content);
         $risk = $richContentService->detectContentRisk($content, false);
 
         if ($risk['risk_score'] > 0)
@@ -133,6 +134,40 @@ class Pin extends Model
     public function updatePin($content, $visit_type, $user, $tags)
     {
         $richContentService = new RichContentService();
+        if ($this->visit_type === 1)
+        {
+            // 还未公开发布的文章
+            $content = $richContentService->preFormatContent($content);
+        }
+        else
+        {
+            // 已发布的文章
+            // 不能编辑投票
+            $newVote = $richContentService->getFirstType($content, 'vote');
+            if ($newVote)
+            {
+                $lastContent = $this
+                    ->content()
+                    ->orderBy('created_at', 'desc')
+                    ->pluck('text')
+                    ->first();
+                $oldVote = $richContentService->getFirstType($lastContent, 'vote');
+
+                if ($oldVote)
+                {
+                    foreach ($content as $i => $row)
+                    {
+                        if ($row['type'] === 'vote')
+                        {
+                            $content[$i] = [
+                                'type' => 'vote',
+                                'data' => $oldVote
+                            ];
+                        }
+                    }
+                }
+            }
+        }
         $risk = $richContentService->detectContentRisk($content, false);
 
         if ($risk['risk_score'] > 0)
@@ -140,7 +175,7 @@ class Pin extends Model
             return false;
         }
 
-        $doPublish = $this->visit_type === 0 && $visit_type !== 0;
+        $doPublish = $this->visit_type === 1 && $visit_type !== 1;
         $now = Carbon::now();
         $data = [
             'last_edit_at' => $now,

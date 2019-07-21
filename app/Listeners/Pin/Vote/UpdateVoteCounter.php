@@ -20,7 +20,7 @@ class UpdateVoteCounter
 
         foreach ($event->answers as $ans)
         {
-            $pinVoteCounter->add($pinSlug, $ans);
+            $pinVoteCounter->add($pinSlug, $ans, 1, false);
         }
     }
 }

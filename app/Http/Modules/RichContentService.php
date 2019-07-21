@@ -10,6 +10,32 @@ use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
 {
+    public function preFormatContent(array $data)
+    {
+        $result = [];
+        foreach ($data as $row)
+        {
+            if ($row['type'] === 'vote')
+            {
+                $result[] = [
+                    'type' => 'vote',
+                    'data' => $this->formatVote(
+                        $row['data']['items'],
+                        $row['data']['right_ids'],
+                        $row['data']['max_select'],
+                        $row['data']['expired_at']
+                    )
+                ];
+            }
+            else
+            {
+                $result[] = $row;
+            }
+        }
+
+        return $result;
+    }
+
     public function saveRichContent(array $data)
     {
         $result = [];

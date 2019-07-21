@@ -29,10 +29,17 @@ class PinResource extends JsonResource
         {
             $title = array_shift($content)['data'];
         }
+        $badge = 'article';
+        $vote = $richContentService->getFirstType($content, 'vote');
+        if ($vote)
+        {
+            $badge = 'vote';
+        }
 
         return [
             'slug' => $this->slug,
             'title' => $title,
+            'badge' => $badge,
             'content' => $content,
             'media' => $richContentService->parseRichPoster($title, $content),
             'intro' => $richContentService->paresPureContent($content),

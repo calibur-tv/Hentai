@@ -89,7 +89,7 @@ class PinController extends Controller
             $patch['up_vote_status'] = $user->hasUpvoted($pinId, Pin::class);
             $patch['mark_status'] = $user->hasBookmarked($pinId, Pin::class);
             $patch['reward_status'] = $user->hasFavorited($pinId, Pin::class);
-            $pinPatchCounter->add($slug, 'visit_count');
+            $pinPatchCounter->add($slug, 'visit_count', 1, true);
         }
         else
         {
@@ -99,14 +99,18 @@ class PinController extends Controller
             $patch['reward_status'] = false;
         }
 
-        if ($pin->content_type == 2 && $user)
+        if (isset($pin->badge) && $pin->badge === 'vote' && $user)
         {
             $hashStr = PinAnswer
                 ::where('pin_slug', $slug)
                 ->where('user_slug', $user->slug)
                 ->pluck('selected_uuid')
                 ->first();
-            $patch['vote_hash'] = json_decode($hashStr, true);
+
+            if ($hashStr)
+            {
+                $patch['vote_hash'] = json_decode($hashStr, true);
+            }
         }
 
         return $this->resOK($patch);
