@@ -114,7 +114,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
         $route->post('story', 'PinController@updateStory');
     });
 
-    $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
+    // $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
+    $route->group(['middleware' => ['auth']], function () use ($route)
     {
         $route->group(['prefix' => 'create'], function () use ($route)
         {
