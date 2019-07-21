@@ -241,6 +241,10 @@ $route->group(['prefix' => 'flow'], function () use ($route)
     $route->get('pins', 'FlowController@pins');
 });
 
+$route->get('test/words', 'TrialController@textTest');
+
+$route->get('test/image', 'TrialController@imageTest');
+
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)
 {
     $route->group(['prefix' => 'role'], function () use ($route)
