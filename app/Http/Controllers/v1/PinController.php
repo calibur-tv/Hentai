@@ -31,7 +31,7 @@ class PinController extends Controller
         $pinRepository = new PinRepository();
         $pin = $pinRepository->item($request->get('slug'));
 
-        if (is_null($pin) || $pin->content_type !== 1)
+        if (is_null($pin))
         {
             return $this->resErrNotFound();
         }
