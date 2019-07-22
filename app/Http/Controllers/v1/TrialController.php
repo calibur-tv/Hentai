@@ -106,6 +106,12 @@ class TrialController extends Controller
 
     public function clearBlockedWords(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('change_black_words'))
+        {
+            return $this->resErrRole();
+        }
+
         Redis::DEL('blocked-risk-words');
 
         return $this->resNoContent();
