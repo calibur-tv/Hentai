@@ -88,12 +88,20 @@ class TrialController extends Controller
         {
             if ($item)
             {
-                Redis::LREM($this->wordsCacheKey($filename), 1, $item);
+                Redis::LREM($this->wordsCacheKey($filename), 0, $item);
             }
+            Redis::LREM('blocked-risk-words', 0, $item);
         }
         $this->changeBlackWordsFile($filename);
 
         return $this->resNoContent();
+    }
+
+    public function getBlockedWords(Request $request)
+    {
+        $data = Redis::LRANGE('blocked-risk-words', 0, -1);
+
+        return $this->resOK($data);
     }
 
     public function textTest(Request $request)

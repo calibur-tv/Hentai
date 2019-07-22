@@ -8,6 +8,7 @@ class WordsFilter
     protected static $BAD_WORDS_LEVEL_2;
     protected $delete_line = 1;
     protected $review_line = 3;
+    protected $replace = ['！', '!', '#', '@', '~', ' ', '.', '。'];
 
     public function count($text)
     {
@@ -15,6 +16,8 @@ class WordsFilter
         {
             return 0;
         }
+
+        $text = str_replace($this->replace, '', $text);
 
         $this->loadWords();
         $words = [];
@@ -42,6 +45,8 @@ class WordsFilter
                 'delete' => false
             ];
         }
+
+        $text = str_replace($this->replace, '', $text);
 
         $this->loadWords();
         $words = [];
@@ -92,6 +97,8 @@ class WordsFilter
                 'review' => false
             ];
         }
+
+        $text = str_replace($this->replace, '', $text);
 
         $this->loadWords();
         $words = [];

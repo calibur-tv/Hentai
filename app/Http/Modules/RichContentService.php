@@ -6,6 +6,7 @@ namespace App\Http\Modules;
 
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
+use Illuminate\Support\Facades\Redis;
 use Mews\Purifier\Facades\Purifier;
 
 class RichContentService
@@ -540,7 +541,7 @@ class RichContentService
 
         if ($riskScore > 0)
         {
-            // TODO 把触发的敏感词记录到一个地方，查看是不是误杀
+            Redis::RPUSH('blocked-risk-words', $riskWords);
         }
 
         return [

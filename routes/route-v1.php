@@ -268,6 +268,8 @@ $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use (
         {
             $route->get('show', 'TrialController@showWords');
 
+            $route->get('blocked', 'TrialController@getBlockedWords');
+
             $route->get('test', 'TrialController@textTest');
 
             $route->post('add', 'TrialController@addWords');

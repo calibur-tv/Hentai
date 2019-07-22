@@ -216,7 +216,7 @@ class Repository
         }
     }
 
-    public function ListRemove($key, $value, $count = 1)
+    public function ListRemove($key, $value, $count = 0)
     {
         Redis::LREM($key, $count, $value);
     }
