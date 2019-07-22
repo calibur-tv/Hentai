@@ -4,10 +4,8 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
-use App\Http\Modules\RichContentService;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
-use App\Models\Pin;
 use App\Models\QuestionRule;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
@@ -265,7 +263,7 @@ class TagController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'tag_slug' => 'required|string',
-            'question_count' => 'required|integer|max:100|min:30',
+            'question_count' => 'required|integer|max:100|min:1',
             'right_rate' => 'required|integer|max:100|min:50',
             'qa_minutes' => 'required|integer|max:120|min:30',
             'rule_type' => 'required|integer',
@@ -299,129 +297,5 @@ class TagController extends Controller
         $tagRepository->rule($request->get('tag_slug'), true);
 
         return $this->resNoContent();
-    }
-
-    /**
-     * 为题库添加题目
-     */
-    public function createQA(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'tag_slug' => 'required|string',
-            'title' => 'required|string|max:50',
-            'answers' => 'required|array',
-            'right_index' => 'required|integer|min:0|max:3'
-        ]);
-
-        if ($validator->fails())
-        {
-            return $this->resErrParams($validator);
-        }
-
-        $user = $request->user();
-        $tag = Tag
-            ::where('slug', $request->get('tag_slug'))
-            ->first();
-
-        if (is_null($tag))
-        {
-            return $this->resErrNotFound();
-        }
-
-        if (
-            $user->cant('create_tag_qa') &&
-            !$user->is_admin &&
-            !$user->hasBookmarked($tag, Tag::class)
-        )
-        {
-            return $this->resErrRole();
-        }
-
-        $content = [
-            [
-                'type' => 'title',
-                'data' => [
-                    'text' => $request->get('title')
-                ]
-            ]
-        ];
-
-        $richContextService = new RichContentService();
-        $maxSelect = 1;
-        $expired_at = 0;
-        $content[] = [
-            'type' => 'vote',
-            'data' => $richContextService->formatVote(
-                $request->get('answers'),
-                $request->get('right_index'),
-                $maxSelect,
-                $expired_at
-            )
-        ];
-
-        $contentType = 2;
-        $visitType = 0;
-        $tags = [
-            config('app.tag.qa'),
-            $tag->slug
-        ];
-
-        $qa = Pin::createPin(
-            $content,
-            $contentType,
-            $visitType,
-            $user,
-            $tags
-        );
-
-        return $this->resCreated($qa);
-    }
-
-    /**
-     * 更新某个题目
-     */
-    public function updateQA(Request $request)
-    {
-
-    }
-
-    /**
-     * 删除某个题目
-     */
-    public function deleteQA(Request $request)
-    {
-
-    }
-
-    /**
-     * 用户开始答题，给他发卷
-     */
-    public function beginQA(Request $request)
-    {
-
-    }
-
-    /**
-     * 检查某道题是否答对
-     */
-    public function checkQA(Request $request)
-    {
-
-    }
-
-    /**
-     * 获取题目列表，不包括选项
-     */
-    public function Questions(Request $request)
-    {
-
-    }
-
-    /**
-     * 获取题目，包括问题和选项
-     */
-    public function showQA(Request $request)
-    {
-
     }
 }

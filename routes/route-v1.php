@@ -152,6 +152,32 @@ $route->group(['prefix' => 'pin'], function () use ($route)
     });
 });
 
+$route->group(['prefix' => 'atfield', 'middleware' => 'auth'], function () use ($route)
+{
+    $route->post('create', 'ATFieldController@createQA');
+
+    $route->post('update', 'ATFieldController@updateQA');
+
+    $route->post('delete', 'ATFieldController@deleteQA');
+
+    $route->post('begin', 'ATFieldController@beginQA');
+
+    $route->post('check', 'ATFieldController@checkQA');
+
+    $route->get('list', 'ATFieldController@Questions');
+
+    $route->get('flow', 'ATFieldController@flow');
+
+    $route->get('item', 'ATFieldController@showQA');
+
+    $route->group(['prefix' => 'rule'], function () use ($route)
+    {
+        $route->get('show', 'ATFieldController@getJoinRule');
+
+        $route->post('update', 'ATFieldController@updateJoinRule');
+    });
+});
+
 $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
@@ -159,33 +185,6 @@ $route->group(['prefix' => 'tag'], function () use ($route)
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'TagController@patch');
-    });
-
-    $route->group(['prefix' => 'rule'], function () use ($route)
-    {
-        $route->get('show', 'TagController@getJoinRule');
-
-        $route->group(['prefix' => 'edit', 'middleware' => 'auth'], function () use ($route)
-        {
-            $route->post('update', 'TagController@updateJoinRule');
-        });
-    });
-
-    $route->group(['prefix' => 'qa', 'middleware' => 'auth'], function () use ($route)
-    {
-        $route->post('create', 'TagController@createQA');
-
-        $route->post('update', 'TagController@updateQA');
-
-        $route->post('delete', 'TagController@deleteQA');
-
-        $route->post('begin', 'TagController@beginQA');
-
-        $route->post('check', 'TagController@checkQA');
-
-        $route->get('list', 'TagController@Questions');
-
-        $route->get('item', 'TagController@showQA');
     });
 
     $route->get('batch_patch', 'TagController@batchPatch');

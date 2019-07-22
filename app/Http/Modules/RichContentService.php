@@ -268,6 +268,7 @@ class RichContentService
     public function formatVote(array $answers, $right_index, int $max_select = 1, int $expired_at = 0)
     {
         $items = [];
+        $ids = [];
         foreach ($answers as $i => $ans)
         {
             $id = $i . str_rand();

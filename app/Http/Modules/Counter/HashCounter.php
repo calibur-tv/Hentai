@@ -68,7 +68,7 @@ class HashCounter
     /**
      * 加减某个值
      */
-    public function add($slug, $key, $value = 1, $increment = false)
+    public function add($slug, $key, $value = 1, $not_relation = false)
     {
         $cacheKey = $this->cacheKey($slug);
         if (!Redis::HEXISTS($cacheKey, $key))
@@ -76,7 +76,7 @@ class HashCounter
             $this->save($slug, $this->boot($slug));
         }
 
-        if ($increment)
+        if ($not_relation)
         {
             Redis::HINCRBYFLOAT($cacheKey, $key, $value);
         }
