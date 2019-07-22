@@ -156,7 +156,7 @@ $route->group(['prefix' => 'atfield', 'middleware' => 'auth'], function () use (
 {
     $route->post('create', 'ATFieldController@createQA');
 
-    $route->post('update', 'ATFieldController@updateQA');
+    $route->post('recommended', 'ATFieldController@recommendQA');
 
     $route->post('delete', 'ATFieldController@deleteQA');
 
