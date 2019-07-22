@@ -104,6 +104,13 @@ class TrialController extends Controller
         return $this->resOK($data);
     }
 
+    public function clearBlockedWords(Request $request)
+    {
+        Redis::DEL('blocked-risk-words');
+
+        return $this->resNoContent();
+    }
+
     public function textTest(Request $request)
     {
         $content = $request->get('text');

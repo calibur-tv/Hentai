@@ -77,6 +77,19 @@ class ImageFilter
             }
         }
 
+        if (
+            $scenes['ads']['suggestion'] === 'pass' &&
+            $scenes['politician']['suggestion'] === 'pass' &&
+            $scenes['pulp']['suggestion'] === 'review' &&
+            $scenes['terror']['suggestion'] === 'pass'
+        )
+        {
+            if ($scenes['pulp']['details']['label'] === 'sexy')
+            {
+                return $defaultResult;
+            }
+        }
+
         if ($response['suggestion'] === 'block')
         {
             return [
