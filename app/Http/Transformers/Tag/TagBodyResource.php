@@ -28,7 +28,7 @@ class TagBodyResource extends JsonResource
                 'seen_user_count' => $this->seen_user_count,
                 'activity_stat' => $this->activity_stat,
                 'followers_count' => $this->followers_count,
-                'question_count' => $this->question_count,
+                'question_count' => $this->question_count
             ],
             'children' => TagItemResource::collection($this->children)
         ];

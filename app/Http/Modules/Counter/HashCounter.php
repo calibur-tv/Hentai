@@ -74,12 +74,14 @@ class HashCounter
         if (!Redis::HEXISTS($cacheKey, $key))
         {
             $this->save($slug, $this->boot($slug));
+            if ($not_relation)
+            {
+                Redis::HINCRBYFLOAT($cacheKey, $key, $value);
+            }
+            return;
         }
 
-        if ($not_relation)
-        {
-            Redis::HINCRBYFLOAT($cacheKey, $key, $value);
-        }
+        Redis::HINCRBYFLOAT($cacheKey, $key, $value);
     }
 
     /**
