@@ -26,20 +26,22 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        if ($event->published)
+        if (!$event->published)
         {
-            $flowRepository = new FlowRepository();
+            return;
+        }
 
-            $tags = $event->pin
-                ->tags()
-                ->pluck('slug')
-                ->toArray();
-            $pinSlug = $event->pin->slug;
+        $flowRepository = new FlowRepository();
 
-            foreach ($tags as $tagSlug)
-            {
-                $flowRepository->del_pin($tagSlug, $pinSlug);
-            }
+        $tags = $event->pin
+            ->tags()
+            ->pluck('slug')
+            ->toArray();
+        $pinSlug = $event->pin->slug;
+
+        foreach ($tags as $tagSlug)
+        {
+            $flowRepository->del_pin($tagSlug, $pinSlug);
         }
     }
 }

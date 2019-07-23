@@ -30,9 +30,11 @@ class UpdateFlowListCache
     {
         $comment = $event->comment;
         $slug = $comment->pin_slug;
-        $pin = Pin::where('slug', $slug)->first();
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
 
-        if (is_null($pin) || $pin->visit_type !== 0 || $pin->content_type !== 1)
+        if (is_null($pin) || !$pin->published_at || $pin->content_type !== 1)
         {
             return;
         }

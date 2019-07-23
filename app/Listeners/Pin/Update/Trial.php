@@ -27,23 +27,25 @@ class Trial implements ShouldQueue
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->published)
+        if (!$event->published)
         {
-            $pin = $event->pin;
-            $content = $pin->content;
+            return;
+        }
 
-            $richContentService = new RichContentService();
+        $pin = $event->pin;
+        $content = $pin->content;
 
-            $risk = $richContentService->detectContentRisk($content);
+        $richContentService = new RichContentService();
 
-            if ($risk['risk_score'] > 0)
-            {
-                $pin->deletePin(User::find(2)->first());
-            }
-            else if ($risk['use_review'] > 0)
-            {
-                $pin->reviewPin(2);
-            }
+        $risk = $richContentService->detectContentRisk($content);
+
+        if ($risk['risk_score'] > 0)
+        {
+            $pin->deletePin(User::find(2)->first());
+        }
+        else if ($risk['use_review'] > 0)
+        {
+            $pin->reviewPin(2);
         }
     }
 }

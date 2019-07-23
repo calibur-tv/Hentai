@@ -26,17 +26,19 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        if ($event->published)
+        if (!$event->published)
         {
-            $list = $event->pin->tags()
-                ->pluck('slug')
-                ->toArray();
+            return;
+        }
 
-            $tagPatchCounter = new TagPatchCounter();
-            foreach ($list as $slug)
-            {
-                $tagPatchCounter->add($slug, 'pin_count', -1);
-            }
+        $list = $event->pin->tags()
+            ->pluck('slug')
+            ->toArray();
+
+        $tagPatchCounter = new TagPatchCounter();
+        foreach ($list as $slug)
+        {
+            $tagPatchCounter->add($slug, 'pin_count', -1);
         }
     }
 }

@@ -75,7 +75,6 @@ class PinRepository extends Repository
         {
             return Pin
                 ::where('user_slug', $slug)
-                ->where('visit_type', 1)
                 ->orderBy('last_edit_at', 'DESC')
                 ->pluck('last_edit_at', 'slug')
                 ->toArray();

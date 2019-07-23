@@ -46,7 +46,7 @@ class PinController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($pin->visit_type != 0)
+        if (!$pin->published_at)
         {
             $errMessage = $pinRepository->decrypt($request);
             if ($errMessage)
@@ -73,10 +73,10 @@ class PinController extends Controller
         $patch = $pinPatchCounter->all($slug);
 
         $patch['trial_type'] = $pin->trial_type;
-        $patch['visit_type'] = $pin->visit_type;
         $patch['comment_type'] = $pin->comment_type;
         $patch['recommended_at'] = $pin->recommended_at;
         $patch['last_top_at'] = $pin->last_top_at;
+        $patch['published_at'] = $pin->published_at;
         $patch['deleted_at'] = $pin->deleted_at;
         $patch['vote_hash'] = [];
 
@@ -211,10 +211,12 @@ class PinController extends Controller
             $tags[] = $area->parent_slug;
         }
 
+        $contentType = 1;
+
         $pin = Pin::createPin(
             $request->get('content'),
-            1,
-            $request->get('publish') ? 0 : 1,
+            $contentType,
+            $request->get('publish'),
             $user,
             $tags
         );
@@ -224,7 +226,7 @@ class PinController extends Controller
             return $this->resErrBad('请勿发表敏感内容');
         }
 
-        if ($pin->visit_type != 0)
+        if (!$pin->published_at)
         {
             $pinRepository = new PinRepository();
             return $this->resCreated($pinRepository->encrypt($pin->slug));
@@ -320,7 +322,7 @@ class PinController extends Controller
 
         $result = $pin->updatePin(
             $request->get('content'),
-            $request->get('publish') ? 0 : $pin->visit_type,
+            $request->get('publish'),
             $user,
             $tags
         );
@@ -330,7 +332,7 @@ class PinController extends Controller
             return $this->resErrBad('请勿发表敏感内容');
         }
 
-        if ($pin->visit_type != 0)
+        if (!$pin->published_at)
         {
             $pinRepository = new PinRepository();
             return $this->resOK($pinRepository->encrypt($pin->slug));

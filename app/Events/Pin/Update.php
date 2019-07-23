@@ -29,7 +29,7 @@ class Update
         $this->user = $user;
         $this->tags = $tags;
         $this->doPublish = $publish;
-        $this->published = $pin->visit_type != 1;
+        $this->published = !!$pin->published_at;
 
         $oldTags = $pin
             ->tags()

@@ -29,7 +29,7 @@ class UpdateFlowListCache
     public function handle(\App\Events\Pin\Reward $event)
     {
         $pin = $event->pin;
-        if ($pin->visit_type !== 0 || $pin->content_type !== 1)
+        if (!$pin->published_at || $pin->content_type !== 1)
         {
             return;
         }

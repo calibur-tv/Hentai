@@ -47,7 +47,6 @@ class PinResource extends JsonResource
             'area' => new TagItemResource($this->area),
             'topic' => new TagItemResource($this->topic),
             'notebook' => new TagItemResource($this->notebook),
-            'visit_type' => $this->visit_type,
             'trial_type' => $this->trial_type,
             'content_type' => $this->content_type,
             'comment_type' => $this->comment_type,

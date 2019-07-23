@@ -63,10 +63,10 @@ class FlowRepository extends Repository
                             }
                             return $q->where('created_at', '>=', $date);
                         })
-                        ->where('visit_type', 0)
                         ->where('trial_type', 0)
-                        ->whereNull('last_top_at')
                         ->whereNotIn('content_type', [2])
+                        ->whereNotNull('published_at')
+                        ->whereNull('last_top_at')
                         ->select('slug', 'visit_count', 'comment_count', 'like_count', 'mark_count', 'reward_count', 'created_at');
                 }])
                 ->select('id')
@@ -116,10 +116,10 @@ class FlowRepository extends Repository
                 ->with(['pins' => function($query)
                 {
                     $query
-                        ->where('visit_type', 0)
                         ->where('trial_type', 0)
-                        ->whereNull('last_top_at')
                         ->whereNotIn('content_type', [2])
+                        ->whereNull('last_top_at')
+                        ->whereNotNull('published_at')
                         ->select('slug', 'created_at');
                 }])
                 ->select('id')
@@ -147,10 +147,10 @@ class FlowRepository extends Repository
                 ->with(['pins' => function($query)
                 {
                     $query
-                        ->where('visit_type', 0)
                         ->where('trial_type', 0)
-                        ->whereNull('last_top_at')
                         ->whereNotIn('content_type', [2])
+                        ->whereNull('last_top_at')
+                        ->whereNotNull('published_at')
                         ->select('slug', 'updated_at');
                 }])
                 ->select('id')

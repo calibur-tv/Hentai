@@ -23,6 +23,6 @@ class Delete
     {
         $this->pin = $pin;
         $this->user = $user;
-        $this->published = $pin->visit_type != 1;
+        $this->published = !!$pin->published_at;
     }
 }

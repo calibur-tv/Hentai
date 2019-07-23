@@ -39,12 +39,13 @@ class TagPatchCounter extends HashCounter
         $questionCount = $tag
             ->pins()
             ->where('content_type', 2)
+            ->whereNotNull('recommended_at')
             ->count();
 
         $pinCount = $tag
             ->pins()
-            ->where('visit_type', '<>', 1)
             ->where('content_type', '<>', 2)
+            ->whereNotNull('published_at')
             ->count();
 
         return [

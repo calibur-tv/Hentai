@@ -28,10 +28,9 @@ class Pin extends Model
     protected $fillable = [
         'slug',
         'user_slug',
-        'visit_type',       // 访问类型，0 已发布，1 草稿箱, 2 仅好友可见
         'trial_type',       // 进入审核池的类型，默认 0 不在审核池，1 创建触发敏感词过滤进入审核池
         'comment_type',     // 评论权限的类型，默认 0 允许所有人评论
-        'content_type',     // 内容类型：0 待定，1 帖子，2 分区问答
+        'content_type',     // 内容类型：1 是 calibur 公开帖子，2 是 calibur 分区答题
         'last_top_at',      // 最后置顶时间
         'last_edit_at',     // 最后编辑时间
         'published_at',     // 发布时间
@@ -89,7 +88,7 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $visit_type, $user, $tags)
+    public static function createPin($content, $content_type, $publish, $user, $tags)
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
@@ -104,10 +103,9 @@ class Pin extends Model
         $data = [
             'user_slug' => $user->slug,
             'content_type' => $content_type,
-            'visit_type' => $visit_type,
             'last_edit_at' => $now
         ];
-        if ($visit_type == 0)
+        if ($publish)
         {
             $data['published_at'] = $now;
         }
@@ -125,16 +123,16 @@ class Pin extends Model
 
         if ($content_type === 1)
         {
-            event(new \App\Events\Pin\Create($pin, $user, $tags, $visit_type == 0));
+            event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
         }
 
         return $pin;
     }
 
-    public function updatePin($content, $visit_type, $user, $tags)
+    public function updatePin($content, $publish, $user, $tags)
     {
         $richContentService = new RichContentService();
-        if ($this->visit_type === 1)
+        if (!$this->published_at)
         {
             // 还未公开发布的文章
             $content = $richContentService->preFormatContent($content);
@@ -175,11 +173,10 @@ class Pin extends Model
             return false;
         }
 
-        $doPublish = $this->visit_type === 1 && $visit_type !== 1;
+        $doPublish = !$this->published_at && $publish;
         $now = Carbon::now();
         $data = [
-            'last_edit_at' => $now,
-            'visit_type' => $visit_type
+            'last_edit_at' => $now
         ];
         if ($doPublish)
         {
@@ -187,6 +184,7 @@ class Pin extends Model
         }
 
         $this->update($data);
+        $now->published_at = $now;
 
         $richContent = $this->content()->create([
             'text' => $richContentService->saveRichContent($content)
