@@ -94,15 +94,6 @@ class ATFieldController extends Controller
             return $this->resErrNotFound();
         }
 
-        if (
-            $user->cant('create_tag_qa') &&
-            !$user->is_admin &&
-            !$user->hasBookmarked($tag, Tag::class)
-        )
-        {
-            return $this->resErrRole();
-        }
-
         $content = [
             [
                 'type' => 'title',
