@@ -115,7 +115,7 @@ class HashCounter
 
         $key = $this->cacheKey($slug);
         Redis::HMSET($key, $value);
-        Redis::EXPIRE($key, daily_cache_expire());
+        Redis::EXPIREAT($key, daily_cache_expire());
     }
 
     /**

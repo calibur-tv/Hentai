@@ -21,7 +21,7 @@ class AddDefaultTagRelation
     /**
      * Handle the event.
      *
-     * @param  Register  $event
+     * @param  \App\Events\User\Register  $event
      * @return void
      */
     public function handle(\App\Events\User\Register $event)
@@ -32,19 +32,7 @@ class AddDefaultTagRelation
 
     protected function joinNewbieTopic($user)
     {
-        $tagSlug = config('app.tag.newbie');
-
-        $user->bookmark(
-            Tag::where('slug', $tagSlug)->first(),
-            Tag::class
-        );
-
-        $user
-            ->timeline()
-            ->create([
-                'event_type' => 1,
-                'event_slug' => $tagSlug
-            ]);
+        event(new \App\Events\User\JoinZone($user, Tag::where('slug', config('app.tag.newbie'))->first()));
     }
 
     protected function createDefaultNotebook($user)

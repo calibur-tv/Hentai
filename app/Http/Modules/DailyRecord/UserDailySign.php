@@ -85,7 +85,7 @@ class UserDailySign
 
         $cacheKey = $this->sign_cache_key($userSlug);
         Redis::SET($cacheKey, $signCount);
-        Redis::EXPIRE($cacheKey, daily_cache_expire());
+        Redis::EXPIREAT($cacheKey, daily_cache_expire());
 
         return (boolean)$signCount;
     }

@@ -109,5 +109,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Message\Create\IncrementGetterUnreadMessageCount',
             'App\Listeners\Message\Create\SocketPushToGetter',
         ],
+        'App\Events\User\JoinZone' => [
+            'App\Listeners\User\JoinZone\RefreshUserBookmark',
+            'App\Listeners\User\JoinZone\RefreshUserTimeline',
+            'App\Listeners\User\JoinZone\UpdateTagCounter',
+        ],
     ];
 }

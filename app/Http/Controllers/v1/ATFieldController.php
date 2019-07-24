@@ -358,6 +358,15 @@ class ATFieldController extends Controller
             return $this->resErrBad('题目还未答完');
         }
 
+        $tag = Tag
+            ::where('slug', $slug)
+            ->first();
+
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound('没有找到对应的分区');
+        }
+
         $rule = QuestionRule
             ::where('tag_slug', $slug)
             ->first();
@@ -386,6 +395,8 @@ class ATFieldController extends Controller
         $sheet->update([
             'result_type' => 1
         ]);
+
+        event(new \App\Events\User\JoinZone($user, $tag));
 
         return $this->resOK('pass');
     }
