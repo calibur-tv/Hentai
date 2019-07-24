@@ -154,21 +154,21 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
 $route->group(['prefix' => 'atfield', 'middleware' => 'auth'], function () use ($route)
 {
-    $route->post('create', 'ATFieldController@createQA');
+    $route->post('create', 'ATFieldController@create');
 
-    $route->post('recommended', 'ATFieldController@recommendQA');
+    $route->post('recommend', 'ATFieldController@recommend');
 
-    $route->post('delete', 'ATFieldController@deleteQA');
+    $route->post('delete', 'ATFieldController@delete');
 
-    $route->post('begin', 'ATFieldController@beginQA');
+    $route->post('begin', 'ATFieldController@begin');
 
-    $route->post('check', 'ATFieldController@checkQA');
+    $route->get('list', 'ATFieldController@list');
 
-    $route->get('list', 'ATFieldController@Questions');
+    $route->post('submit', 'ATFieldController@submit');
+
+    $route->get('result', 'ATFieldController@result');
 
     $route->get('flow', 'ATFieldController@flow');
-
-    $route->get('item', 'ATFieldController@showQA');
 
     $route->group(['prefix' => 'rule'], function () use ($route)
     {

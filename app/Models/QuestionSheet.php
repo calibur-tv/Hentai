@@ -16,7 +16,7 @@ class QuestionSheet extends Model
         'tag_slug',
         'questions_slug',
         'done_count',
-        'result_type'
+        'result_type',      // 0.答题中，1.已通过 2.已失败 3.已超时
     ];
 
     public function user()

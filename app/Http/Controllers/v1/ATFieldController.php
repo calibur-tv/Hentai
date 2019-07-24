@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Models\Pin;
+use App\Models\PinAnswer;
 use App\Models\QuestionRule;
+use App\Models\QuestionSheet;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -68,7 +70,7 @@ class ATFieldController extends Controller
         return $this->resNoContent();
     }
 
-    public function createQA(Request $request)
+    public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'tag_slug' => 'required|string',
@@ -138,7 +140,7 @@ class ATFieldController extends Controller
         return $this->resCreated($qa);
     }
 
-    public function deleteQA(Request $request)
+    public function delete(Request $request)
     {
         $user = $request->user();
         if (!$user->is_admin)
@@ -162,7 +164,7 @@ class ATFieldController extends Controller
         return $this->resNoContent();
     }
 
-    public function recommendQA(Request $request)
+    public function recommend(Request $request)
     {
         $user = $request->user();
         if (!$user->is_admin)
@@ -236,23 +238,177 @@ class ATFieldController extends Controller
         ]);
     }
 
-    public function beginQA(Request $request)
+    /**
+     * 发卷
+     */
+    public function begin(Request $request)
     {
+        $user = $request->user();
+        $slug = $request->get('slug');
 
+        $sheet = QuestionSheet
+            ::where('user_slug', $user->slug)
+            ->where('tag_slug', $slug)
+            ->first();
+
+        if ($sheet)
+        {
+            return $this->resOK($sheet->result_type == 0 ? 'pending' : 'resolve');
+        }
+
+        $rule = QuestionRule
+            ::where('tag_slug', $slug)
+            ->first();
+
+        if (is_null($rule))
+        {
+            return $this->resOK('reject');
+        }
+
+        $pins = Pin
+            ::where('content_type', 2)
+            ->whereHas('tags', function ($query) use ($slug)
+            {
+                $query->where('slug', $slug);
+            })
+            ->take($rule->question_count)
+            ->whereNotNull('recommended_at')
+            ->pluck('slug')
+            ->toArray();
+
+        if (empty($pins))
+        {
+            return $this->resOK('reject');
+        }
+
+        QuestionSheet::create([
+            'user_slug' => $user->slug,
+            'tag_slug' => $slug,
+            'questions_slug' => implode(',', $pins),
+            'done_count' => 0,
+            'result_type' => 0
+        ]);
+
+        return $this->resOK('pending');
     }
 
-    public function checkQA(Request $request)
+    /**
+     * 获取试题
+     */
+    public function list(Request $request)
     {
+        $user = $request->user();
+        $slug = $request->get('slug');
 
+        $sheet = QuestionSheet
+            ::where('user_slug', $user->slug)
+            ->where('tag_slug', $slug)
+            ->first();
+
+        if (is_null($rule))
+        {
+            return $this->resErrNotFound('请重新开始答题');
+        }
+
+        $pins = explode(',', $sheet->questions_slug);
+        if (empty($pins))
+        {
+            $sheet->delete();
+
+            return $this->resErrNotFound('请重新开始答题');
+        }
+
+        $pinRepository = new PinRepository();
+        $tagRepository = new TagRepository();
+
+        return $this->resOK([
+            'tag' => $tagRepository->item($slug),
+            'questions' => $pinRepository->list($pins)
+        ]);
     }
 
-    public function Questions(Request $request)
+    /**
+     * 交卷获得最终结果
+     */
+    public function submit(Request $request)
     {
+        $user = $request->user();
+        $slug = $request->get('slug');
 
+        $sheet = QuestionSheet
+            ::where('user_slug', $user->slug)
+            ->where('tag_slug', $slug)
+            ->first();
+
+        if (is_null($rule))
+        {
+            return $this->resErrNotFound('没有找到试卷');
+        }
+
+        $pins = explode(',', $sheet->questions_slug);
+        if (empty($pins))
+        {
+            $sheet->delete();
+
+            return $this->resErrNotFound('请重新开始答题');
+        }
+
+        if (count($pins) > $sheet->done_count)
+        {
+            return $this->resErrBad('题目还未答完');
+        }
+
+        $rule = QuestionRule
+            ::where('tag_slug', $slug)
+            ->first();
+
+        if (is_null($rule))
+        {
+            return $this->resErrNotFound('没有找到答题规则');
+        }
+
+        $rightCount = PinAnswer
+            ::whereIn('pin_slug', $pins)
+            ->where('user_slug', $user->slug)
+            ->where('is_right', 1)
+            ->count();
+
+        if (!$rightCount || ($rightCount / $sheet->done_count * 100 < $rule->right_rate))
+        {
+            $sheet->update([
+                'result_type' => 2
+            ]);
+            $sheet->delete();
+
+            return $this->resOK('failed');
+        }
+
+        $sheet->update([
+            'result_type' => 1
+        ]);
+
+        return $this->resOK('pass');
     }
 
-    public function showQA(Request $request)
+    /**
+     * 查看这道题当前用户是怎么选的
+     */
+    public function result(Request $request)
     {
+        $pinSlug = $request->get('slug');
+        $user = $request->user();
 
+        $hashStr = PinAnswer
+            ::where('pin_slug', $pinSlug)
+            ->where('user_slug', $user->slug)
+            ->pluck('selected_uuid')
+            ->first();
+
+        if ($hashStr)
+        {
+            return $this->resOK(json_decode($hashStr, true));
+        }
+
+        return $this->resOK([]);
     }
 }
