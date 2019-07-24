@@ -75,6 +75,7 @@ class PinRepository extends Repository
         {
             return Pin
                 ::where('user_slug', $slug)
+                ->whereNull('published_at')
                 ->orderBy('last_edit_at', 'DESC')
                 ->pluck('last_edit_at', 'slug')
                 ->toArray();
