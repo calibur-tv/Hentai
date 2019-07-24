@@ -296,7 +296,7 @@ class ATFieldController extends Controller
             ->where('tag_slug', $slug)
             ->first();
 
-        if (is_null($rule))
+        if (is_null($sheet))
         {
             return $this->resErrNotFound('请重新开始答题');
         }
@@ -323,12 +323,16 @@ class ATFieldController extends Controller
             $answers[$key] = json_decode($val, true);
         }
 
+        $result = $pinRepository->list($pins);
+
         return $this->resOK([
             'extra' => [
                 'tag' => $tagRepository->item($slug),
                 'answers' => $answers
             ],
-            'result' => $pinRepository->list($pins)
+            'result' => $result,
+            'no_more' => true,
+            'total' => count($result)
         ]);
     }
 
