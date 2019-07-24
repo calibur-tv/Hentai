@@ -230,14 +230,6 @@ class ATFieldController extends Controller
     }
 
     /**
-     * 分区的题目信息
-     */
-    public function info(Request $request)
-    {
-
-    }
-
-    /**
      * 发卷
      */
     public function begin(Request $request)
@@ -275,7 +267,7 @@ class ATFieldController extends Controller
             ->pluck('slug')
             ->toArray();
 
-        if (empty($pins))
+        if (count($pins) < $rule->question_count)
         {
             return $this->resOK('no_question');
         }
