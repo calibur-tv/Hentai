@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
 use App\Http\Transformers\Tag\TagItemResource;
-use App\Models\QuestionRule;
+use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
 use App\Services\Trial\WordsFilter;
@@ -244,7 +244,7 @@ class TagController extends Controller
         return $this->resNoContent();
     }
 
-    public function getJoinRule(Request $request)
+    public function atfield(Request $request)
     {
         $slug = $request->get('slug');
         if (!$slug)
@@ -252,49 +252,27 @@ class TagController extends Controller
             return $this->resErrBad();
         }
 
-        $tagRepository = new TagRepository();
-        $rule = $tagRepository->rule($slug);
+        $trialCount = Pin
+            ::where('content_type', 2)
+            ->whereHas('tags', function ($query) use ($slug)
+            {
+                $query->where('slug', $slug);
+            })
+            ->whereNull('recommended_at')
+            ->count();
 
-        return $this->resOK($rule);
-    }
+        $passCount = Pin
+            ::where('content_type', 2)
+            ->whereHas('tags', function ($query) use ($slug)
+            {
+                $query->where('slug', $slug);
+            })
+            ->whereNotNull('recommended_at')
+            ->count();
 
-    public function updateJoinRule(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'tag_slug' => 'required|string',
-            'question_count' => 'required|integer|max:100|min:1',
-            'right_rate' => 'required|integer|max:100|min:50',
-            'qa_minutes' => 'required|integer|max:120|min:30',
-            'rule_type' => 'required|integer',
-            'result_type' => 'required|integer',
+        return $this->resOK([
+            'trial' => $trialCount,
+            'pass' => $passCount
         ]);
-
-        if ($validator->fails())
-        {
-            return $this->resErrParams($validator);
-        }
-
-        $user = $request->user();
-
-        if ($user->cant('update_tag_join_rule') && !$user->is_admin)
-        {
-            return $this->resErrRole();
-        }
-
-        $resultType = $request->get('result_type');
-        QuestionRule
-            ::where('tag_slug', $request->get('tag_slug'))
-            ->update([
-                'question_count' => $request->get('question_count'),
-                'right_rate' => $resultType === 1 ? 100 : $request->get('right_rate'),
-                'qa_minutes' => $request->get('qa_minutes'),
-                'rule_type' => $request->get('rule_type'),
-                'result_type' => $resultType
-            ]);
-
-        $tagRepository = new TagRepository();
-        $tagRepository->rule($request->get('tag_slug'), true);
-
-        return $this->resNoContent();
     }
 }

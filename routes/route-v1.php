@@ -182,6 +182,8 @@ $route->group(['prefix' => 'tag'], function () use ($route)
 {
     $route->get('show', 'TagController@show');
 
+    $route->get('atfield', 'TagController@atfield');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'TagController@patch');

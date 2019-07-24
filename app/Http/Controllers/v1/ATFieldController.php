@@ -239,6 +239,14 @@ class ATFieldController extends Controller
     }
 
     /**
+     * 分区的题目信息
+     */
+    public function info(Request $request)
+    {
+
+    }
+
+    /**
      * 发卷
      */
     public function begin(Request $request)
@@ -262,7 +270,7 @@ class ATFieldController extends Controller
 
         if (is_null($rule))
         {
-            return $this->resOK('reject');
+            return $this->resOK('no_rule');
         }
 
         $pins = Pin
@@ -278,7 +286,7 @@ class ATFieldController extends Controller
 
         if (empty($pins))
         {
-            return $this->resOK('reject');
+            return $this->resOK('no_question');
         }
 
         QuestionSheet::create([
@@ -321,9 +329,23 @@ class ATFieldController extends Controller
         $pinRepository = new PinRepository();
         $tagRepository = new TagRepository();
 
+        $answers = PinAnswer
+            ::where('user_slug', $user->slug)
+            ->whereIn('pin_slug', $pins)
+            ->pluck('selected_uuid', 'pin_slug')
+            ->toArray();
+
+        foreach ($answers as $key => $val)
+        {
+            $answers[$key] = json_decode($val, true);
+        }
+
         return $this->resOK([
-            'tag' => $tagRepository->item($slug),
-            'questions' => $pinRepository->list($pins)
+            'extra' => [
+                'tag' => $tagRepository->item($slug),
+                'answers' => $answers
+            ],
+            'result' => $pinRepository->list($pins)
         ]);
     }
 
