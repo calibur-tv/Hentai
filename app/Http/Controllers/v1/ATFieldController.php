@@ -178,6 +178,11 @@ class ATFieldController extends Controller
             'recommended_at' => Carbon::now()
         ]);
 
+        $pin->timeline()->create([
+            'event_type' => 4,
+            'event_slug' => $user->slug
+        ]);
+
         return $this->resNoContent();
     }
 
