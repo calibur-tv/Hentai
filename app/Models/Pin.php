@@ -182,7 +182,6 @@ class Pin extends Model
         }
 
         $this->update($data);
-        $now->published_at = $now;
 
         $richContent = $this->content()->create([
             'text' => $richContentService->saveRichContent($content)

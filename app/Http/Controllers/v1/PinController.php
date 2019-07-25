@@ -11,6 +11,7 @@ use App\Models\Pin;
 use App\Models\PinAnswer;
 use App\Services\Spider\Query;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class PinController extends Controller
@@ -61,6 +62,7 @@ class PinController extends Controller
     public function patch(Request $request)
     {
         $slug = $request->get('slug');
+        $time = $request->get('time');
         $pinRepository = new PinRepository();
         $pin = $pinRepository->item($slug);
 
@@ -78,6 +80,7 @@ class PinController extends Controller
         $patch['last_top_at'] = $pin->last_top_at;
         $patch['published_at'] = $pin->published_at;
         $patch['deleted_at'] = $pin->deleted_at;
+        $patch['last_edit_at'] = $pin->last_edit_at;
         $patch['vote_hash'] = [];
 
         $user = $request->user();
@@ -111,6 +114,11 @@ class PinController extends Controller
             {
                 $patch['vote_hash'] = json_decode($hashStr, true);
             }
+        }
+
+        if ($time != $pin->last_edit_at)
+        {
+            $pinRepository->DeletePage("/pin/{$slug}");
         }
 
         return $this->resOK($patch);
