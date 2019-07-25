@@ -27,15 +27,17 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->doPublish)
+        if (!$event->doPublish || $event->pin->content_type !== 1)
         {
-            $event->user->timeline()->create([
-                'event_type' => 3,
-                'event_slug' => $event->pin->slug
-            ]);
-
-            $userRepository = new UserRepository();
-            $userRepository->timeline($event->user->slug, true);
+            return;
         }
+
+        $event->user->timeline()->create([
+            'event_type' => 3,
+            'event_slug' => $event->pin->slug
+        ]);
+
+        $userRepository = new UserRepository();
+        $userRepository->timeline($event->user->slug, true);
     }
 }

@@ -26,7 +26,7 @@ class RefreshUserDrafts
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->doPublish)
+        if ($event->doPublish || $event->pin->content_type !== 1)
         {
             return;
         }

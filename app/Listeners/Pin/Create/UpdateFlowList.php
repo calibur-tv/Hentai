@@ -26,15 +26,17 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Create $event)
     {
-        if ($event->doPublish)
+        if (!$event->doPublish || $event->pin->content_type !== 1)
         {
-            $flowRepository = new FlowRepository();
-            $slug = $event->pin->slug;
+            return;
+        }
 
-            foreach ($event->tags as $tagSlug)
-            {
-                $flowRepository->add_pin($tagSlug, $slug);
-            }
+        $flowRepository = new FlowRepository();
+        $slug = $event->pin->slug;
+
+        foreach ($event->tags as $tagSlug)
+        {
+            $flowRepository->add_pin($tagSlug, $slug);
         }
     }
 }

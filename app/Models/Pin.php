@@ -122,10 +122,7 @@ class Pin extends Model
         ]);
         $pin->content = $richContent->text;
 
-        if ($content_type === 1)
-        {
-            event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
-        }
+        event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
 
         return $pin;
     }
