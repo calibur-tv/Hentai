@@ -41,7 +41,7 @@ class ComputeUserDailyStat extends Command
         DB
             ::table('users')
             ->orderBy('id')
-            ->where('level', '>', 0)
+            ->where('level', '>', 1)
             ->select('slug')
             ->chunk(100, function($users) use ($userActivity, $userExposure)
             {

@@ -60,6 +60,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'followers_count',              // 粉丝数量
         'following_count',              // 关注数量
         'visit_count',                  // 访问量
+        'is_admin',                     // 是否是管理员
     ];
 
     protected $hidden = [
