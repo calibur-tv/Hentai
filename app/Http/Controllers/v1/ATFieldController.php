@@ -320,7 +320,9 @@ class ATFieldController extends Controller
 
         foreach ($answers as $key => $val)
         {
-            $answers[$key] = json_decode($val, true);
+            $answers[$key] = [
+                'selected_id' => json_decode($val, true)[0]
+            ];
         }
 
         $result = $pinRepository->list($pins);
