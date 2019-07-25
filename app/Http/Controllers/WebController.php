@@ -27,7 +27,7 @@ class WebController extends Controller
 
         foreach ($pins as $pin)
         {
-            $pin->tags->attach([slug2id('1o34sa'), slug2id('8h8')]);
+            $pin->tags()->attach([slug2id('1o34sa'), slug2id('8h8')]);
             $pinRepository->item($pin->slug, true);
         }
         return response('<html lang="en" class="">
