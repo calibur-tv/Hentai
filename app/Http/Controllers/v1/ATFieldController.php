@@ -183,6 +183,9 @@ class ATFieldController extends Controller
             'event_slug' => $user->slug
         ]);
 
+        $pinRepository = new PinRepository();
+        $pinRepository->item($slug, true);
+
         return $this->resNoContent();
     }
 
