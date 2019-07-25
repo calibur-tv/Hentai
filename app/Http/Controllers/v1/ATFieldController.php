@@ -351,7 +351,7 @@ class ATFieldController extends Controller
             ->where('tag_slug', $slug)
             ->first();
 
-        if (is_null($rule))
+        if (is_null($sheet))
         {
             return $this->resErrNotFound('没有找到试卷');
         }
@@ -362,11 +362,6 @@ class ATFieldController extends Controller
             $sheet->delete();
 
             return $this->resErrNotFound('请重新开始答题');
-        }
-
-        if (count($pins) > $sheet->done_count)
-        {
-            return $this->resErrBad('题目还未答完');
         }
 
         $tag = Tag
@@ -393,12 +388,18 @@ class ATFieldController extends Controller
             ->where('is_right', 1)
             ->count();
 
-        if (!$rightCount || ($rightCount / $sheet->done_count * 100 < $rule->right_rate))
+        if (!$rightCount || ($rightCount / count($pins) * 100 < $rule->right_rate))
         {
             $sheet->update([
                 'result_type' => 2
             ]);
+
             $sheet->delete();
+
+            PinAnswer
+                ::whereIn('pin_slug', $pins)
+                ->where('user_slug', $user->slug)
+                ->delete();
 
             return $this->resOK('failed');
         }
