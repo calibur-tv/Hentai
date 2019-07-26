@@ -62,7 +62,6 @@ class PinController extends Controller
     public function patch(Request $request)
     {
         $slug = $request->get('slug');
-        $time = $request->get('time');
         $pinRepository = new PinRepository();
         $pin = $pinRepository->item($slug);
 
@@ -74,13 +73,6 @@ class PinController extends Controller
         $pinPatchCounter = new PinPatchCounter();
         $patch = $pinPatchCounter->all($slug);
 
-        $patch['trial_type'] = $pin->trial_type;
-        $patch['comment_type'] = $pin->comment_type;
-        $patch['recommended_at'] = $pin->recommended_at;
-        $patch['last_top_at'] = $pin->last_top_at;
-        $patch['published_at'] = $pin->published_at;
-        $patch['deleted_at'] = $pin->deleted_at;
-        $patch['last_edit_at'] = $pin->last_edit_at;
         $patch['vote_hash'] = [];
 
         $user = $request->user();
@@ -114,11 +106,6 @@ class PinController extends Controller
             {
                 $patch['vote_hash'] = json_decode($hashStr, true);
             }
-        }
-
-        if ($time != $pin->last_edit_at)
-        {
-            $pinRepository->DeletePage("/pin/{$slug}");
         }
 
         return $this->resOK($patch);
