@@ -337,6 +337,13 @@ class RichContentService
                     $result .= (($i + 1) . ' ' . $item['text']);
                 }
             }
+            else if ($type === 'vote')
+            {
+                foreach ($row['data']['items'] as $i => $item)
+                {
+                    $result .= (($i + 1) . ' ' . $item['text']);
+                }
+            }
             else if ($type === 'image')
             {
                 $result .= $row['data']['caption'];

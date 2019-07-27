@@ -64,6 +64,7 @@ class ImageFilter
         }
 
         $scenes = $response['scenes'];
+
         if (
             $scenes['ads']['suggestion'] === 'pass' &&
             $scenes['politician']['suggestion'] === 'pass' &&
@@ -71,7 +72,7 @@ class ImageFilter
             $scenes['terror']['suggestion'] !== 'pass'
         )
         {
-            if (preg_match('/anime/', $scenes['terror']['details']['label']))
+            if (preg_match('/anime/', $scenes['terror']['details'][0]['label']))
             {
                 return $defaultResult;
             }
@@ -84,7 +85,7 @@ class ImageFilter
             $scenes['terror']['suggestion'] === 'pass'
         )
         {
-            if ($scenes['pulp']['details']['label'] === 'sexy')
+            if ($scenes['pulp']['details'][0]['label'] === 'sexy')
             {
                 return $defaultResult;
             }
