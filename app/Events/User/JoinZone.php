@@ -23,7 +23,7 @@ class JoinZone
         $user->bookmark($tag, Tag::class);
         $user->timeline()->create([
             'event_type' => 1,
-            'event_slug' => $slug
+            'event_slug' => $tag->slug
         ]);
     }
 }
