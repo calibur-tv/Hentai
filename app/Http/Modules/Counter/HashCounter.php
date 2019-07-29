@@ -129,7 +129,10 @@ class HashCounter
             ->where($this->uniqueKey, $slug)
             ->update($result);
 
-        $this->search($slug, $result);
+        if (config('app.env') === 'production')
+        {
+            $this->search($slug, $result);
+        }
 
         Redis::HMSET(
             $this->cacheKey($slug),
