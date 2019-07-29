@@ -10,11 +10,10 @@ return [
      | to accept any value.
      |
      */
-    'supportsCredentials' => true,
-    'allowedOrigins' => ['*'],
+    'supportsCredentials' => false,
+    'allowedOrigins' => config('app.env') === 'production' ? ['www.calibur.tv'] : ['*'],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
     'exposedHeaders' => ['*'],
     'maxAge' => 0,
 ];
-
