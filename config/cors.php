@@ -11,7 +11,7 @@ return [
      |
      */
     'supportsCredentials' => false,
-    'allowedOrigins' => ['https://www.calibur.tv'],
+    'allowedOrigins' => config('app.env') === 'production' ? ['https://www.calibur.tv'] : ['*'],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
     'exposedHeaders' => ['*'],
