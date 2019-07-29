@@ -26,19 +26,21 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if ($event->doPublish)
+        if (!$event->doPublish)
         {
-            $tagPatchCounter = new TagPatchCounter();
+            return;
+        }
 
-            foreach ($event->detachTags as $tagSlug)
-            {
-                $tagPatchCounter->add($tagSlug, 'pin_count', -1);
-            }
+        $tagPatchCounter = new TagPatchCounter();
 
-            foreach ($event->attachTags as $tagSlug)
-            {
-                $tagPatchCounter->add($tagSlug, 'pin_count', 1);
-            }
+        foreach ($event->detachTags as $tagSlug)
+        {
+            $tagPatchCounter->add($tagSlug, 'pin_count', -1);
+        }
+
+        foreach ($event->attachTags as $tagSlug)
+        {
+            $tagPatchCounter->add($tagSlug, 'pin_count', 1);
         }
     }
 }

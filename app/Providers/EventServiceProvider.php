@@ -18,6 +18,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\User\UpdateProfile' => [
             'App\Listeners\User\UpdateProfile\RefreshCache',
+            'App\Listeners\User\UpdateProfile\AddUserToSearch',
         ],
         'App\Events\User\DailySign' => [
             'App\Listeners\User\DailySign\UpdateUserActivity',
@@ -31,6 +32,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Create\UpdateAuthorTimeline',
             'App\Listeners\Pin\Create\UpdateTagCounter',
             'App\Listeners\Pin\Create\UpdateFlowList',
+            'App\Listeners\Pin\Create\AddPinToSearch',
             'App\Listeners\Pin\Create\Trial',
         ],
         'App\Events\Pin\Update' => [
@@ -40,6 +42,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Update\RefreshCache',
             'App\Listeners\Pin\Update\UpdateTagCounter',
             'App\Listeners\Pin\Update\UpdateFlowList',
+            'App\Listeners\Pin\Update\UpdatePinSearch',
             'App\Listeners\Pin\Update\Trial',
         ],
         'App\Events\Pin\Delete' => [
@@ -48,16 +51,19 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Delete\UpdateTagCounter',
             'App\Listeners\Pin\Delete\RefreshCache',
             'App\Listeners\Pin\Delete\UpdateFlowList',
+            'App\Listeners\Pin\Delete\RemovePinSearch',
         ],
         'App\Events\Tag\Create' => [
             'App\Listeners\Tag\Create\InitTagTimeline',
             'App\Listeners\Tag\Create\UpdateCreatorBookmark',
             'App\Listeners\Tag\Create\UpdateCreatorTimeline',
             'App\Listeners\Tag\Create\CreateQuestionRule',
+            'App\Listeners\Tag\Create\AddTagToSearch',
             'App\Listeners\Tag\Create\RefreshParentCache',
         ],
         'App\Events\Tag\Update' => [
             'App\Listeners\Tag\Update\UpdateTagTimeline',
+            'App\Listeners\Tag\Update\UpdateTagSearch',
             'App\Listeners\Tag\Update\RefreshCache',
         ],
         'App\Events\Tag\Delete' => [
@@ -65,6 +71,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Tag\Delete\UpdateCreatorTimeline',
             'App\Listeners\Tag\Delete\UpdateUsersBookmark',
             'App\Listeners\Tag\Delete\MoveChildrenToTrash',
+            'App\Listeners\Tag\Delete\RemoveTagSearch',
             'App\Listeners\Tag\Delete\RefreshCache',
         ],
         'App\Events\User\ToggleFollowUser' => [
