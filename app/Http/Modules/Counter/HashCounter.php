@@ -9,15 +9,13 @@ use Illuminate\Support\Facades\Redis;
 class HashCounter
 {
     protected $table;
-    protected $fields = [];
     protected $timeout = 3600; // 一小时写一次数据库
     protected $uniqueKey = 'slug';
     protected $migrate = true;
 
-    public function __construct(string $table, array $fields, bool $migrate = true)
+    public function __construct(string $table, bool $migrate = true)
     {
         $this->table = $table;
-        $this->fields = $fields;
         $this->migrate = $migrate;
     }
 
@@ -89,11 +87,7 @@ class HashCounter
      */
     public function boot($slug)
     {
-        return DB
-            ::table($this->table)
-            ->where($this->uniqueKey, $slug)
-            ->select($this->fields)
-            ->first();
+        return [];
     }
 
     /**
@@ -135,12 +129,19 @@ class HashCounter
             ->where($this->uniqueKey, $slug)
             ->update($result);
 
+        $this->search($slug, $result);
+
         Redis::HMSET(
             $this->cacheKey($slug),
             [
                 'migrate_at' => time()
             ]
         );
+    }
+
+    protected function search($slug, $result)
+    {
+
     }
 
     protected function cacheKey($slug)

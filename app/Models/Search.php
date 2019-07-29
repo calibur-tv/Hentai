@@ -11,9 +11,9 @@ class Search extends Model
     protected $table = 'searches';
     /**
      * type：
-     * 0 => user
      * 1 => tag
      * 2 => pin
+     * 3 => user
      */
     protected $fillable = [
         'type',

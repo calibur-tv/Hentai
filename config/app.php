@@ -146,6 +146,13 @@ return [
         ]
     ],
 
+    'search' => [
+        'access' => env('ALIYUN_OPEN_SEARCH_ACCESS'),
+        'secret' => env('ALIYUN_OPEN_SEARCH_SECRET'),
+        'name' => env('ALIYUN_OPEN_SEARCH_APP_NAME'),
+        'endpoint' => env('APP_ENV') === 'production' ? env('ALIYUN_OPEN_SEARCH_END_POINT_PROD') : env('ALIYUN_OPEN_SEARCH_END_POINT_TEST')
+    ],
+
     'oauth2' => [
         // QQ 登录
         'qq' => [

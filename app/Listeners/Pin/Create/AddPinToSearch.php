@@ -30,8 +30,7 @@ class AddPinToSearch
         Search::create([
             'type' => 2,
             'slug' => $pin->slug,
-            'text' => $text,
-            'score' => 0
+            'text' => $text
         ]);
     }
 }

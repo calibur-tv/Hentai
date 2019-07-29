@@ -4,19 +4,14 @@
 namespace App\Http\Modules\Counter;
 
 
+use App\Models\Search;
 use App\Models\Tag;
 
 class TagPatchCounter extends HashCounter
 {
     public function __construct()
     {
-        parent::__construct('tags', [
-            'pin_count',
-            'seen_user_count',
-            'followers_count',
-            'activity_stat',
-            'question_count'
-        ]);
+        parent::__construct('tags');
     }
 
     public function boot($slug)
@@ -55,5 +50,20 @@ class TagPatchCounter extends HashCounter
             'question_count' => $questionCount,
             'activity_stat' => $tag->activity_stat
         ];
+    }
+
+    public function search($slug, $result)
+    {
+        Search
+            ::where('slug', $slug)
+            ->where('type', 1)
+            ->update([
+                'score' =>
+                    $result['pin_count'] +
+                    $result['seen_user_count'] +
+                    $result['followers_count'] +
+                    $result['question_count'] +
+                    $result['activity_stat']
+            ]);
     }
 }

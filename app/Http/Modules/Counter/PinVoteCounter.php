@@ -12,7 +12,7 @@ class PinVoteCounter extends HashCounter
 {
     public function __construct()
     {
-        parent::__construct('pin_answers', [], false);
+        parent::__construct('pin_answers', false);
     }
 
     public function boot($slug)

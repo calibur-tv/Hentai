@@ -22,22 +22,19 @@ class AddUserToSearch
             ->first();
 
         $text = $user->nickname . '|' . $user->signature;
-        $score = $user->followers_count + $user->following_count + $user->visit_count;
 
         if (null === $search)
         {
             Search::create([
-                'type' => 0,
+                'type' => 3,
                 'slug' => $user->slug,
-                'text' => $text,
-                'score' => $score
+                'text' => $text
             ]);
         }
         else
         {
             $search->update([
-                'text' => $text,
-                'score' => $score
+                'text' => $text
             ]);
         }
     }

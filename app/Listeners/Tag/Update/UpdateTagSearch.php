@@ -26,23 +26,9 @@ class UpdateTagSearch
             ->first();
 
         $text = $txtTag->alias;
-        $score = $tag->seen_user_count + $tag->followers_count + $tag->activity_stat;
 
-        if (null == $search)
-        {
-            Search::create([
-                'type' => 1,
-                'slug' => $tag->slug,
-                'text' => $text,
-                'score' => $score
-            ]);
-        }
-        else
-        {
-            $search->update([
-                'text' => $text,
-                'score' => $score
-            ]);
-        }
+        $search->update([
+            'text' => $text
+        ]);
     }
 }

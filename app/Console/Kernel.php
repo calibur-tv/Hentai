@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
         Jobs\Test::class,
         Jobs\AutoFreeUser::class,
         Jobs\ComputeSignCount::class,
-        Jobs\ComputeUserDailyStat::class
+        Jobs\ComputeUserDailyStat::class,
+        Jobs\ClearSearchRepeatData::class
     ];
 
     /**
@@ -30,6 +31,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('AutoFreeUser')->everyFiveMinutes();
         $schedule->command('ComputeSignCount')->dailyAt('00:30');
         $schedule->command('ComputeUserDailyStat')->dailyAt('00:01');
+        $schedule->command('ClearSearchRepeatData')->dailyAt('05:00');
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
     }
 }

@@ -5,18 +5,13 @@ namespace App\Http\Modules\Counter;
 
 
 use App\Models\Pin;
+use App\Models\Search;
 
 class PinPatchCounter extends HashCounter
 {
     public function __construct()
     {
-        parent::__construct('pins', [
-            'visit_count',
-            'comment_count',
-            'like_count',
-            'mark_count',
-            'reward_count'
-        ]);
+        parent::__construct('pins');
     }
 
     public function boot($slug)
@@ -43,5 +38,20 @@ class PinPatchCounter extends HashCounter
             'reward_count' => $pin->favoriters()->count(),
             'like_count' => $pin->upvoters()->count()
         ];
+    }
+
+    public function search($slug, $result)
+    {
+        Search
+            ::where('slug', $slug)
+            ->where('type', 2)
+            ->update([
+                'score' =>
+                    $result['visit_count'] +
+                    $result['comment_count'] +
+                    $result['mark_count'] +
+                    $result['reward_count'] +
+                    $result['like_count']
+            ]);
     }
 }

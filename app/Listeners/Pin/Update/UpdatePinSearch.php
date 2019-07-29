@@ -32,27 +32,19 @@ class UpdatePinSearch
         $txtPin = $pinRepository->item($pin->slug);
 
         $text = $txtPin->title->text . '|' . $txtPin->intro;
-        $score =
-            $pin->like_count +
-            $pin->mark_count +
-            $pin->reward_count +
-            $pin->comment_count +
-            $pin->visit_count;
 
         if (null === $search)
         {
             Search::create([
                 'type' => 2,
                 'slug' => $pin->slug,
-                'text' => $text,
-                'score' => $score
+                'text' => $text
             ]);
         }
         else
         {
             $search->update([
-                'text' => $text,
-                'score' => $score
+                'text' => $text
             ]);
         }
     }

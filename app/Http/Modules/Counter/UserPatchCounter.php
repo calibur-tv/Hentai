@@ -5,18 +5,14 @@ namespace App\Http\Modules\Counter;
 
 
 use App\Http\Repositories\UserRepository;
+use App\Models\Search;
 use App\User;
 
 class UserPatchCounter extends HashCounter
 {
     public function __construct()
     {
-        parent::__construct('users', [
-            'visit_count',
-            'followers_count',
-            'following_count',
-            'friends_count'
-        ]);
+        parent::__construct('users');
     }
 
     public function boot($slug)
@@ -44,5 +40,18 @@ class UserPatchCounter extends HashCounter
             'following_count' => $user->followings()->count(),
             'friends_count' => $friends['total']
         ];
+    }
+
+    public function search($slug, $result)
+    {
+        Search
+            ::where('slug', $slug)
+            ->where('type', 3)
+            ->update([
+                'score' =>
+                    $result['visit_count'] +
+                    $result['followers_count'] +
+                    $result['friends_count']
+            ]);
     }
 }
