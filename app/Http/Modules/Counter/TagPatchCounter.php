@@ -62,7 +62,6 @@ class TagPatchCounter extends HashCounter
                     $result['pin_count'] +
                     $result['seen_user_count'] +
                     $result['followers_count'] +
-                    $result['question_count'] +
                     $result['activity_stat']
             ]);
     }
