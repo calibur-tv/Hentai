@@ -44,16 +44,20 @@ class Test extends Command
         $tagRepository = new TagRepository();
         foreach ($tags as $tag)
         {
+            $tag->update([
+                'migration_state' => 6
+            ]);
+
             $txtTag = $tagRepository->item($tag->slug);
+            if (!$txtTag->name)
+            {
+                continue;
+            }
 
             Search::create([
                 'type' => 1,
                 'slug' => $tag->slug,
                 'text' => $txtTag->name
-            ]);
-
-            $tag->update([
-                'migration_state' => 6
             ]);
         }
 
