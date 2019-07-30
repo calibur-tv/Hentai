@@ -2,6 +2,8 @@
 
 namespace App\Console\Jobs;
 
+use App\Http\Repositories\TagRepository;
+use App\Models\Search;
 use App\Models\Tag;
 use App\User;
 use Illuminate\Console\Command;
@@ -29,6 +31,32 @@ class Test extends Command
      */
     public function handle()
     {
+        $tags = Tag
+            ::where('migration_state', '<>', 6)
+            ->whereIn('parent_slug', [
+                config('app.tag.topic'),
+                config('app.tag.bangumi'),
+                config('app.tag.game')
+            ])
+            ->take(200)
+            ->get();
+
+        $tagRepository = new TagRepository();
+        foreach ($tags as $tag)
+        {
+            $txtTag = $tagRepository->item($tag->slug);
+
+            Search::create([
+                'type' => 1,
+                'slug' => $tag->slug,
+                'text' => $txtTag->name
+            ]);
+
+            $tag->update([
+                'migration_state' => 6
+            ]);
+        }
+
         return true;
     }
 }
