@@ -33,7 +33,7 @@ use App\Services\OpenSearch\Thrift\Type\TMessageType;
  */
 class TBinarySerializer
 {
-  // NOTE(rmarin): Because App\Services\OpenSearch\Thrift_protocol_write_binary
+  // NOTE(rmarin): Because thrift_protocol_write_binary
   // adds a begin message prefix, you cannot specify
   // a transport in which to serialize an object. It has to
   // be a string. Otherwise we will break the compatibility with

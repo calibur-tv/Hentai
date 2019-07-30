@@ -37,7 +37,7 @@ class Search
         $this->params = new SearchParamsBuilder();
     }
 
-    public function retrieve($key, $type = 'all', $page = 0, $count = 15)
+    public function retrieve($key, $type = 'all', $page = 1, $count = 15)
     {
         $typeId = $this->convertModal($type);
         $this->params->setStart($page * $count);

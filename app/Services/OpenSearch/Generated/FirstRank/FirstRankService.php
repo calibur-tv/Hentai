@@ -59,7 +59,7 @@ interface FirstRankServiceIf {
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchException
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchClientException
    */
-  public function updateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank);
+  public function updateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank);
   /**
    * @param string $identity
    * @param \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank
@@ -67,7 +67,7 @@ interface FirstRankServiceIf {
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchException
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchClientException
    */
-  public function validateUpdateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank);
+  public function validateUpdateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank);
   /**
    * @param string $identity
    * @return \App\Services\OpenSearch\Generated\FirstRank\FirstRank
@@ -374,13 +374,13 @@ class FirstRankServiceClient implements \App\Services\OpenSearch\Generated\First
     throw new \Exception("listByAppIdAndName failed: unknown result");
   }
 
-  public function updateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank)
+  public function updateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank)
   {
     $this->send_updateById($identity, $firstRank);
     return $this->recv_updateById();
   }
 
-  public function send_updateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank)
+  public function send_updateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank)
   {
     $args = new \App\Services\OpenSearch\Generated\FirstRank\FirstRankService_updateById_args();
     $args->identity = $identity;
@@ -432,13 +432,13 @@ class FirstRankServiceClient implements \App\Services\OpenSearch\Generated\First
     throw new \Exception("updateById failed: unknown result");
   }
 
-  public function validateUpdateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank)
+  public function validateUpdateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank)
   {
     $this->send_validateUpdateById($identity, $firstRank);
     return $this->recv_validateUpdateById();
   }
 
-  public function send_validateUpdateById($identity, \App\Services\OpenSearch\Generated\FirstRank\FirstRank $firstRank)
+  public function send_validateUpdateById($identity, \OpenSearch\Generated\FirstRank\FirstRank $firstRank)
   {
     $args = new \App\Services\OpenSearch\Generated\FirstRank\FirstRankService_validateUpdateById_args();
     $args->identity = $identity;

@@ -22,10 +22,9 @@ namespace App\Services\OpenSearch\Util;
 
 use App\Services\OpenSearch\Generated\Search\Constant;
 use App\Services\OpenSearch\Generated\Search\DeepPaging;
-use App\Services\OpenSearch\Generated\Search\SearchType;
 
-class UrlParamsBuilder {
-
+class UrlParamsBuilder
+{
     const QUERY = 'query';
     const FORMAT = 'format';
     const FIRST_RANK_NAME = 'first_rank_name';
@@ -48,6 +47,8 @@ class UrlParamsBuilder {
     const SUMMARY_KV_SEPARATOR = ':';
 
     const SEARCH_TYPE_SCAN = 'scan';
+
+    const ABTEST = "abtest";
 
     private static $summaryKeys = array(
         'summary_field' => 'SUMMARY_PARAM_SUMMARY_FIELD',
@@ -75,6 +76,9 @@ class UrlParamsBuilder {
         $this->initDisableFunctions($searchParams);
         $this->initRouteValue($searchParams);
         $this->initCustomParams($searchParams);
+        $this->initAbtest($searchParams);
+        $this->initUserId($searchParams);
+        $this->initRawQuery($searchParams);
     }
 
     public function initScroll($searchParams) {
@@ -151,6 +155,24 @@ class UrlParamsBuilder {
     public function initCustomParams($searchParams) {
         if (isset($searchParams->customParam)) {
             $this->params = array_merge($this->params, $searchParams->customParam);
+        }
+    }
+
+    public function initAbtest($searchParams) {
+        if (isset($searchParams->abtest) && isset($searchParams->abtest->sceneTag) && isset($searchParams->abtest->flowDivider)) {
+            $this->params[self::ABTEST] = sprintf("%s=%s,%s=%s", Constant::get('ABTEST_PARAM_SCENE_TAG'), $searchParams->abtest->sceneTag, Constant::get('ABTEST_PARAM_FLOW_DIVIDER'), $searchParams->abtest->flowDivider);
+        }
+    }
+
+    public function initUserId($searchParams) {
+        if (isset($searchParams->userId)) {
+            $this->params[Constant::get('USER_ID')] = $searchParams->userId;
+        }
+    }
+
+    public function initRawQuery($searchParams) {
+        if (isset($searchParams->rawQuery)) {
+            $this->params[Constant::get('RAW_QUERY')] = $searchParams->rawQuery;
         }
     }
 

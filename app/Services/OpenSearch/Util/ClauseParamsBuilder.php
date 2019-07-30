@@ -24,7 +24,8 @@ use App\Services\OpenSearch\Generated\Search\Constant;
 use App\Services\OpenSearch\Generated\Search\Order;
 use App\Services\OpenSearch\Generated\Search\searchFormat;
 
-class ClauseParamsBuilder {
+class ClauseParamsBuilder
+{
     const CONFIG_KEY = 'config';
     const QUERY_KEY = 'query';
     const SORT_KEY = 'sort';
@@ -98,10 +99,6 @@ class ClauseParamsBuilder {
         if (isset($this->params->rank->reRankSize)) {
             $config[] = Constant::get(self::CONFIG_CLAUSE_RERANK_SIZE) .
                 self::CLAUSE_CONFIG_KV_SEPARATOR . $this->params->rank->reRankSize;
-        }
-
-        if (isset($this->params->config->kvpairs)) {
-            $config[] = self::KVPAIRS . self::CLAUSE_CONFIG_KV_SEPARATOR . $this->params->config->kvpairs;
         }
 
         if (isset($this->params->config->customConfig)) {
@@ -201,6 +198,12 @@ class ClauseParamsBuilder {
         }
     }
 
+    private function buildKVPairsClause() {
+        if (isset($this->params->config->kvpairs)) {
+            $this->clauses[self::KVPAIRS] = $this->params->config->kvpairs;
+        }
+    }
+
     public function getClausesString() {
         $this->buildConfigClause();
         $this->buildQueryClause();
@@ -208,6 +211,7 @@ class ClauseParamsBuilder {
         $this->buildFilterClause();
         $this->buildDistinctClause();
         $this->buildAggregateClause();
+        $this->buildKVPairsClause();
 
         $clauses = array();
         foreach ($this->clauses as $clauseKey => $value) {

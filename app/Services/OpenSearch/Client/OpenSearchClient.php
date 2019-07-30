@@ -21,12 +21,11 @@
 namespace App\Services\OpenSearch\Client;
 
 use App\Services\OpenSearch\Generated\OpenSearch\OpenSearch;
-use App\Services\OpenSearch\Generated\OpenSearch\Constant;
 use App\Services\OpenSearch\Generated\Common\OpenSearchResult;
 use App\Services\OpenSearch\Generated\Common\TraceInfo;
 
-class OpenSearchClient extends OpenSearch {
-
+class OpenSearchClient extends OpenSearch
+{
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
     const METHOD_PUT = 'PUT';
@@ -34,14 +33,25 @@ class OpenSearchClient extends OpenSearch {
     const METHOD_PATCH = 'PATCH';
 
     const API_VERSION = '3';
-    const SDK_VERSION = '3.0.0';
     const API_TYPE = 'openapi';
+
+    const SDK_VERSION = '3.1.0';
+    const SDK_TYPE    = 'opensearch_sdk';
 
     private $debug = false;
 
     public $timeout = 10;
     public $connectTimeout = 1;
 
+    /**
+     * 构造方法。
+     *
+     * @param string $accessKey 指定您的accessKeyId，在 https://ak-console.aliyun.com/#/accesskey 中可以创建。
+     * @param string $secret 指定您的secret。
+     * @param string $host 指定您要访问的区域的endPoint，在控制台应用详情页中有指定。
+     * @param array @options 指定一些可选参数，debug：true/false，是否开启debug模式（默认不开启），gzip:true/false 是否开启gzip压缩（默认不开启），timeout：超时时间，seconds（默认10秒）,connectTimeout: 连接超时时间，seconds(默认1秒)
+     * @return void
+     */
     public function __construct($accessKey, $secret, $host, $options = array()) {
         $args = array(
             'accessKey' => trim($accessKey),
@@ -69,26 +79,70 @@ class OpenSearchClient extends OpenSearch {
         parent::__construct($args);
     }
 
+    /**
+     * 发送一个GET请求。
+     *
+     * @param string $uri 发起GET请求的uri。
+     * @param array $params 发起GET请求的参数，以param_key => param_value的方式体现。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function get($uri, $params = array()) {
         return $this->call($uri, $params, '', self::METHOD_GET);
     }
 
+    /**
+     * 发送一个PUT请求。
+     *
+     * @param string $uri 发起PUT请求的uri。
+     * @param string $body 发起PUT请求的body体，为一个原始的json格式的string。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function put($uri, $body = '') {
         return $this->call($uri, array(), $body, self::METHOD_PUT);
     }
 
+    /**
+     * 发送一个POST请求。
+     *
+     * @param string $uri 发起POST请求的uri。
+     * @param string $body 发起POST请求的body体，为一个原始的json格式的string。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function post($uri, $body = '') {
         return $this->call($uri, array(), $body, self::METHOD_POST);
     }
 
+    /**
+     * 发送一个DELETE请求。
+     *
+     * @param string $uri 发起DELETE请求的uri。
+     * @param string $body 发起DELETE请求的body体，为一个原始的json格式的string。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function delete($uri, $body = '') {
         return $this->call($uri, array(), $body, self::METHOD_DELETE);
     }
 
+    /**
+     * 发送一个PATCH请求。
+     *
+     * @param string $uri 发起PATCH请求的uri。
+     * @param string $body 发起PATCH请求的body体，为一个原始的json格式的string。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function patch($uri, $body = '') {
         return $this->call($uri, array(), $body, self::METHOD_PATCH);
     }
 
+    /**
+     * 发送一个请求。
+     *
+     * @param string $uri 发起请求的uri。
+     * @param array $params 指定的url中的query string 列表。
+     * @param string $body 发起请求的body体，为一个原始的json格式的string。
+     * @param string $method 发起请求的方法，有GET/POST/DELETE/PUT/PATCH等
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult
+     */
     public function call($uri, array $params, $body, $method) {
         $path = "/v" . self::API_VERSION . "/" . self::API_TYPE . "{$uri}";
         $url = $this->host . $path;
@@ -157,7 +211,8 @@ class OpenSearchClient extends OpenSearch {
         if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
             $query = !empty($params) ? http_build_query($params, null, '&', PHP_QUERY_RFC3986) : '';
         } else {
-            while (list ($key, $val) = each ($params)) {
+            $arg = '';
+            foreach ($params as $key => $val) {
                 $arg .= rawurlencode($key) . "=" . rawurlencode($val) . "&";
             }
             $query = substr($arg, 0, count($arg) - 2);
@@ -169,13 +224,14 @@ class OpenSearchClient extends OpenSearch {
     private function _filter($parameters = array()){
         $params = array();
         if(!empty($parameters)){
-            while (list ($key, $val) = each ($parameters)) {
+            foreach ($parameters as $key => $val) {
                 if ($key == "Signature" ||$val === "" || $val === NULL){
                     continue;
                 } else {
                     $params[$key] = $parameters[$key];
                 }
             }
+
             uksort($params,'strnatcasecmp');
             reset($params);
         }

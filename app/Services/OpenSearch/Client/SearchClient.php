@@ -20,22 +20,38 @@
 
 namespace App\Services\OpenSearch\Client;
 
-use App\Services\OpenSearch\Generated\Search\Config;
 use App\Services\OpenSearch\Generated\Search\OpenSearchSearcherServiceIf;
-use App\Services\OpenSearch\Generated\Search\SearchFormat;
 use App\Services\OpenSearch\Generated\Search\SearchParams;
 use App\Services\OpenSearch\Util\UrlParamsBuilder;
 
+/**
+ * 应用搜索操作类。
+ *
+ * 通过制定关键词、过滤条件搜索应用结果。
+ *
+ */
 class SearchClient implements OpenSearchSearcherServiceIf {
 
     const SEARCH_API_PATH = '/apps/%s/search';
 
     private $openSearchClient;
 
+    /**
+     * 构造方法。
+     *
+     * @param \App\Services\OpenSearch\Client\OpenSearchClient $openSearchClient 基础类，负责计算签名，和服务端进行交互和返回结果。
+     * @return void
+     */
     public function __construct($openSearchClient) {
         $this->openSearchClient = $openSearchClient;
     }
 
+    /**
+     * 执行搜索操作。
+     *
+     * @param \App\Services\OpenSearch\Generated\Search\SearchParams $searchParams 制定的搜索条件。
+     * @return \App\Services\OpenSearch\Generated\Common\OpenSearchResult OpenSearchResult类
+     */
     public function execute(SearchParams $searchParams) {
         $path = self::getPath($searchParams);
         $builder = new UrlParamsBuilder($searchParams);

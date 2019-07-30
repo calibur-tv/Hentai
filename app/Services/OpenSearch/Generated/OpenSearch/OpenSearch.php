@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\OpenSearch\Generated\OpenSearch;
 
 /**
@@ -7,15 +8,8 @@ namespace App\Services\OpenSearch\Generated\OpenSearch;
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-use App\Services\OpenSearch\Thrift\Base\TBase;
 use App\Services\OpenSearch\Thrift\Type\TType;
-use App\Services\OpenSearch\Thrift\Type\TMessageType;
-use App\Services\OpenSearch\Thrift\Exception\TException;
 use App\Services\OpenSearch\Thrift\Exception\TProtocolException;
-use App\Services\OpenSearch\Thrift\Protocol\TProtocol;
-use App\Services\OpenSearch\Thrift\Protocol\TBinaryProtocolAccelerated;
-use App\Services\OpenSearch\Thrift\Exception\TApplicationException;
-
 
 class OpenSearch {
   static $_TSPEC;
@@ -263,13 +257,3 @@ class OpenSearch {
   }
 
 }
-
-final class Constant extends \App\Services\OpenSearch\Thrift\Type\TConstant {
-  static protected $VERSION;
-
-  static protected function init_VERSION() {
-    return "3.1.0";
-  }
-}
-
-

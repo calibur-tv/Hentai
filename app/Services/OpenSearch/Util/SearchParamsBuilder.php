@@ -23,27 +23,26 @@ namespace App\Services\OpenSearch\Util;
 use App\Services\OpenSearch\Generated\Search\Aggregate;
 use App\Services\OpenSearch\Generated\Search\Distinct;
 use App\Services\OpenSearch\Generated\Search\Config;
-use App\Services\OpenSearch\Generated\Search\Constant;
-use App\Services\OpenSearch\Generated\Search\Order;
-use App\Services\OpenSearch\Generated\Search\Rank;
 use App\Services\OpenSearch\Generated\Search\SearchFormat;
 use App\Services\OpenSearch\Generated\Search\SearchParams;
 use App\Services\OpenSearch\Generated\Search\Sort;
 use App\Services\OpenSearch\Generated\Search\SortField;
 use App\Services\OpenSearch\Generated\Search\Summary;
 use App\Services\OpenSearch\Generated\Search\DeepPaging;
+use App\Services\OpenSearch\Generated\Search\Abtest;
 
 /**
  * 搜索配置项。
  */
-class SearchParamsBuilder {
-
+class SearchParamsBuilder
+{
     const SORT_INCREASE = 1;
     const SORT_DECREASE = 0;
 
     private $searchParams;
 
-    public function __construct($opts = array()) {
+    public function __construct($opts = array())
+    {
 
         $config = new Config();
         $this->searchParams = new SearchParams(array('config' => $config));
@@ -69,7 +68,7 @@ class SearchParamsBuilder {
         }
 
         if (isset($opts['kvpairs'])) {
-            $this->setKVPairs($opts['kvpairs']);
+            $this->setKvPairs($opts['kvpairs']);
         }
 
         if (isset($opts['fetchFields'])) {
@@ -151,12 +150,16 @@ class SearchParamsBuilder {
                 $this->setCustomParam($key, $value);
             }
         }
+
+        if (isset($opts['reRankSize'])) {
+            $this->setReRankSize($opts['reRankSize']);
+        }
     }
 
     /**
      * 设置返回结果的偏移量。
      *
-     * @param int $start 偏移量。
+     * @param int $start 偏移量，范围[0,5000]。
      * @return void
      */
     public function setStart($start) {
@@ -166,7 +169,7 @@ class SearchParamsBuilder {
     /**
      * 设置返回结果的条数。
      *
-     * @param int $hits 返回结果的条数。
+     * @param int $hits 返回结果的条数，范围[0,500]。
      * @return void
      */
     public function setHits($hits) {
@@ -176,7 +179,7 @@ class SearchParamsBuilder {
     /**
      * 设置返回结果的格式。
      *
-     * @param String $format 返回结果的格式，有json。
+     * @param String $format 返回结果的格式，有json、fulljson和xml格式。
      * @return void
      */
     public function setFormat($format) {
@@ -232,6 +235,16 @@ class SearchParamsBuilder {
      */
     public function setRouteValue($routeValue) {
         $this->searchParams->config->routeValue = $routeValue;
+    }
+
+    /**
+     * 设置参与精排个数。
+     *
+     * @param int $reRankSize 参与精排个数，范围[0,2000]。
+     * @return void
+     */
+    public function setReRankSize($reRankSize) {
+        $this->searchParams->rank->reRankSize = $reRankSize;
     }
 
     /**
@@ -356,7 +369,7 @@ class SearchParamsBuilder {
     /**
      * 添加查询分析配置。
      *
-     * @param array $qpName 指定的查询分析名称。
+     * @param array $qpName 指定的QP名称。
      * @return void
      */
     public function addQueryProcessor($qpName) {
@@ -370,7 +383,7 @@ class SearchParamsBuilder {
     /**
      * 添加要关闭的function。
      *
-     * @param String $disabledFunction 指定的要关闭方法的名称。
+     * @param String $disabledFunction 指定的要关闭的方法名称。
      * @return void
      */
     public function addDisableFunctions($disabledFunction) {
@@ -427,6 +440,58 @@ class SearchParamsBuilder {
     }
 
     /**
+     * 设置abtest数据的sceneTag。
+     *
+     * SceneTag 为场景标签。
+     *
+     * @param String $sceneTag 设定abtest的sceneTag。
+     * @return void
+     */
+    public function setSceneTag($sceneTag) {
+        if ($this->searchParams->abtest == null) {
+            $this->searchParams->abtest = new Abtest();
+        }
+
+        $this->searchParams->abtest->sceneTag = $sceneTag;
+    }
+
+    /**
+     * 设置abtest数据的flowDivider。
+     *
+     * FlowDivider 为流量分配标识。
+     *
+     * @param String $flowDivider 设定abtest的flowDivider。
+     * @return void
+     */
+    public function setFlowDivider($flowDivider) {
+        if ($this->searchParams->abtest == null) {
+            $this->searchParams->abtest = new Abtest();
+        }
+
+        $this->searchParams->abtest->flowDivider = $flowDivider;
+    }
+
+    /**
+     * 设置终端用户的id，用来统计uv信息。
+     *
+     * @param String $userId 设定终端用户的id。
+     * @return void
+     */
+    public function setUserId($userId) {
+        $this->searchParams->userId = $userId;
+    }
+
+    /**
+     * 设置终端用户输入的query。
+     *
+     * @param String $rawQuery 设定终端用户输入的query。
+     * @return void
+     */
+    public function setRawQuery($rawQuery) {
+        $this->searchParams->rawQuery = $rawQuery;
+    }
+
+    /**
      * 获取SearchParams对象。
      *
      * @return SearchParams
@@ -435,5 +500,3 @@ class SearchParamsBuilder {
         return $this->searchParams;
     }
 }
-
-

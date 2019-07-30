@@ -584,5 +584,3 @@ class OpenSearchClientException extends TException {
   }
 
 }
-
-

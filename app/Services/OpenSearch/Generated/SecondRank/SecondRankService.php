@@ -52,7 +52,7 @@ interface SecondRankServiceIf {
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchException
    * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchClientException
    */
-  public function updateById($id, \App\Services\OpenSearch\Generated\SecondRank\SecondRank $secondRank);
+  public function updateById($id, \OpenSearch\Generated\SecondRank\SecondRank $secondRank);
   /**
    * @param string $id
    * @return \App\Services\OpenSearch\Generated\SecondRank\SecondRank
@@ -302,13 +302,13 @@ class SecondRankServiceClient implements \App\Services\OpenSearch\Generated\Seco
     throw new \Exception("listByAppIdAndName failed: unknown result");
   }
 
-  public function updateById($id, \App\Services\OpenSearch\Generated\SecondRank\SecondRank $secondRank)
+  public function updateById($id, \OpenSearch\Generated\SecondRank\SecondRank $secondRank)
   {
     $this->send_updateById($id, $secondRank);
     return $this->recv_updateById();
   }
 
-  public function send_updateById($id, \App\Services\OpenSearch\Generated\SecondRank\SecondRank $secondRank)
+  public function send_updateById($id, \OpenSearch\Generated\SecondRank\SecondRank $secondRank)
   {
     $args = new \App\Services\OpenSearch\Generated\SecondRank\SecondRankService_updateById_args();
     $args->id = $id;

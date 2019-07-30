@@ -1664,7 +1664,7 @@ class App {
 
 }
 
-final class Constant extends \Thrift\Type\TConstant {
+final class Constant extends \App\Services\OpenSearch\Thrift\Type\TConstant {
   static protected $TYPE_STANDARD;
   static protected $TYPE_ADVANCE;
 
