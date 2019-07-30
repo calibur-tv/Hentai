@@ -46,7 +46,7 @@ class Search
         $this->params->setFormat($this->format);
         $this->params->setQuery(
             $typeId
-                ? "text:'${key}' AND type:'" . $typeId . "'&&sort=-(score)"
+                ? "text:'${key}'&&filter=type='" . $typeId . "'&&sort=-(score)"
                 : "text:'${key}'&&sort=-(score)"
         );
 
