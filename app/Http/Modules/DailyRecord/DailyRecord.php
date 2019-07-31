@@ -40,7 +40,7 @@ class DailyRecord
 
         $list = DB
             ::table($this->table)
-            ->where('record_id', $slug)
+            ->where('record_slug', $slug)
             ->where('record_type', $this->record_type)
             ->where('day', '>', Carbon::now()->addDays(-(31 + $delta)))
             ->select('day', 'value')

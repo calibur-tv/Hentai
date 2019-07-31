@@ -16,12 +16,6 @@ use App\Services\OpenSearch\Thrift\Protocol\TProtocol;
 use App\Services\OpenSearch\Thrift\Protocol\TBinaryProtocolAccelerated;
 use App\Services\OpenSearch\Thrift\Exception\TApplicationException;
 
-
-interface GeneralSearcherServiceIf {
-
-}
-
-
 class GeneralSearcherServiceClient implements \App\Services\OpenSearch\Generated\GeneralSearcher\GeneralSearcherServiceIf {
   protected $input_ = null;
   protected $output_ = null;

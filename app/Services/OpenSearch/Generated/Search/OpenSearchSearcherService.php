@@ -17,16 +17,6 @@ use App\Services\OpenSearch\Thrift\Protocol\TBinaryProtocolAccelerated;
 use App\Services\OpenSearch\Thrift\Exception\TApplicationException;
 
 
-interface OpenSearchSearcherServiceIf extends \App\Services\OpenSearch\Generated\GeneralSearcher\GeneralSearcherServiceIf {
-  /**
-   * @param \App\Services\OpenSearch\Generated\Search\SearchParams $searchParams
-   * @return \App\Services\OpenSearch\Generated\GeneralSearcher\SearchResult
-   * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchException
-   * @throws \App\Services\OpenSearch\Generated\Common\OpenSearchClientException
-   */
-  public function execute(\App\Services\OpenSearch\Generated\Search\SearchParams $searchParams);
-}
-
 class OpenSearchSearcherServiceClient extends \App\Services\OpenSearch\Generated\GeneralSearcher\GeneralSearcherServiceClient implements \App\Services\OpenSearch\Generated\Search\OpenSearchSearcherServiceIf {
   public function __construct($input, $output=null) {
     parent::__construct($input, $output);
