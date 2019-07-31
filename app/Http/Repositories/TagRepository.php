@@ -110,6 +110,36 @@ class TagRepository extends Repository
         }, $refresh);
     }
 
+    public function search()
+    {
+        $result = $this->RedisItem('tag-all-search', function ()
+        {
+            $tag = Tag
+                ::whereIn('parent_slug', [
+                    config('app.tag.bangumi'),
+                    config('app.tag.topic'),
+                    config('app.tag.game')
+                ])
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
+                ->get();
+
+            return TagItemResource::collection($tag);
+        });
+
+        if (gettype($result) === 'string')
+        {
+            $result = json_decode($result, true);
+        }
+        return $result;
+    }
+
     /**
      * @param $slug
      * @param $user

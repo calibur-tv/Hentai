@@ -13,6 +13,7 @@ use App\Http\Repositories\UserRepository;
 use App\Services\OpenSearch\Client\OpenSearchClient;
 use App\Services\OpenSearch\Client\SearchClient;
 use App\Services\OpenSearch\Util\SearchParamsBuilder;
+use Illuminate\Support\Facades\Log;
 
 class Search
 {
@@ -51,6 +52,10 @@ class Search
         );
 
         $res = json_decode($this->search->execute($this->params->build())->result, true);
+
+        Log::info('search', [
+            'res' => $res
+        ]);
 
         if ($res['status'] !== 'OK')
         {

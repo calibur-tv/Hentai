@@ -275,4 +275,12 @@ class TagController extends Controller
             'pass' => $passCount
         ]);
     }
+
+    public function search()
+    {
+        $tagRepository = new TagRepository();
+        $result = $tagRepository->search();
+
+        return $this->resOK($result);
+    }
 }

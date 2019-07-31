@@ -61,6 +61,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
 $route->group(['prefix' => 'search'], function () use ($route)
 {
     $route->get('mixin', 'SearchController@mixin');
+
+    $route->get('tags', 'TagController@search');
 });
 
 $route->group(['prefix' => 'message'], function () use ($route)
