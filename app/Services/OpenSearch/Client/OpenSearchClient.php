@@ -23,6 +23,7 @@ namespace App\Services\OpenSearch\Client;
 use App\Services\OpenSearch\Generated\OpenSearch\OpenSearch;
 use App\Services\OpenSearch\Generated\Common\OpenSearchResult;
 use App\Services\OpenSearch\Generated\Common\TraceInfo;
+use Illuminate\Support\Facades\Log;
 
 class OpenSearchClient extends OpenSearch
 {
@@ -286,6 +287,10 @@ class OpenSearchClient extends OpenSearch
             $options[CURLOPT_STDERR] = $out;
         }
 
+        Log::info('curl', [
+            'url' => $url,
+            'options' => $options
+        ]);
         $session = curl_init($url);
         curl_setopt_array($session, $options);
         $response = curl_exec($session);

@@ -50,8 +50,7 @@ class UserPatchCounter extends HashCounter
             ->update([
                 'score' =>
                     $result['visit_count'] +
-                    $result['followers_count'] +
-                    $result['friends_count']
+                    $result['followers_count']
             ]);
     }
 }
