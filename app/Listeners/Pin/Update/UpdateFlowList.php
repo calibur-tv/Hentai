@@ -6,6 +6,7 @@ use App\Http\Repositories\FlowRepository;
 use App\Http\Repositories\TagRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class UpdateFlowList
 {
@@ -27,6 +28,9 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin update flow list begin');
+
+
         if (!$event->published)
         {
             return;
@@ -44,5 +48,7 @@ class UpdateFlowList
         {
             $flowRepository->add_pin($tagSlug, $pinSlug);
         }
+
+        Log::info('update pin update flow list end');
     }
 }

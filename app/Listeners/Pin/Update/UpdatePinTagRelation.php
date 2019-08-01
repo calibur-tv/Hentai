@@ -6,6 +6,7 @@ use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class UpdatePinTagRelation
 {
@@ -27,6 +28,8 @@ class UpdatePinTagRelation
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin tag relation begin');
+
         $pin = $event->pin;
 
         if (!empty($event->detachTags))
@@ -46,5 +49,7 @@ class UpdatePinTagRelation
             }, $event->attachTags);
             $pin->tags()->attach($attachIds);
         }
+
+        Log::info('update pin tag relation end');
     }
 }

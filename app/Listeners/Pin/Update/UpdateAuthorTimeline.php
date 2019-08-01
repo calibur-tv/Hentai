@@ -6,6 +6,7 @@ use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class UpdateAuthorTimeline
 {
@@ -27,6 +28,8 @@ class UpdateAuthorTimeline
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin update author timeline begin');
+
         if (!$event->doPublish)
         {
             return;
@@ -39,5 +42,7 @@ class UpdateAuthorTimeline
 
         $userRepository = new UserRepository();
         $userRepository->timeline($event->user->slug, true);
+
+        Log::info('update pin update author timeline end');
     }
 }

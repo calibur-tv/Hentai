@@ -5,6 +5,7 @@ namespace App\Events\Pin;
 use App\Models\Pin;
 use App\User;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class Update
 {
@@ -35,6 +36,8 @@ class Update
             ->tags()
             ->pluck('slug')
             ->toArray();
+
+        Log::info('update pin fire event');
 
         $this->attachTags = array_diff($tags, $oldTags);
         $this->detachTags = array_diff($oldTags, $tags);

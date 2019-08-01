@@ -6,6 +6,7 @@ use App\Http\Modules\RichContentService;
 use App\User;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class Trial implements ShouldQueue
 {
@@ -27,6 +28,8 @@ class Trial implements ShouldQueue
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin trial begin');
+
         if (!$event->published)
         {
             return;
@@ -47,5 +50,7 @@ class Trial implements ShouldQueue
         {
             $pin->reviewPin(2);
         }
+
+        Log::info('update pin trial end');
     }
 }

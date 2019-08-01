@@ -4,6 +4,7 @@ namespace App\Listeners\Pin\Update;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class UpdatePinTimeline
 {
@@ -25,6 +26,8 @@ class UpdatePinTimeline
      */
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin timeline begin');
+
         $pin = $event->pin;
         $pin->timeline()->create([
             'event_type' => 1,
@@ -38,5 +41,7 @@ class UpdatePinTimeline
                 'event_slug' => $pin->user_slug
             ]);
         }
+
+        Log::info('update pin timeline end');
     }
 }

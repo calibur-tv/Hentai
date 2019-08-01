@@ -17,6 +17,8 @@ class UpdatePinSearch
 
     public function handle(\App\Events\Pin\Update $event)
     {
+        Log::info('update pin search begin');
+
         if (!$event->published || $event->pin->content_type !== 1)
         {
             return;
@@ -47,5 +49,7 @@ class UpdatePinSearch
                 'text' => $text
             ]);
         }
+
+        Log::info('update pin search end');
     }
 }
