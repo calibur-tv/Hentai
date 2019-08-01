@@ -13,7 +13,6 @@ use App\Http\Repositories\UserRepository;
 use App\Services\OpenSearch\Client\OpenSearchClient;
 use App\Services\OpenSearch\Client\SearchClient;
 use App\Services\OpenSearch\Util\SearchParamsBuilder;
-use Illuminate\Support\Facades\Log;
 
 class Search
 {
@@ -53,18 +52,14 @@ class Search
 
         $res = json_decode($this->search->execute($this->params->build())->result, true);
 
-        Log::info('search', [
-            'res' => $res
-        ]);
-
-        if ($res['status'] !== 'OK')
-        {
-            return [
-                'total' => 0,
-                'result' => [],
-                'no_more' => true
-            ];
-        }
+//        if ($res['status'] !== 'OK')
+//        {
+//            return [
+//                'total' => 0,
+//                'result' => [],
+//                'no_more' => true
+//            ];
+//        }
 
         $ret = $res['result'];
         $list = $ret['items'];
@@ -86,7 +81,7 @@ class Search
                 $typeId = $item['type'];
                 $slug = $item['slug'];
                 $repository = $this->getRepositoryByType($typeId);
-                $item = $repository->item($slug);
+                $item = $typeId == 1 ? $repository->relation_item($slug) : $repository->item($slug);
                 if (!$item)
                 {
                     \App\Models\Search
@@ -114,8 +109,8 @@ class Search
     {
         $arr = [
             'all' => 0,
-            'pin' => 1,
-            'tag' => 2,
+            'tag' => 1,
+            'pin' => 2,
             'user' => 3
         ];
 
@@ -138,11 +133,11 @@ class Search
     {
         if ($type == 1)
         {
-            return new PinRepository();
+            return new TagRepository();
         }
         else if ($type == 2)
         {
-            return new TagRepository();
+            return new PinRepository();
         }
         else if ($type == 3)
         {
