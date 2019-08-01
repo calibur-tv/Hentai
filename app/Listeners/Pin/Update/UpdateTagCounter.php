@@ -5,7 +5,6 @@ namespace App\Listeners\Pin\Update;
 use App\Http\Modules\Counter\TagPatchCounter;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Log;
 
 class UpdateTagCounter
 {
@@ -27,8 +26,6 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        Log::info('update pin tag count begin');
-
         if (!$event->doPublish)
         {
             return;
@@ -45,7 +42,5 @@ class UpdateTagCounter
         {
             $tagPatchCounter->add($tagSlug, 'pin_count', 1);
         }
-
-        Log::info('update pin tag count end');
     }
 }

@@ -6,7 +6,6 @@ namespace App\Listeners\Pin\Update;
 
 use App\Http\Repositories\PinRepository;
 use App\Models\Search;
-use Illuminate\Support\Facades\Log;
 
 class UpdatePinSearch
 {
@@ -17,8 +16,6 @@ class UpdatePinSearch
 
     public function handle(\App\Events\Pin\Update $event)
     {
-        Log::info('update pin search begin');
-
         if (!$event->published || $event->pin->content_type !== 1)
         {
             return;
@@ -49,7 +46,5 @@ class UpdatePinSearch
                 'text' => $text
             ]);
         }
-
-        Log::info('update pin search end');
     }
 }
