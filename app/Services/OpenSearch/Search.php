@@ -78,7 +78,7 @@ class Search
         {
             foreach ($list as $item)
             {
-                $typeId = $item['type'];
+                $typeId = (int)$item['type'];
                 $slug = $item['slug'];
                 $repository = $this->getRepositoryByType($typeId);
                 $item = $typeId == 1 ? $repository->relation_item($slug) : $repository->item($slug);
