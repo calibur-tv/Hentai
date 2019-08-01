@@ -52,14 +52,14 @@ class Search
 
         $res = json_decode($this->search->execute($this->params->build())->result, true);
 
-//        if ($res['status'] !== 'OK')
-//        {
-//            return [
-//                'total' => 0,
-//                'result' => [],
-//                'no_more' => true
-//            ];
-//        }
+        if ($res['status'] !== 'OK')
+        {
+            return [
+                'total' => 0,
+                'result' => [],
+                'no_more' => true
+            ];
+        }
 
         $ret = $res['result'];
         $list = $ret['items'];
