@@ -51,18 +51,23 @@ class Search
         );
 
         $res = json_decode($this->search->execute($this->params->build())->result, true);
+        $defResult = [
+            'total' => 0,
+            'result' => [],
+            'no_more' => true
+        ];
 
         if ($res['status'] !== 'OK')
         {
-            return [
-                'total' => 0,
-                'result' => [],
-                'no_more' => true
-            ];
+            return $defResult;
         }
 
         $ret = $res['result'];
         $list = $ret['items'];
+        if (!$list)
+        {
+            return $defResult;
+        }
 
         $result = [];
         if ($typeId)
