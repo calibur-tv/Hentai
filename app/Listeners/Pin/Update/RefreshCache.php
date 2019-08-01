@@ -30,7 +30,7 @@ class RefreshCache
         $pinRepository = new PinRepository();
         $pinRepository->item($pin->slug, true);
 
-        $pinRepository->DeletePage("/pin/{$pin->slug}");
+        // $pinRepository->DeletePage("/pin/{$pin->slug}");
 
         if ($event->doPublish)
         {
