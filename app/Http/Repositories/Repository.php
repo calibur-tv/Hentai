@@ -64,7 +64,7 @@ class Repository
             });
         }
 
-        return $cache;
+        return gettype($cache) === 'object' ? json_decode(json_encode($cache)) : $cache;
     }
 
     public function RedisHash($key, $func, $force = false, $exp = 'd')

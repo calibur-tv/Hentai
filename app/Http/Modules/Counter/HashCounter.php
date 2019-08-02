@@ -83,6 +83,25 @@ class HashCounter
     }
 
     /**
+     * 加减某个值
+     */
+    public function batch($slug, $keys, $value = 1)
+    {
+        $cacheKey = $this->cacheKey($slug);
+        if (!Redis::EXISTS($cacheKey))
+        {
+            $this->save($slug, $this->boot($slug));
+        }
+        else
+        {
+            foreach ($keys as $key)
+            {
+                Redis::HINCRBYFLOAT($cacheKey, $key, $value);
+            }
+        }
+    }
+
+    /**
      * 从DB初始化数据
      */
     public function boot($slug)

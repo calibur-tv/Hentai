@@ -18,9 +18,6 @@ class UpdateVoteCounter
         $pinVoteCounter = new PinVoteCounter();
         $pinSlug = $event->pin->slug;
 
-        foreach ($event->answers as $ans)
-        {
-            $pinVoteCounter->add($pinSlug, $ans, 1, false);
-        }
+        $pinVoteCounter->batch($pinSlug, $event->answers, 1);
     }
 }
