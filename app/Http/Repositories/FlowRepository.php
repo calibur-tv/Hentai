@@ -120,7 +120,8 @@ class FlowRepository extends Repository
                         ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
-                        ->select('slug', 'created_at');
+                        ->select('slug', 'published_at')
+                        ->orderBy('published_at', 'DESC');
                 }])
                 ->select('id')
                 ->get()
@@ -131,7 +132,7 @@ class FlowRepository extends Repository
             {
                 foreach ($list['pins'] as $pin)
                 {
-                    $result[$pin['slug']] = $pin['created_at'];
+                    $result[$pin['slug']] = $pin['published_at'];
                 }
             }
             return $result;
@@ -151,7 +152,8 @@ class FlowRepository extends Repository
                         ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
-                        ->select('slug', 'updated_at');
+                        ->select('slug', 'updated_at')
+                        ->orderBy('updated_at', 'DESC');
                 }])
                 ->select('id')
                 ->get()
