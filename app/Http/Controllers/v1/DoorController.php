@@ -73,6 +73,8 @@ class DoorController extends Controller
         {
             $museNew = true;
             $mustOld = false;
+
+            return $this->resErrServiceUnavailable('暂时关闭手机号注册');
         }
         else if ($type === 'forgot_password')
         {
