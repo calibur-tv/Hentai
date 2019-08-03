@@ -72,7 +72,7 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'user' => App\Http\Middleware\UserMiddleware::class,
     'throttle' => App\Http\Middleware\ThrottleMiddleware::class,
-    'geetest' => App\Http\Middleware\GeetestMiddleware::class,
+    // 'geetest' => App\Http\Middleware\GeetestMiddleware::class,
     'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role' => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
