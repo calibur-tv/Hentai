@@ -107,6 +107,8 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
     $route->get('vote_stat', 'PinController@voteStat');
 
+    $route->get('timeline', 'PinController@timeline');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'PinController@patch');

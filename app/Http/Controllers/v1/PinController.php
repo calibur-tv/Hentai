@@ -7,11 +7,11 @@ use App\Http\Modules\Counter\PinPatchCounter;
 use App\Http\Modules\Counter\PinVoteCounter;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Pin;
 use App\Models\PinAnswer;
 use App\Services\Spider\Query;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class PinController extends Controller
@@ -455,6 +455,49 @@ class PinController extends Controller
         $ids['extra'] = $secret;
 
         return $this->resOK($ids);
+    }
+
+    public function timeline(Request $request)
+    {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
+
+        $pin = Pin
+            ::where('slug', $slug)
+            ->first();
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $timeline = $pin
+            ->timeline()
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('event_type', 'DESC')
+            ->select('event_type', 'event_slug', 'created_at')
+            ->get()
+            ->toArray();
+
+        $result = [];
+        $userRepository = new UserRepository();
+        foreach ($timeline as $item)
+        {
+            $result[] = [
+                'type' => Pin::convertTimeline($item['event_type']),
+                'time' => $item['created_at'],
+                'data' => [
+                    'user' => $userRepository->item($item['event_slug'])
+                ]
+            ];
+        }
+
+        return $this->resOK([
+            'no_more' => true,
+            'result' => $result
+        ]);
     }
 
     /**

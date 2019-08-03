@@ -67,11 +67,27 @@ class Pin extends Model
         /**
          * 0 => 创建帖子
          * 1 => 更新帖子
-         * 2 => 作者删除
+         * 2 => 删除帖子
          * 3 => 公开帖子
          * 4 => 被推荐
          */
         return $this->morphMany('App\Models\Timeline', 'timelineable');
+    }
+
+    public static function convertTimeline($event_type)
+    {
+        if ($event_type == 0) {
+            return '创建帖子';
+        } else if ($event_type == 1) {
+            return '更新帖子';
+        } else if ($event_type == 2) {
+            return '删除帖子';
+        } else if ($event_type == 3) {
+            return '公开帖子';
+        } else if ($event_type == 4) {
+            return '被推荐';
+        }
+        return '未知：' . $event_type;
     }
 
     public function comments()
