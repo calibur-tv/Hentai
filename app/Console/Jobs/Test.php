@@ -30,10 +30,9 @@ class Test extends Command
      */
     public function handle()
     {
-        return true;
         $post = DB
             ::table('posts')
-            ->where('migration_state', 1)
+            ->where('migration_state', '<>', 5)
             ->take(1000)
             ->get()
             ->toArray();
@@ -73,7 +72,7 @@ class Test extends Command
                     ::table('posts')
                     ->where('id', $item->id)
                     ->update([
-                        'migration_state' => 2
+                        'migration_state' => 5
                     ]);
                 continue;
             }
@@ -89,7 +88,7 @@ class Test extends Command
                 ::table('posts')
                 ->where('id', $item->id)
                 ->update([
-                    'migration_state' => 2
+                    'migration_state' => 5
                 ]);
         }
 
