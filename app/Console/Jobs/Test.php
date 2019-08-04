@@ -46,13 +46,28 @@ class Test extends Command
             {
                 $row = str_replace('<p>', '', $row);
                 $row = str_replace('</p>', '', $row);
-                $result[] = [
-                    'type' => 'paragraph',
-                    'data' => [
-                        'text' => $row
-                    ]
-                ];
+                if ($row)
+                {
+                    $result[] = [
+                        'type' => 'paragraph',
+                        'data' => [
+                            'text' => $row
+                        ]
+                    ];
+                }
             }
+
+            if (empty($result))
+            {
+                DB
+                    ::table('posts')
+                    ->where('id', $item->id)
+                    ->update([
+                        'migration_state' => 1
+                    ]);
+                continue;
+            }
+
             $user = User::where('id', $item->user_id)->first();
             $tags = [
                 config('app.tag.topic'),

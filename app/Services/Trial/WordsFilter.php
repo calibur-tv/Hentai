@@ -19,6 +19,11 @@ class WordsFilter
 
         $text = str_replace($this->replace, '', $text);
 
+        if ( ! $text)
+        {
+            return 0;
+        }
+
         $this->loadWords();
         $words = [];
 
@@ -47,6 +52,11 @@ class WordsFilter
         }
 
         $text = str_replace($this->replace, '', $text);
+
+        if ( ! $text)
+        {
+            return 0;
+        }
 
         $this->loadWords();
         $words = [];
@@ -86,19 +96,26 @@ class WordsFilter
 
     public function filter($text)
     {
-        if (!$text)
+        $defaultResp = [
+            'text' => '',
+            'words' => [],
+            'words_1' => [],
+            'words_2' => [],
+            'delete' => false,
+            'review' => false
+        ];
+
+        if ( ! $text)
         {
-            return [
-                'text' => '',
-                'words' => [],
-                'words_1' => [],
-                'words_2' => [],
-                'delete' => false,
-                'review' => false
-            ];
+            return $defaultResp;
         }
 
         $text = str_replace($this->replace, '', $text);
+
+        if ( ! $text)
+        {
+            return $defaultResp;
+        }
 
         $this->loadWords();
         $words = [];
