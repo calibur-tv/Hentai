@@ -30,6 +30,14 @@ class Test extends Command
      */
     public function handle()
     {
+        Pin
+            ::where('content_type', 2)
+            ->whereHas('tags', function ($query)
+            {
+                $query->where('parent_slug', config('app.tag.notebook'));
+            })
+            ->delete();
+
         return true;
     }
 }
