@@ -30,6 +30,7 @@ class Test extends Command
      */
     public function handle()
     {
+        return true;
         $post = DB
             ::table('posts')
             ->where('migration_state', 1)
