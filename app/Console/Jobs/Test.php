@@ -64,16 +64,16 @@ class Test extends Command
                     $result[] = [
                         'type' => 'image',
                         'data' => [
-                            'caption' => $item['text'],
+                            'caption' => $row['text'],
                             'withBorder' => false,
                             'stretched' => false,
                             'withBackground' => false,
                             'file' => [
-                                'height' => $item['height'],
-                                'width' => $item['width'],
-                                'size' => $item['size'],
-                                'mime' => $item['mime'],
-                                'url' => $item['url']
+                                'height' => $row['height'],
+                                'width' => $row['width'],
+                                'size' => $row['size'],
+                                'mime' => $row['mime'],
+                                'url' => $row['url']
                             ]
                         ]
                     ];
