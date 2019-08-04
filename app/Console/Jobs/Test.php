@@ -32,7 +32,7 @@ class Test extends Command
     {
         $post = DB
             ::table('posts')
-            ->where('migration_state', 0)
+            ->where('migration_state', 1)
             ->take(1000)
             ->get()
             ->toArray();
@@ -41,7 +41,12 @@ class Test extends Command
         {
             $content = $item->content;
             $arr = explode('<p><br></p>', $content);
-            $result = [];
+            $result = [
+                'type' => 'title',
+                'data' => [
+                    'text' => $item->title
+                ]
+            ];
             foreach ($arr as $row)
             {
                 $row = str_replace('<p>', '', $row);
@@ -59,13 +64,13 @@ class Test extends Command
 
             $user = User::where('id', $item->user_id)->first();
 
-            if (empty($result) || !$user)
+            if (count($result) === 1 || !$user)
             {
                 DB
                     ::table('posts')
                     ->where('id', $item->id)
                     ->update([
-                        'migration_state' => 1
+                        'migration_state' => 2
                     ]);
                 continue;
             }
@@ -81,7 +86,7 @@ class Test extends Command
                 ::table('posts')
                 ->where('id', $item->id)
                 ->update([
-                    'migration_state' => 1
+                    'migration_state' => 2
                 ]);
         }
 
