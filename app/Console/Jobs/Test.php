@@ -53,7 +53,7 @@ class Test extends Command
                     ]
                 ];
             }
-            $user = User::where('id', $item->user_id);
+            $user = User::where('id', $item->user_id)->first();
             $tags = [
                 config('app.tag.topic'),
                 config('app.tag.newbie')
