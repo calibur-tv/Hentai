@@ -2,6 +2,8 @@
 
 namespace App\Console\Jobs;
 
+use App\Http\Repositories\UserRepository;
+use App\Models\Tag;
 use App\User;
 use Illuminate\Console\Command;
 
@@ -27,14 +29,16 @@ class Test extends Command
     public function handle()
     {
         $users = User
-            ::where('migration_state', '<>', 4)
-            ->take(1000)
+            ::where('migration_state', '<>', 5)
+            ->take(5000)
             ->get();
+
+        $userRepository = new UserRepository();
 
         foreach ($users as $user)
         {
             $level = $user
-                ->tags()
+                ->bookmarks(Tag::class)
                 ->whereIn('parent_slug', [
                     config('app.tag.bangumi'),
                     config('app.tag.game'),
@@ -44,8 +48,10 @@ class Test extends Command
 
             $user->update([
                 'level' => $level,
-                'migration_state' => 4
+                'migration_state' => 5
             ]);
+
+            $userRepository->item($user->slug, true);
         }
 
         return true;
