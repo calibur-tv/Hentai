@@ -57,7 +57,9 @@ class Test extends Command
                 }
             }
 
-            if (empty($result))
+            $user = User::where('id', $item->user_id)->first();
+
+            if (empty($result) || !$user)
             {
                 DB
                     ::table('posts')
@@ -68,7 +70,6 @@ class Test extends Command
                 continue;
             }
 
-            $user = User::where('id', $item->user_id)->first();
             $tags = [
                 config('app.tag.topic'),
                 config('app.tag.newbie')
