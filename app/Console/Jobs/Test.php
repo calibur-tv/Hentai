@@ -39,7 +39,7 @@ class Test extends Command
 
         foreach ($post as $item)
         {
-            $content = $item['content'];
+            $content = $item->content;
             $arr = explode('<p><br></p>', $content);
             $result = [];
             foreach ($arr as $row)
@@ -53,7 +53,7 @@ class Test extends Command
                     ]
                 ];
             }
-            $user = User::where('id', $item['user_id']);
+            $user = User::where('id', $item->user_id);
             $tags = [
                 config('app.tag.topic'),
                 config('app.tag.newbie')
@@ -63,7 +63,7 @@ class Test extends Command
 
             DB
                 ::table('posts')
-                ->where('id', $item['id'])
+                ->where('id', $item->id)
                 ->update([
                     'migration_state' => 1
                 ]);
