@@ -42,9 +42,11 @@ class Test extends Command
             $content = $item->content;
             $arr = explode('<p><br></p>', $content);
             $result = [
-                'type' => 'title',
-                'data' => [
-                    'text' => $item->title
+                [
+                    'type' => 'title',
+                    'data' => [
+                        'text' => $item->title
+                    ]
                 ]
             ];
             foreach ($arr as $row)
