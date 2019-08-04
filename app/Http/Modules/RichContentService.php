@@ -409,9 +409,9 @@ class RichContentService
             return null;
         }
 
-        $banner = $title['banner'];
-        if ($banner)
+        if (isset($title['banner']))
         {
+            $banner = $title['banner'];
             $imageCount++;
         }
         else if ($firstImage)
