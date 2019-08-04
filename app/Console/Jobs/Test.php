@@ -31,7 +31,7 @@ class Test extends Command
     public function handle()
     {
         $post = DB
-            ::table('posts')
+            ::table('scores')
             ->where('migration_state', '<>', 5)
             ->take(1000)
             ->get()
@@ -39,8 +39,7 @@ class Test extends Command
 
         foreach ($post as $item)
         {
-            $content = $item->content;
-            $arr = explode('<p><br></p>', $content);
+            $arr = json_decode($item->content, true);
             $result = [
                 [
                     'type' => 'title',
@@ -51,14 +50,51 @@ class Test extends Command
             ];
             foreach ($arr as $row)
             {
-                $row = str_replace('<p>', '', $row);
-                $row = str_replace('</p>', '', $row);
-                if ($row)
+                if ($row['type'] === 'txt' || $row['type'] === 'use')
                 {
                     $result[] = [
                         'type' => 'paragraph',
                         'data' => [
-                            'text' => $row
+                            'text' => $row['text']
+                        ]
+                    ];
+                }
+                else if ($row['type'] === 'img')
+                {
+                    $result[] = [
+                        'type' => 'image',
+                        'data' => [
+                            'caption' => $item['text'],
+                            'withBorder' => false,
+                            'stretched' => false,
+                            'withBackground' => false,
+                            'file' => [
+                                'height' => $item['height'],
+                                'width' => $item['width'],
+                                'size' => $item['size'],
+                                'mime' => $item['mime'],
+                                'url' => $item['url']
+                            ]
+                        ]
+                    ];
+                }
+                else if ($row['type'] === 'title')
+                {
+                    $result[] = [
+                        'type' => 'header',
+                        'data' => [
+                            'level' => 2,
+                            'text ' => $row['text']
+                        ]
+                    ];
+                }
+                else if ($row['type'] === 'list')
+                {
+                    $result[] = [
+                        'type' => 'list',
+                        'data' => [
+                            'style' => $row['sort'] ? 'ordered' : 'unordered',
+                            'items' => explode('\n', $row['text'])
                         ]
                     ];
                 }
@@ -69,7 +105,7 @@ class Test extends Command
             if (count($result) === 1 || !$user)
             {
                 DB
-                    ::table('posts')
+                    ::table('scores')
                     ->where('id', $item->id)
                     ->update([
                         'migration_state' => 5
@@ -85,7 +121,7 @@ class Test extends Command
             Pin::createPin($result, 1, false, $user, $tags);
 
             DB
-                ::table('posts')
+                ::table('scores')
                 ->where('id', $item->id)
                 ->update([
                     'migration_state' => 5
