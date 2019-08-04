@@ -94,6 +94,17 @@ class ATFieldController extends Controller
             return $this->resErrNotFound();
         }
 
+        if (!in_array(
+            $tag->parent_slug,
+            [
+                config('app.tag.bangumi'),
+                config('app.tag.game'),
+                config('app.tag.newbie')
+            ]
+        )) {
+            return $this->resErrBad('暂不支持开放的分区');
+        }
+
         $content = [
             [
                 'type' => 'title',
