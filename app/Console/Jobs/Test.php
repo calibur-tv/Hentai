@@ -84,7 +84,7 @@ class Test extends Command
                         'type' => 'header',
                         'data' => [
                             'level' => 2,
-                            'text ' => $row['text']
+                            'text' => $row['text']
                         ]
                     ];
                 }
