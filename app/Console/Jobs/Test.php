@@ -3,9 +3,11 @@
 namespace App\Console\Jobs;
 
 use App\Http\Repositories\UserRepository;
+use App\Models\Pin;
 use App\Models\Tag;
 use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class Test extends Command
 {
@@ -28,30 +30,43 @@ class Test extends Command
      */
     public function handle()
     {
-        $users = User
-            ::where('migration_state', '<>', 5)
-            ->take(5000)
-            ->get();
+        $post = DB
+            ::table('posts')
+            ->where('migration_state', 0)
+            ->take(1000)
+            ->get()
+            ->toArray();
 
-        $userRepository = new UserRepository();
-
-        foreach ($users as $user)
+        foreach ($post as $item)
         {
-            $level = $user
-                ->bookmarks(Tag::class)
-                ->whereIn('parent_slug', [
-                    config('app.tag.bangumi'),
-                    config('app.tag.game'),
-                    config('app.tag.topic')
-                ])
-                ->count();
+            $content = $item['content'];
+            $arr = explode('<p><br></p>', $content);
+            $result = [];
+            foreach ($arr as $row)
+            {
+                $row = str_replace('<p>', '', $row);
+                $row = str_replace('</p>', '', $row);
+                $result[] = [
+                    'type' => 'paragraph',
+                    'data' => [
+                        'text' => $row
+                    ]
+                ];
+            }
+            $user = User::where('id', $item['user_id']);
+            $tags = [
+                config('app.tag.topic'),
+                config('app.tag.newbie')
+            ];
 
-            $user->update([
-                'level' => $level,
-                'migration_state' => 5
-            ]);
+            Pin::createPin($result, 1, false, $user, $tags);
 
-            $userRepository->item($user->slug, true);
+            DB
+                ::table('posts')
+                ->where('id', $item['id'])
+                ->update([
+                    'migration_state' => 1
+                ]);
         }
 
         return true;
