@@ -10,6 +10,8 @@ namespace App\Models;
 
 
 use App\Services\Relation\Traits\CanBeBookmarked;
+use App\Services\Relation\Traits\CanBookmark;
+use App\Services\Relation\Traits\CanFollow;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Relation\Traits\CanBeFollowed;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,7 +20,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Tag extends Model
 {
-    use CanBeFollowed, CanBeBookmarked, HasRoles, SoftDeletes;
+    use CanBeFollowed, CanBeBookmarked, HasRoles, SoftDeletes,
+        CanBookmark,        // 标记的用户就是班长
+        CanFollow;          // 关注的 tag 就是相关板块
 
     protected $guard_name = 'api';
 

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Services\Relation\Traits\CanBeBookmarked;
 use App\Services\Relation\Traits\CanBeFollowed;
 use App\Services\Trial\WordsFilter;
 use Illuminate\Auth\Authenticatable;
@@ -25,7 +26,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
     use Authenticatable, Authorizable, SoftDeletes, HasRoles,
         CanFollow, CanLike, CanBookmark, CanFavorite, CanVote, CanSubscribe,
-        CanBeFollowed;
+        CanBeFollowed, CanBeBookmarked;
 
     protected $guard_name = 'api';
 

@@ -55,6 +55,7 @@ class TagController extends Controller
 
         $tagId = slug2id($slug);
         $patch['is_marked'] = $user->hasBookmarked($tagId, Tag::class);
+        $patch['is_master'] = $user->isBookmarkedBy($tagId, Tag::class);
 
         return $this->resOK($patch);
     }
