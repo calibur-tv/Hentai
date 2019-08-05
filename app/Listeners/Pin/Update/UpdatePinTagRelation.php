@@ -27,6 +27,11 @@ class UpdatePinTagRelation
     {
         $pin = $event->pin;
 
+        if ($event->published && !$event->canMovePin)
+        {
+            return;
+        }
+
         if (!empty($event->detachTags))
         {
             $detachIds = array_map(function ($slug)

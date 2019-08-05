@@ -17,6 +17,7 @@ class Update
     public $published;
     public $attachTags;
     public $detachTags;
+    public $canMovePin;
 
     /**
      * Create a new event instance.
@@ -30,6 +31,7 @@ class Update
         $this->tags = $tags;
         $this->doPublish = $publish;
         $this->published = !!$pin->published_at;
+        $this->canMovePin = $user->can('move_pin');
 
         $oldTags = $pin
             ->tags()
