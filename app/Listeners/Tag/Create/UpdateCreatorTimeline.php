@@ -21,11 +21,22 @@ class UpdateCreatorTimeline
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Tag\Create  $event
      * @return void
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if (
+            !in_array($event->tag->parent_slug, [
+                config('app.tag.topic'),
+                config('app.tag.bangumi'),
+                config('app.tag.game')
+            ])
+        )
+        {
+            return;
+        }
+
         $user = $event->user;
         $user->timeline()->create([
             'event_type' => 2,
