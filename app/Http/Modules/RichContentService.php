@@ -409,6 +409,7 @@ class RichContentService
             return null;
         }
 
+        $banner = null;
         if (isset($title['banner']))
         {
             $banner = $title['banner'];
