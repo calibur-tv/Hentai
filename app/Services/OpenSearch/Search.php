@@ -123,10 +123,10 @@ class Search
         {
             if (gettype($modal) === 'string')
             {
-                return $arr[$modal] ?: 0;
+                return $arr[$modal] ?? 0;
             }
 
-            return array_flip($arr)[$modal] ?: 'all';
+            return array_flip($arr)[$modal] ?? 'all';
         }
         catch (\Exception $e)
         {
