@@ -99,7 +99,7 @@ class ATFieldController extends Controller
             [
                 config('app.tag.bangumi'),
                 config('app.tag.game'),
-                config('app.tag.newbie')
+                config('app.tag.topic')
             ]
         )) {
             return $this->resErrBad('暂不支持开放的分区');
