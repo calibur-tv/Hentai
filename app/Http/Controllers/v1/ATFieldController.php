@@ -470,11 +470,17 @@ class ATFieldController extends Controller
     {
         $tag_slug = $request->get('tag_slug');
         $invite_slug = $request->get('user_slug');
+        $user = $request->user();
 
         $tag = Tag::where('slug', $tag_slug)->first();
         if (is_null($tag))
         {
             return $this->resErrNotFound();
+        }
+
+        if (!$user->isBookmarkedBy($tag))
+        {
+            return $this->resErrRole('只有班长才能进行该操作');
         }
 
         $rule = QuestionRule
