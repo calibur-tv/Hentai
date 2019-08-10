@@ -10,6 +10,7 @@ use App\Models\PinAnswer;
 use App\Models\QuestionRule;
 use App\Models\QuestionSheet;
 use App\Models\Tag;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -36,7 +37,7 @@ class ATFieldController extends Controller
             'tag_slug' => 'required|string',
             'question_count' => 'required|integer|max:100|min:1',
             'right_rate' => 'required|integer|max:100|min:50',
-            'qa_minutes' => 'required|integer|max:120|min:30',
+            'qa_minutes' => 'required|integer|max:120|min:10',
             'rule_type' => 'required|integer',
             'result_type' => 'required|integer',
         ]);
@@ -275,6 +276,11 @@ class ATFieldController extends Controller
             return $this->resOK('no_rule');
         }
 
+        if ($rule->rule_type == 1)
+        {
+            return $this->resErrRole('该分区只能邀请加入');
+        }
+
         $pins = Pin
             ::where('content_type', 2)
             ->whereHas('tags', function ($query) use ($slug)
@@ -427,7 +433,10 @@ class ATFieldController extends Controller
             'result_type' => 1
         ]);
 
-        event(new \App\Events\User\JoinZone($user, $tag));
+        if (!$tag->isBookmarkedBy($user))
+        {
+            event(new \App\Events\User\JoinZone($user, $tag));
+        }
 
         return $this->resOK('pass');
     }
@@ -452,5 +461,49 @@ class ATFieldController extends Controller
         }
 
         return $this->resOK([]);
+    }
+
+    /**
+     * 邀请用户加入
+     */
+    public function invite(Request $request)
+    {
+        $tag_slug = $request->get('tag_slug');
+        $invite_slug = $request->get('user_slug');
+
+        $tag = Tag::where('slug', $tag_slug)->first();
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $rule = QuestionRule
+            ::where('tag_slug', $tag_slug)
+            ->first();
+
+        if (is_null($rule))
+        {
+            return $this->resErrNotFound('还未制定分区规则');
+        }
+
+        if ($rule->rule_type == 2)
+        {
+            return $this->resErrBad('该分区不支持邀请加入');
+        }
+
+        $invite = User::where('slug', $invite_slug)->first();
+        if (is_null($invite))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($tag->isBookmarkedBy($invite))
+        {
+            return $this->resErrBad('用户已加入');
+        }
+
+        event(new \App\Events\User\JoinZone($invite, $tag));
+
+        return $this->resNoContent();
     }
 }
