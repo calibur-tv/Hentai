@@ -60,6 +60,17 @@ class TagController extends Controller
         return $this->resOK($patch);
     }
 
+    /**
+     * 返回热门 tag
+     */
+    public function hottest()
+    {
+        $tagRepository = new TagRepository();
+        $hottest = $tagRepository->hottest();
+
+        return $this->resOK($hottest);
+    }
+
     public function batchPatch(Request $request)
     {
         $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];

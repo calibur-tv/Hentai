@@ -110,6 +110,41 @@ class TagRepository extends Repository
         }, $refresh);
     }
 
+    public function hottest()
+    {
+        $result = $this->RedisItem('hottest-sub-area', function ()
+        {
+            $tag = Tag
+                ::whereIn('parent_slug', [
+                    config('app.tag.bangumi'),
+                    config('app.tag.topic'),
+                    config('app.tag.game')
+                ])
+                ->orderBy('activity_stat', 'desc')
+                ->orderBy('pin_count', 'desc')
+                ->orderBy('followers_count', 'desc')
+                ->orderBy('seen_user_count', 'desc')
+                ->take(10)
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
+                ->get();
+
+            return TagItemResource::collection($tag);
+        });
+
+        if (gettype($result) === 'string')
+        {
+            $result = json_decode($result, true);
+        }
+        return $result;
+    }
+
     public function search()
     {
         $result = $this->RedisItem('tag-all-search', function ()
