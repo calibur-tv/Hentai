@@ -120,7 +120,6 @@ class TagRepository extends Repository
                     config('app.tag.topic'),
                     config('app.tag.game')
                 ])
-                ->where('pin_count', '>', 0)
                 ->orderBy('activity_stat', 'desc')
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
