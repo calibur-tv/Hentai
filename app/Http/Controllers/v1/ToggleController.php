@@ -136,19 +136,27 @@ class ToggleController extends Controller
             ->where('user_slug', $user->slug)
             ->first();
 
-        if (!is_null($pinAnswer))
+        if (is_null($pinAnswer))
         {
-            return $this->resErrBad('已投过票');
+            PinAnswer::create([
+                'pin_slug' => $pinSlug,
+                'user_slug' => $user->slug,
+                'selected_uuid' => json_encode($requestAnswers),
+                'is_right' => (bool)count(array_intersect($requestAnswers, $vote['right_ids']))
+            ]);
+
+            event(new \App\Events\Pin\Vote($pin, $user, $requestAnswers));
         }
+        else
+        {
+            $oldAnswer = json_decode($pinAnswer->selected_uuid, true);
+            $pinAnswer->update([
+                'selected_uuid' => json_encode($requestAnswers),
+                'is_right' => (bool)count(array_intersect($requestAnswers, $vote['right_ids']))
+            ]);
 
-        PinAnswer::create([
-            'pin_slug' => $pinSlug,
-            'user_slug' => $user->slug,
-            'selected_uuid' => json_encode($requestAnswers),
-            'is_right' => (bool)count(array_intersect($requestAnswers, $vote['right_ids']))
-        ]);
-
-        event(new \App\Events\Pin\Vote($pin, $user, $requestAnswers));
+            event(new \App\Events\Pin\ReVote($pin, $user, $requestAnswers, $oldAnswer));
+        }
 
         return $this->resNoContent();
     }

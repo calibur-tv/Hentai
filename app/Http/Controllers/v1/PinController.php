@@ -94,7 +94,7 @@ class PinController extends Controller
             $patch['reward_status'] = false;
         }
 
-        if ($pin->badge === 'vote' && $user)
+        if ($pin->badge === '投票' && $user)
         {
             $hashStr = PinAnswer
                 ::where('pin_slug', $slug)
