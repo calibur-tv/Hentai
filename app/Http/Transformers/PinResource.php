@@ -29,11 +29,27 @@ class PinResource extends JsonResource
         {
             $title = array_shift($content)['data'];
         }
-        $badge = 'article';
-        $vote = $richContentService->getFirstType($content, 'vote');
-        if ($vote)
+        $media = $richContentService->parseRichPoster($title, $content);
+        $badge = '帖子';
+        if ($richContentService->getFirstType($content, 'baidu'))
         {
-            $badge = 'vote';
+            $badge = '网盘';
+        }
+        else if ($richContentService->getFirstType($content, 'vote'))
+        {
+            $badge = '投票';
+        }
+        else if ($richContentService->getFirstType($content, 'music'))
+        {
+            $badge = '音乐';
+        }
+        else if ($richContentService->getFirstType($content, 'video'))
+        {
+            $badge = '视频';
+        }
+        else if ($media['image_count'] >= 9)
+        {
+            $badge = '图集';
         }
 
         return [
@@ -41,7 +57,7 @@ class PinResource extends JsonResource
             'title' => $title,
             'badge' => $badge,
             'content' => $content,
-            'media' => $richContentService->parseRichPoster($title, $content),
+            'media' => $media,
             'intro' => $richContentService->paresPureContent($content),
             'author' => new UserItemResource($this->author),
             'area' => new TagItemResource($this->area),

@@ -49,7 +49,7 @@ class UpdateFlowListCache
 
         foreach ($tags as $tagSlug)
         {
-            $flowRepository->add_pin($tagSlug, $slug);
+            $flowRepository->update_pin($tagSlug, $slug);
         }
 
         $pin->update([

@@ -177,6 +177,12 @@ class FlowRepository extends Repository
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
     }
 
+    public function update_pin($tagSlug, $pinSlug)
+    {
+        $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
+        $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
+    }
+
     public function del_pin($tagSlug, $pinSlug)
     {
         $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);

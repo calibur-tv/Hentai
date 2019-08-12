@@ -21,7 +21,7 @@ class UpdateFlowList
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Pin\Create  $event
+     * @param  \App\Events\Pin\Update  $event
      * @return void
      */
     public function handle(\App\Events\Pin\Update $event)
