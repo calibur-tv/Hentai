@@ -31,6 +31,18 @@ class Test extends Command
      */
     public function handle()
     {
+        $list = Pin
+            ::where('content_type', 2)
+            ->whereNull('published_at')
+            ->pluck('slug')
+            ->toArray();
+
+        $pinRepository = new PinRepository();
+        foreach ($list as $slug)
+        {
+            $pinRepository->item($slug, true);
+        }
+
         return true;
     }
 }
