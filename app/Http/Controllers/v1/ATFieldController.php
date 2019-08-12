@@ -352,6 +352,10 @@ class ATFieldController extends Controller
         }
 
         $result = $pinRepository->list($pins);
+        $result = array_filter($result, function($item)
+        {
+            return !$item['deleted_at'];
+        });
 
         return $this->resOK([
             'extra' => [
