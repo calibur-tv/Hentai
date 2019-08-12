@@ -228,6 +228,7 @@ class RichContentService
 
     public function parseRichContent(string $data)
     {
+        return json_decode($data, true);
         $data = json_decode($data, true);
         $result = [];
         foreach ($data as $row)

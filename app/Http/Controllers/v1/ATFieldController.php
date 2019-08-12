@@ -356,6 +356,29 @@ class ATFieldController extends Controller
         {
             return !$item->deleted_at;
         });
+        $result = array_map(function ($item)
+        {
+            $result = [];
+            foreach ($item->content as $row)
+            {
+                if ($row->type === 'vote')
+                {
+                    // 过滤掉答案
+                    unset($row->data->right_ids);
+                    $result[] = [
+                        'type' => 'vote',
+                        'data' => $row->data
+                    ];
+                }
+                else
+                {
+                    $result[] = $row;
+                }
+            }
+
+            $item->content = $result;
+            return $item;
+        }, $result);
 
         return $this->resOK([
             'extra' => [
