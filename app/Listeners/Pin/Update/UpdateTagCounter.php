@@ -26,7 +26,7 @@ class UpdateTagCounter
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        if (!$event->doPublish)
+        if (!$event->doPublish || $event->pin->content_type != 1)
         {
             return;
         }

@@ -26,7 +26,7 @@ class UpdateFlowList
      */
     public function handle(\App\Events\Pin\Delete $event)
     {
-        if (!$event->published)
+        if (!$event->published || $event->pin->content_type != 1)
         {
             return;
         }

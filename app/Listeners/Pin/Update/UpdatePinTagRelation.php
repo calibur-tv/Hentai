@@ -25,9 +25,7 @@ class UpdatePinTagRelation
      */
     public function handle(\App\Events\Pin\Update $event)
     {
-        $pin = $event->pin;
-
-        if ($event->published && !$event->canMovePin)
+        if (($event->published && !$event->canMovePin) || $event->pin->content_type != 1)
         {
             return;
         }
@@ -38,7 +36,7 @@ class UpdatePinTagRelation
             {
                 return slug2id($slug);
             }, $event->detachTags);
-            $pin->tags()->detach($detachIds);
+            $event->pin->tags()->detach($detachIds);
         }
 
         if (!empty($event->attachTags))
@@ -47,7 +45,7 @@ class UpdatePinTagRelation
             {
                 return slug2id($slug);
             }, $event->attachTags);
-            $pin->tags()->attach($attachIds);
+            $event->pin->tags()->attach($attachIds);
         }
     }
 }

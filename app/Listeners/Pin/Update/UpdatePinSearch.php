@@ -16,7 +16,7 @@ class UpdatePinSearch
 
     public function handle(\App\Events\Pin\Update $event)
     {
-        if (!$event->published || $event->pin->content_type !== 1)
+        if (!$event->published || $event->pin->content_type != 1)
         {
             return;
         }
