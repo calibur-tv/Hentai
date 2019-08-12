@@ -225,7 +225,8 @@ class ATFieldController extends Controller
             {
                 return $query
                     ->whereNotNull('recommended_at')
-                    ->orderBy('like_count', $sort === 'like_desc' ? 'DESC' : 'ASC');
+                    ->orderBy('like_count', $sort === 'like_desc' ? 'DESC' : 'ASC')
+                    ->orderBy('id', 'ASC');
             })
             ->when($slug, function ($query) use ($slug)
             {
