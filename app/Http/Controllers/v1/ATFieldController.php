@@ -257,6 +257,7 @@ class ATFieldController extends Controller
     {
         $user = $request->user();
         $slug = $request->get('slug');
+        $retry = $request->get('retry') ?: false;
 
         $sheet = QuestionSheet
             ::where('user_slug', $user->slug)
@@ -265,7 +266,14 @@ class ATFieldController extends Controller
 
         if ($sheet)
         {
-            return $this->resOK($sheet->result_type == 0 ? 'pending' : 'resolve');
+            if ($retry)
+            {
+                $sheet->delete();
+            }
+            else
+            {
+                return $this->resOK($sheet->result_type == 0 ? 'pending' : 'resolve');
+            }
         }
 
         $rule = QuestionRule
