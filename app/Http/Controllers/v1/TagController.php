@@ -177,7 +177,7 @@ class TagController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($tag->creator_slug !== $user->slug)
+        if ($tag->creator_slug !== $user->slug && !$user->is_admin)
         {
             return $this->resErrRole();
         }
