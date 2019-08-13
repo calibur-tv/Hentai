@@ -210,6 +210,19 @@ class UserController extends Controller
         return $this->resOK();
     }
 
+    public function getRoles(Request $request)
+    {
+        $user = $request->user();
+        $permissions = $user->getPermissionsViaRoles();
+        $result = [];
+        foreach ($permissions as $item)
+        {
+            $result[] = $item['name'];
+        }
+
+        return $this->resOK($result);
+    }
+
     /**
      * 每日签到
      */

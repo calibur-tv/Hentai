@@ -55,6 +55,8 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->post('update_info', 'UserController@updateProfile');
 
         $route->post('daily_sign', 'UserController@dailySign');
+
+        $route->get('roles', 'UserController@getRoles');
     });
 });
 
