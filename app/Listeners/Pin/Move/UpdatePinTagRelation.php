@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\Pin\Update;
+namespace App\Listeners\Pin\Move;
 
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,16 +20,11 @@ class UpdatePinTagRelation
     /**
      * Handle the event.
      *
-     * @param  \App\Events\Pin\Update  $event
+     * @param  \App\Events\Pin\Move  $event
      * @return void
      */
-    public function handle(\App\Events\Pin\Update $event)
+    public function handle(\App\Events\Pin\Move $event)
     {
-        if ($event->published || $event->pin->content_type != 1)
-        {
-            return;
-        }
-
         if (!empty($event->detachTags))
         {
             $detachIds = array_map(function ($slug)

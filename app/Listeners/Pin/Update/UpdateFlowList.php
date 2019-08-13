@@ -41,7 +41,7 @@ class UpdateFlowList
                 $flowRepository->add_pin($tagSlug, $pinSlug);
             }
         }
-        else if ($event->canMovePin)
+        else
         {
             foreach ($event->detachTags as $tagSlug)
             {

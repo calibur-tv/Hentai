@@ -360,6 +360,28 @@ class PinController extends Controller
         return $this->resNoContent();
     }
 
+    public function movePin(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('move_pin'))
+        {
+            return $this->resErrRole();
+        }
+
+        $pin = Pin
+            ::where('slug', $request->get('slug'))
+            ->first();
+        if (is_null($pin))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $tags = $request->get('tags');
+        event(new \App\Events\Pin\Move($pin, $user, $tags));
+
+        return $this->resOK();
+    }
+
     public function getEditableContent(Request $request)
     {
         $slug = $request->get('slug');
@@ -498,14 +520,6 @@ class PinController extends Controller
             'no_more' => true,
             'result' => $result
         ]);
-    }
-
-    /**
-     * 举报入口，修改 trial_type
-     */
-    public function report(Request $request)
-    {
-
     }
 
     /**

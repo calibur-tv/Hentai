@@ -40,6 +40,14 @@ class PinRepository extends Repository
             $pin->notebook = $pin
                 ->tags()
                 ->where('parent_slug', config('app.tag.notebook'))
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
                 ->orderBy('id', 'ASC')
                 ->first();
 
@@ -49,12 +57,28 @@ class PinRepository extends Repository
                     config('app.tag.bangumi'),
                     config('app.tag.game')
                 ])
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
                 ->orderBy('id', 'ASC')
                 ->first();
 
             $pin->topic = $pin
                 ->tags()
                 ->where('parent_slug', config('app.tag.topic'))
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
                 ->orderBy('id', 'ASC')
                 ->first();
 

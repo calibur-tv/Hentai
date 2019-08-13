@@ -111,45 +111,30 @@ $route->group(['prefix' => 'pin'], function () use ($route)
 
     $route->get('timeline', 'PinController@timeline');
 
+    $route->get('batch_patch', 'PinController@batchPatch');
+
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'PinController@patch');
     });
 
-    $route->get('batch_patch', 'PinController@batchPatch');
-
-    $route->group(['prefix' => 'update', 'middleware' => ['auth']], function () use ($route)
-    {
-        $route->get('content', 'PinController@getEditableContent');
-
-        $route->post('story', 'PinController@updateStory');
-    });
-
-    // $route->group(['middleware' => ['auth', 'throttle']], function () use ($route)
     $route->group(['middleware' => ['auth']], function () use ($route)
     {
-        $route->group(['prefix' => 'create'], function () use ($route)
-        {
-            $route->post('story', 'PinController@createStory');
-        });
+        $route->post('create/story', 'PinController@createStory');
+
+        $route->get('update/content', 'PinController@getEditableContent');
+
+        $route->post('update/story', 'PinController@updateStory');
 
         $route->post('delete', 'PinController@deletePin');
 
-        $route->post('report', 'PinController@report');
+        $route->post('move', 'PinController@movePin');
 
-        $route->post('mark', 'PinController@mark');
-
-        $route->post('vote', 'PinController@vote');
-
-        $route->post('reward', 'PinController@reward');
-
-        $route->post('share', 'PinController@share');
+        $route->get('drafts', 'PinController@userDrafts');
     });
 
     $route->group(['middleware' => 'auth'], function () use ($route)
     {
-        $route->get('drafts', 'PinController@userDrafts');
-
         $route->get('trials', 'PinController@trials');
 
         $route->post('resolve', 'PinController@resolve');
