@@ -87,6 +87,8 @@ class Pin extends Model
             return '公开帖子';
         } else if ($event_type == 4) {
             return '被推荐';
+        } else if ($event_type == 5) {
+            return '修改分区';
         }
         return '未知：' . $event_type;
     }
