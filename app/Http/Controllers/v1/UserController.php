@@ -345,6 +345,11 @@ class UserController extends Controller
         return $this->resOK($result);
     }
 
+    public function managers()
+    {
+        $userRepository = new UserRepository();
+    }
+
     /**
      * 审核中的用户（修改用户数据的时候有可能进审核）
      */

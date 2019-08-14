@@ -180,6 +180,14 @@ class UserRepository extends Repository
         ];
     }
 
+    public function managers()
+    {
+        return $this->RedisItem('calibur-managers', function ()
+        {
+
+        });
+    }
+
     public function getWechatAccessToken()
     {
         return $this->RedisItem('wechat_js_sdk_access_token', function ()
