@@ -25,6 +25,11 @@ class UpdateTagSearch
             ->where('slug', $tag->slug)
             ->first();
 
+        if (!$search)
+        {
+            return;
+        }
+
         $text = $txtTag->alias;
 
         $search->update([

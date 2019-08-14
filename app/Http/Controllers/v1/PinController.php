@@ -362,6 +362,12 @@ class PinController extends Controller
 
     public function movePin(Request $request)
     {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
+
         $user = $request->user();
         if ($user->cant('move_pin'))
         {
@@ -369,7 +375,7 @@ class PinController extends Controller
         }
 
         $pin = Pin
-            ::where('slug', $request->get('slug'))
+            ::where('slug', $slug)
             ->first();
         if (is_null($pin))
         {
