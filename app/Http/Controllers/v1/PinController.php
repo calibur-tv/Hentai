@@ -383,6 +383,7 @@ class PinController extends Controller
         }
 
         $tags = $request->get('tags');
+        $tags[] = config('app.tag.topic');
         event(new \App\Events\Pin\Move($pin, $user, $tags));
 
         return $this->resOK();
