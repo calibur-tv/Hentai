@@ -348,6 +348,8 @@ class UserController extends Controller
     public function managers()
     {
         $userRepository = new UserRepository();
+
+        return $this->resOK($userRepository->managers());
     }
 
     /**

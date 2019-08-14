@@ -12,6 +12,7 @@ namespace App\Http\Repositories;
 use App\Http\Transformers\User\UserHomeResource;
 use App\Services\Qiniu\Http\Client;
 use App\User;
+use Spatie\Permission\Models\Role;
 
 class UserRepository extends Repository
 {
@@ -180,12 +181,34 @@ class UserRepository extends Repository
         ];
     }
 
-    public function managers()
+    public function managers($refresh = false)
     {
-        return $this->RedisItem('calibur-managers', function ()
+        $cache = $this->RedisItem('school-managers', function ()
         {
+            $roles = Role
+                ::pluck('name')
+                ->toArray();
 
-        });
+            $result = [];
+
+            foreach ($roles as $name)
+            {
+                $result[$name] = User
+                    ::role($name)
+                    ->pluck('slug')
+                    ->toArray();
+            }
+
+            return $result;
+        }, $refresh);
+
+        $result = [];
+        foreach ($cache as $key => $val)
+        {
+            $result[$key] = $this->list($val);
+        }
+
+        return $result;
     }
 
     public function getWechatAccessToken()
