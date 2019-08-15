@@ -146,7 +146,7 @@ class ATFieldController extends Controller
     public function delete(Request $request)
     {
         $user = $request->user();
-        if (!$user->is_admin)
+        if ($user->cant('delete_qa'))
         {
             return $this->resErrRole();
         }
@@ -170,7 +170,7 @@ class ATFieldController extends Controller
     public function recommend(Request $request)
     {
         $user = $request->user();
-        if (!$user->is_admin)
+        if ($user->cant('trial_qa'))
         {
             return $this->resErrRole();
         }
@@ -204,7 +204,7 @@ class ATFieldController extends Controller
     public function flow(Request $request)
     {
         $user = $request->user();
-        if (!$user->is_admin)
+        if ($user->cant('visit_qa'))
         {
             return $this->resErrRole();
         }
