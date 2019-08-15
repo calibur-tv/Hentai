@@ -31,6 +31,21 @@ class Test extends Command
      */
     public function handle()
     {
+        $tags = Tag::where('migration_state', '<>', 7)
+            ->take(1000)
+            ->get();
+
+
+        $userRepository = new UserRepository();
+        foreach ($tags as $tag)
+        {
+            $user = $userRepository->item($tag->creator_slug);
+            $tag->bookmark($user);
+            $tag->update([
+                'migration_state' => 7
+            ]);
+        }
+
         return true;
     }
 }

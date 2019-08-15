@@ -60,6 +60,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Pin\Delete\RemovePinSearch',
         ],
         'App\Events\Tag\Create' => [
+            'App\Listeners\Tag\Create\InitTagMaster',
             'App\Listeners\Tag\Create\InitTagTimeline',
             'App\Listeners\Tag\Create\UpdateCreatorBookmark',
             'App\Listeners\Tag\Create\UpdateCreatorTimeline',

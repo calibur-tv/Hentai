@@ -593,7 +593,7 @@ class ATFieldController extends Controller
 
         if (!$user->isBookmarkedBy($tag))
         {
-            return $this->resErrBad();
+            return $this->resErrRole('你不是现任班长');
         }
 
         $master = User
