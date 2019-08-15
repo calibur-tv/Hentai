@@ -38,7 +38,7 @@ class CreateQuestionRule
         }
 
         $tag->rule()->create([
-            'question_count' => 10,
+            'question_count' => 5,
             'qa_minutes' => 5,
             'right_rate' => 100,
             'result_type' => $tag->parent_slug === config('app.tag.topic') ? 1 : 0
