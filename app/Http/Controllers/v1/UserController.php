@@ -395,12 +395,13 @@ class UserController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($target->is_admin)
+        $roleName = $request->get('role');
+        if ($target->is_admin || in_array($roleName, ['班长']))
         {
             return $this->resErrRole('无法完成该操作');
         }
 
-        $role = Role::findByName($request->get('role'));
+        $role = Role::findByName($roleName);
 
         if (is_null($role))
         {
@@ -444,7 +445,7 @@ class UserController extends Controller
         }
 
         $roleName = $request->get('role');
-        if (in_array($roleName, ['站长', '管理员', '学生会长']))
+        if (in_array($roleName, ['站长', '管理员', '学生会长', '班长']))
         {
             return $this->resErrRole('无法完成该操作');
         }
