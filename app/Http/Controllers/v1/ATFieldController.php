@@ -59,7 +59,7 @@ class ATFieldController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($user->cant('change_tag_rule') || !$user->isBookmarkedBy($tag))
+        if ($user->cant('change_tag_rule') || !$user->favorite($tag))
         {
             return $this->resErrRole();
         }
@@ -531,7 +531,7 @@ class ATFieldController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($user->cant('invite_user') || !$user->isBookmarkedBy($tag))
+        if ($user->cant('invite_user') || !$user->favorite($tag))
         {
             return $this->resErrRole('只有班长才能进行该操作');
         }
@@ -591,7 +591,7 @@ class ATFieldController extends Controller
             return $this->resErrNotFound();
         }
 
-        if (!$user->isBookmarkedBy($tag))
+        if (!$user->favorite($tag))
         {
             return $this->resErrRole('你不是现任班长');
         }
@@ -615,8 +615,8 @@ class ATFieldController extends Controller
         $master->update([
             'title' => json_encode($user->getRoleNames(), JSON_UNESCAPED_UNICODE)
         ]);
-        $tag->bookmark($master);
-        $tag->unbookmark($user);
+        $master->favorite($tag, Tag::class);
+        $user->unfavorite($tag, Tag::class);
         $user->unbookmark($tag);
         if (!$tag->isBookmarkedBy($master))
         {

@@ -25,6 +25,6 @@ class InitTagMaster
      */
     public function handle(\App\Events\Tag\Create $event)
     {
-        $event->tag->bookmark($event->user);
+        $event->user->favorite($event->tag);
     }
 }
