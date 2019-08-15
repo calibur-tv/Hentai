@@ -39,7 +39,10 @@ class Test extends Command
         foreach ($tags as $tag)
         {
             $user = User::where('slug', $tag->creator_slug)->first();
-            $user->favorite($tag, Tag::class);
+            if ($user)
+            {
+                $user->favorite($tag, Tag::class);
+            }
             $tag->update([
                 'migration_state' => 7
             ]);
