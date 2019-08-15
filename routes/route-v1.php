@@ -166,6 +166,8 @@ $route->group(['prefix' => 'atfield', 'middleware' => 'auth'], function () use (
 
     $route->post('invite', 'ATFieldController@invite');
 
+    $route->post('change_master', 'ATFieldController@changeMaster');
+
     $route->get('list', 'ATFieldController@list');
 
     $route->post('submit', 'ATFieldController@submit');

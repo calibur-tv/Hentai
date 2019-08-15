@@ -139,7 +139,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         /**
          * 用户注册 -> 0
-         * 收藏分区 -> 1
+         * 加入分区 -> 1
          * 创建分区 -> 2
          * 创建文章 -> 3
          */

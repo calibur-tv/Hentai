@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Pin;
 use App\Models\PinAnswer;
 use App\Models\QuestionRule;
@@ -14,6 +15,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class ATFieldController extends Controller
 {
@@ -48,15 +50,23 @@ class ATFieldController extends Controller
         }
 
         $user = $request->user();
+        $tagSlug = $request->get('tag_slug');
+        $tag = Tag
+            ::where('slug', $tagSlug)
+            ->first();
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
 
-        if ($user->cant('update_tag_join_rule') && !$user->is_admin)
+        if ($user->cant('change_tag_rule') || !$user->isBookmarkedBy($tag))
         {
             return $this->resErrRole();
         }
 
         $resultType = $request->get('result_type');
         QuestionRule
-            ::where('tag_slug', $request->get('tag_slug'))
+            ::where('tag_slug', $tagSlug)
             ->update([
                 'question_count' => $request->get('question_count'),
                 'right_rate' => $resultType === 1 ? 100 : $request->get('right_rate'),
@@ -513,13 +523,15 @@ class ATFieldController extends Controller
         $invite_slug = $request->get('user_slug');
         $user = $request->user();
 
-        $tag = Tag::where('slug', $tag_slug)->first();
+        $tag = Tag
+            ::where('slug', $tag_slug)
+            ->first();
         if (is_null($tag))
         {
             return $this->resErrNotFound();
         }
 
-        if (!$user->isBookmarkedBy($tag))
+        if ($user->cant('invite_user') || !$user->isBookmarkedBy($tag))
         {
             return $this->resErrRole('只有班长才能进行该操作');
         }
@@ -550,6 +562,71 @@ class ATFieldController extends Controller
         }
 
         event(new \App\Events\User\JoinZone($invite, $tag));
+
+        return $this->resNoContent();
+    }
+
+    public function changeMaster(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_admin)
+        {
+            return $this->resErrRole();
+        }
+
+        $tagSlug = $request->get('tag_slug');
+        $targetSlug = $request->get('user_slug');
+
+        if ($user->slug === $targetSlug)
+        {
+            return $this->resErrBad();
+        }
+
+        $tag = Tag
+            ::where('slug', $tagSlug)
+            ->first();
+
+        if (is_null($tag))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if (!$user->isBookmarkedBy($tag))
+        {
+            return $this->resErrBad();
+        }
+
+        $master = User
+            ::where('slug', $targetSlug)
+            ->first();
+
+        if (is_null($master))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($master->title)
+        {
+            return $this->resErrBad('该用户已有职位');
+        }
+
+        $role = Role::findByName('班长');
+        $master->assignRole($role);
+        $master->update([
+            'title' => json_encode($user->getRoleNames(), JSON_UNESCAPED_UNICODE)
+        ]);
+        $tag->bookmark($master);
+        $tag->unbookmark($user);
+        $user->unbookmark($tag);
+        if (!$tag->isBookmarkedBy($master))
+        {
+            event(new \App\Events\User\JoinZone($master, $tag));
+        }
+
+        $userRepository = new UserRepository();
+        $userRepository->item($user->slug, true);
+        $userRepository->item($targetSlug, true);
+        $userRepository->managers(true);
 
         return $this->resNoContent();
     }
