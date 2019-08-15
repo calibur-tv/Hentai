@@ -37,7 +37,7 @@ class ATFieldController extends Controller
             'tag_slug' => 'required|string',
             'question_count' => 'required|integer|max:100|min:1',
             'right_rate' => 'required|integer|max:100|min:50',
-            'qa_minutes' => 'required|integer|max:120|min:10',
+            'qa_minutes' => 'required|integer|max:120|min:5',
             'rule_type' => 'required|integer',
             'result_type' => 'required|integer',
         ]);
