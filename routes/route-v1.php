@@ -59,6 +59,10 @@ $route->group(['prefix' => 'user'], function () use ($route)
         $route->post('daily_sign', 'UserController@dailySign');
 
         $route->get('roles', 'UserController@getRoles');
+
+        $route->post('add_manager', 'UserController@addManager');
+
+        $route->post('remove_manager', 'UserController@removeManager');
     });
 });
 

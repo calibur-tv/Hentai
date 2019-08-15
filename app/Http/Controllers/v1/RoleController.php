@@ -31,6 +31,9 @@ class RoleController extends Controller
 
         $role = Role::create(['name' => $request->get('name')]);
 
+        $userRepository = new UserRepository();
+        $userRepository->managers(true);
+
         return $this->resOK($role);
     }
 
@@ -110,18 +113,14 @@ class RoleController extends Controller
             ? $user->removeRole($role)
             : $user->assignRole($role);
 
-        $target = User
-            ::where('slug', $userSlug)
-            ->first();
-
-        $target->update([
-            'title' => json_encode($target->getRoleNames(), JSON_UNESCAPED_UNICODE)
+        $user->update([
+            'title' => json_encode($user->getRoleNames(), JSON_UNESCAPED_UNICODE)
         ]);
 
         // 管理员
         if ($roleId == 2)
         {
-            $target->update([
+            $user->update([
                 'is_admin' => $isDelete ? 0 : 1
             ]);
         }

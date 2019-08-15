@@ -13,6 +13,7 @@ use App\Http\Repositories\UserRepository;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -374,5 +375,97 @@ class UserController extends Controller
     public function reject(Request $request)
     {
 
+    }
+
+    public function removeManager(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('remove_manager'))
+        {
+            return $this->resErrRole();
+        }
+
+        $userSlug = $request->get('slug');
+        $target = User
+            ::where('slug', $userSlug)
+            ->first();
+
+        if (is_null($target))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($target->is_admin)
+        {
+            return $this->resErrRole('无法完成该操作');
+        }
+
+        $role = Role::findByName($request->get('role'));
+
+        if (is_null($role))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $target->removeRole($role);
+
+        $target->update([
+            'title' => json_encode($user->getRoleNames(), JSON_UNESCAPED_UNICODE)
+        ]);
+
+        $userRepository = new UserRepository();
+        $userRepository->item($userSlug, true);
+        $userRepository->managers(true);
+
+        return $this->resNoContent();
+    }
+
+    public function addManager(Request $request)
+    {
+        $user = $request->user();
+        if ($user->cant('add_manager'))
+        {
+            return $this->resErrRole();
+        }
+
+        $userSlug = $request->get('slug');
+        $target = User
+            ::where('slug', $userSlug)
+            ->first();
+
+        if (is_null($target))
+        {
+            return $this->resErrNotFound();
+        }
+
+        if ($target->title)
+        {
+            return $this->resErrRole('该用户已有职位');
+        }
+
+        $roleName = $request->get('role');
+        if (in_array($roleName, ['站长', '管理员', '学生会长']))
+        {
+            return $this->resErrRole('无法完成该操作');
+        }
+
+        $role = Role::findByName($roleName);
+
+        if (is_null($role))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $target->assignRole($role);
+
+        $target->update([
+            'title' => json_encode($user->getRoleNames(), JSON_UNESCAPED_UNICODE)
+        ]);
+
+        $userRepository = new UserRepository();
+        $userRepository->item($userSlug, true);
+        $userRepository->managers(true);
+
+        return $this->resNoContent();
     }
 }
