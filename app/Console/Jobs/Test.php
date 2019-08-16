@@ -31,23 +31,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $tags = Tag
-            ::where('migration_state', '<>', 7)
-            ->take(1000)
-            ->get();
-
-        foreach ($tags as $tag)
-        {
-            $user = User::where('slug', $tag->creator_slug)->first();
-            if ($user)
-            {
-                $user->favorite($tag, Tag::class);
-            }
-            $tag->update([
-                'migration_state' => 7
-            ]);
-        }
-
         return true;
     }
 }

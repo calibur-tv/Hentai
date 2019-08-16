@@ -71,6 +71,23 @@ class TagController extends Controller
         return $this->resOK($hottest);
     }
 
+    public function children(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 10;
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
+
+        $tagRepository = new TagRepository();
+
+        $children = $tagRepository->children($slug, $page, $take);
+
+        return $this->resOK($children);
+    }
+
     public function batchPatch(Request $request)
     {
         $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];

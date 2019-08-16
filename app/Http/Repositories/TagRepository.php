@@ -100,6 +100,37 @@ class TagRepository extends Repository
         return $result;
     }
 
+    public function children($slug, $page, $count = 10, $refresh = false)
+    {
+        $result = $this->RedisItem("tag-{$slug}-children", function () use ($slug)
+        {
+            $tag = Tag
+                ::where('parent_slug', $slug)
+                ->orderBy('activity_stat', 'desc')
+                ->orderBy('pin_count', 'desc')
+                ->orderBy('followers_count', 'desc')
+                ->orderBy('seen_user_count', 'desc')
+                ->with(
+                    [
+                        'content' => function ($query)
+                        {
+                            $query->orderBy('created_at', 'desc');
+                        }
+                    ]
+                )
+                ->get();
+
+            return TagItemResource::collection($tag);
+        }, $refresh);
+
+        if (gettype($result) === 'string')
+        {
+            $result = json_decode($result, true);
+        }
+
+        return $this->filterIdsByPage($result, $page, $count);
+    }
+
     public function rule($slug, $refresh = false)
     {
         return $this->RedisItem("tag-join-rule:{$slug}", function () use ($slug)

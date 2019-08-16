@@ -28,5 +28,6 @@ class RefreshParentCache
     {
         $tagRepository = new TagRepository();
         $tagRepository->relation_item($event->tag->parent_slug, true);
+        $tagRepository->children($event->tag->parent_slug, 0, 0, true);
     }
 }
