@@ -27,7 +27,6 @@ class RefreshParentCache
     public function handle(\App\Events\Tag\Create $event)
     {
         $tagRepository = new TagRepository();
-        $tagRepository->item($event->tag->parent_slug, true);
         $tagRepository->children($event->tag->parent_slug, 0, 0, true);
     }
 }
