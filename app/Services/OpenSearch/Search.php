@@ -86,7 +86,7 @@ class Search
                 $typeId = (int)$item['type'];
                 $slug = $item['slug'];
                 $repository = $this->getRepositoryByType($typeId);
-                $item = $typeId == 1 ? $repository->relation_item($slug) : $repository->item($slug);
+                $item = $repository->item($slug);
                 if (!$item)
                 {
                     \App\Models\Search

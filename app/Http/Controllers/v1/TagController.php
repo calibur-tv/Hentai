@@ -24,13 +24,13 @@ class TagController extends Controller
         $slug = $request->get('slug');
 
         $tagRepository = new TagRepository();
-        $data = $tagRepository->relation_item($slug);
-        if (is_null($data))
+        $tag = $tagRepository->item($slug);
+        if (is_null($tag))
         {
             return $this->resErrNotFound();
         }
 
-        return $this->resOK($data);
+        return $this->resOK($tag);
     }
 
     public function patch(Request $request)

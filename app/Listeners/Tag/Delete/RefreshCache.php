@@ -21,7 +21,7 @@ class RefreshCache
     /**
      * Handle the event.
      *
-     * @param  ExampleEvent  $event
+     * @param  \App\Events\Tag\Delete  $event
      * @return void
      */
     public function handle(\App\Events\Tag\Delete $event)
@@ -30,8 +30,7 @@ class RefreshCache
         $tagRepository = new TagRepository();
 
         $tagRepository->item($tag->slug, true);
-        $tagRepository->relation_item($tag->slug, true);
-        $tagRepository->relation_item($tag->parent_slug, true);
+        $tagRepository->item($tag->parent_slug, true);
 
         if ($tag->parent_slug === config('app.tag.notebook'))
         {

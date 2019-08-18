@@ -9,7 +9,6 @@
 namespace App\Http\Repositories;
 
 
-use App\Http\Transformers\Tag\TagBodyResource;
 use App\Http\Transformers\Tag\TagItemResource;
 use App\Models\QuestionRule;
 use App\Models\Tag;
@@ -40,56 +39,6 @@ class TagRepository extends Repository
             }
 
             return new TagItemResource($tag);
-        }, $refresh);
-
-        if ($result === 'nil')
-        {
-            return null;
-        }
-
-        return $result;
-    }
-
-    public function relation_item($slug, $refresh = false)
-    {
-        if (!$slug)
-        {
-            return null;
-        }
-
-        $result = $this->RedisItem("tag-category:{$slug}", function () use ($slug)
-        {
-            $tag = Tag
-                ::where('slug', $slug)
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        },
-                        'children' => function ($query)
-                        {
-                            $query
-                                ->with(['content' => function ($q)
-                                {
-                                    $q->orderBy('created_at', 'desc');
-                                }])
-                                ->orderBy('activity_stat', 'desc')
-                                ->orderBy('pin_count', 'desc')
-                                ->orderBy('followers_count', 'desc')
-                                ->orderBy('seen_user_count', 'desc')
-                                ->take(10);
-                        }
-                    ]
-                )
-                ->first();
-
-            if (is_null($tag))
-            {
-                return 'nil';
-            }
-
-            return new TagBodyResource($tag);
         }, $refresh);
 
         if ($result === 'nil')
