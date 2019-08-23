@@ -68,7 +68,14 @@ class TagController extends Controller
         $tagRepository = new TagRepository();
         $hottest = $tagRepository->hottest();
 
-        return $this->resOK($hottest);
+        $result = [];
+        foreach ($hottest as $item)
+        {
+            $item['type'] = 'grid';
+            $result[] = $item;
+        }
+
+        return $this->resOK($result);
     }
 
     public function children(Request $request)
