@@ -43,6 +43,7 @@ class Pin extends Model
         'main_area_slug',
         'main_topic_slug',
         'main_notebook_slug',
+        'migration_state'
     ];
 
     public function author()
