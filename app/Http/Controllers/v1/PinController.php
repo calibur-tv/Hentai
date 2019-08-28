@@ -370,6 +370,12 @@ class PinController extends Controller
         }
 
         $tags = $request->get('tags');
+        $topic = $request->get('topic') ?: '';
+        $area = $request->get('area') ?: '';
+        $pin->update([
+            'main_topic_slug' => $topic,
+            'main_area_slug' => $area
+        ]);
         event(new \App\Events\Pin\Move($pin, $user, $tags));
 
         return $this->resOK();

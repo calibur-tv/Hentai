@@ -31,20 +31,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $pins = Pin::where('migration_state', 0)
-            ->take(1000)
-            ->get();
-
-        $pinRepository = new PinRepository();
-        foreach ($pins as $pin)
-        {
-            try {
-                $cache = $pinRepository->item($pin->slug);
-            } catch (\Exception $e) {
-                $pin->delete();
-            }
-        }
-
         return true;
     }
 }
