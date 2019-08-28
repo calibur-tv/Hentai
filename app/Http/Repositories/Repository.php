@@ -265,13 +265,14 @@ class Repository
         $list = $withScore ? array_keys($ids) : $ids;
         if ($maxId)
         {
-            if (array_last($list) < $maxId)
+            $offset = array_search($maxId, $list);
+            if ($offset === false)
             {
                 $offset = count($list) + 1;
             }
             else
             {
-                $offset = array_search($maxId, $list) + 1;
+                $offset += 1;
             }
         }
         else
