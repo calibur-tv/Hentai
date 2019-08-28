@@ -137,17 +137,24 @@ class ATFieldController extends Controller
 
         $contentType = 2;
         $visitType = 0;
-        $tags = [
-            config('app.tag.qa'),
-            $tag->slug
-        ];
+        $mainAreaSlug = '';
+        $mainTopicSlug = '';
+        if ($tag->parent_slug === config('app.tag.topic'))
+        {
+            $mainTopicSlug = $tag->slug;
+        }
+        else
+        {
+            $mainAreaSlug = $tag->slug;
+        }
 
         $qa = Pin::createPin(
             $content,
             $contentType,
             $visitType,
             $user,
-            $tags
+            $mainAreaSlug,
+            $mainTopicSlug
         );
 
         if (is_null($qa))

@@ -157,10 +157,13 @@ class PinController extends Controller
         $tagRepository = new TagRepository();
         $user = $request->user();
 
-        $area = $request->get('area');
-        if ($area)
+        $areaSlug = $request->get('area') ?: '';
+        $topicSlug = $request->get('topic') ?: '';
+        $notebookSlug = $request->get('notebook') ?: '';
+        $area = null;
+        if ($areaSlug)
         {
-            $area = $tagRepository->checkTagIsMarked($request->get('area'), $user);
+            $area = $tagRepository->checkTagIsMarked($areaSlug, $user);
             if (null === $area)
             {
                 return $this->resErrNotFound('不存在的分区');
@@ -171,7 +174,7 @@ class PinController extends Controller
             }
         }
 
-        $topic = $tagRepository->checkTagIsMarked($request->get('topic'), $user);
+        $topic = $tagRepository->checkTagIsMarked($topicSlug, $user);
         if (null === $topic)
         {
             return $this->resErrNotFound('不存在的话题');
@@ -181,7 +184,7 @@ class PinController extends Controller
             return $this->resErrRole('未关注的话题');
         }
 
-        $notebook = $tagRepository->checkTagIsMarked($request->get('notebook'), $user);
+        $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
         if (null === $notebook)
         {
             return $this->resErrNotFound('不存在的专栏');
@@ -195,25 +198,15 @@ class PinController extends Controller
             return $this->resErrBad('非法的专栏');
         }
 
-        $tags = [
-            $notebook->slug,
-            $topic->slug,
-            config('app.tag.topic')
-        ];
-        if ($area)
-        {
-            $tags[] = $area->slug;
-            $tags[] = $area->parent_slug;
-        }
-
         $contentType = 1;
-
         $pin = Pin::createPin(
             $request->get('content'),
             $contentType,
             $request->get('publish'),
             $user,
-            $tags
+            $areaSlug,
+            $topicSlug,
+            $notebookSlug
         );
 
         if (is_null($pin))
@@ -266,10 +259,13 @@ class PinController extends Controller
         $tagRepository = new TagRepository();
         $user = $request->user();
 
-        $area = $request->get('area');
-        if ($area)
+        $areaSlug = $request->get('area') ?: '';
+        $topicSlug = $request->get('topic') ?: '';
+        $notebookSlug = $request->get('notebook') ?: '';
+
+        if ($areaSlug)
         {
-            $area = $tagRepository->checkTagIsMarked($request->get('area'), $user);
+            $area = $tagRepository->checkTagIsMarked($areaSlug, $user);
             if (null === $area)
             {
                 return $this->resErrNotFound('不存在的分区');
@@ -280,7 +276,7 @@ class PinController extends Controller
             }
         }
 
-        $topic = $tagRepository->checkTagIsMarked($request->get('topic'), $user);
+        $topic = $tagRepository->checkTagIsMarked($topicSlug, $user);
         if (null === $topic)
         {
             return $this->resErrNotFound('不存在的话题');
@@ -290,7 +286,7 @@ class PinController extends Controller
             return $this->resErrRole('未关注的话题');
         }
 
-        $notebook = $tagRepository->checkTagIsMarked($request->get('notebook'), $user);
+        $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
         if (null === $notebook)
         {
             return $this->resErrNotFound('不存在的专栏');
@@ -304,22 +300,13 @@ class PinController extends Controller
             return $this->resErrBad('非法的专栏');
         }
 
-        $tags = [
-            $notebook->slug,
-            $topic->slug,
-            config('app.tag.topic')
-        ];
-        if ($area)
-        {
-            $tags[] = $area->slug;
-            $tags[] = $area->parent_slug;
-        }
-
         $result = $pin->updatePin(
             $request->get('content'),
             $request->get('publish'),
             $user,
-            $tags
+            $areaSlug,
+            $topicSlug,
+            $notebookSlug
         );
 
         if (!$result)
@@ -383,7 +370,6 @@ class PinController extends Controller
         }
 
         $tags = $request->get('tags');
-        $tags[] = config('app.tag.topic');
         event(new \App\Events\Pin\Move($pin, $user, $tags));
 
         return $this->resOK();

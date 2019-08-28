@@ -31,6 +31,25 @@ class Test extends Command
      */
     public function handle()
     {
+        $pins = Pin::where('migration_state', 0)
+            ->take(100)
+            ->get();
+
+        $pinRepository = new PinRepository();
+        foreach ($pins as $pin)
+        {
+            $cache = $pinRepository->item($pin->slug);
+            $mainAreaSlug = $cache->area ? $cache->area->slug : '';
+            $mainTopicSlug = $cache->topic ? $cache->topic->slug : '';
+            $mainNotebookSlug = $cache->notebook ? $cache->notebook->slug : '';
+            $pin->update([
+                'main_area_slug' => $mainAreaSlug,
+                'main_topic_slug' => $mainTopicSlug,
+                'main_notebook_slug' => $mainNotebookSlug,
+                'migration_state' => 1
+            ]);
+        }
+
         return true;
     }
 }

@@ -40,6 +40,9 @@ class Pin extends Model
         'like_count',       // 点赞数
         'mark_count',       // 收藏数
         'reward_count',     // 打赏数
+        'main_area_slug',
+        'main_topic_slug',
+        'main_notebook_slug',
     ];
 
     public function author()
@@ -108,7 +111,15 @@ class Pin extends Model
         return $this->morphMany('App\Models\Report', 'reportable');
     }
 
-    public static function createPin($content, $content_type, $publish, $user, $tags)
+    public static function createPin(
+        $content,
+        $content_type,
+        $publish,
+        $user,
+        $main_area_slug = '',
+        $main_topic_slug = '',
+        $main_notebook_slug = ''
+    )
     {
         $richContentService = new RichContentService();
         $content = $richContentService->preFormatContent($content);
@@ -123,7 +134,10 @@ class Pin extends Model
         $data = [
             'user_slug' => $user->slug,
             'content_type' => $content_type,
-            'last_edit_at' => $now
+            'last_edit_at' => $now,
+            'main_area_slug' => $main_area_slug,
+            'main_topic_slug' => $main_topic_slug,
+            'main_notebook_slug' => $main_notebook_slug
         ];
         if ($publish)
         {
@@ -140,13 +154,21 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
         $pin->content = $richContent->text;
+        $tags = [$main_area_slug, $main_topic_slug, $main_notebook_slug];
 
         event(new \App\Events\Pin\Create($pin, $user, $tags, $publish));
 
         return $pin;
     }
 
-    public function updatePin($content, $publish, $user, $tags)
+    public function updatePin(
+        $content,
+        $publish,
+        $user,
+        $main_area_slug = '',
+        $main_topic_slug = '',
+        $main_notebook_slug = ''
+    )
     {
         $richContentService = new RichContentService();
         if (!$this->published_at)
@@ -193,7 +215,10 @@ class Pin extends Model
         $doPublish = !$this->published_at && $publish;
         $now = Carbon::now();
         $data = [
-            'last_edit_at' => $now
+            'last_edit_at' => $now,
+            'main_area_slug' => $main_area_slug,
+            'main_topic_slug' => $main_topic_slug,
+            'main_notebook_slug' => $main_notebook_slug
         ];
         if ($doPublish)
         {
@@ -206,6 +231,7 @@ class Pin extends Model
             'text' => $richContentService->saveRichContent($content)
         ]);
         $this->content = $richContent->text;
+        $tags = [$main_area_slug, $main_topic_slug, $main_notebook_slug];
 
         event(new \App\Events\Pin\Update($this, $user, $tags, $doPublish));
 

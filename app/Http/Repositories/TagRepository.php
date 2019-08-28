@@ -259,4 +259,30 @@ class TagRepository extends Repository
 
         return $result;
     }
+
+    public function receiveTagChain($slug, $result = [])
+    {
+        if (!$slug)
+        {
+            return $result;
+        }
+        $tag = $this->item($slug);
+        if (!$tag)
+        {
+            return $result;
+        }
+
+        if (empty($result))
+        {
+            $result[] = $slug;
+        }
+
+        if (!$tag->parent_slug || $tag->parent_slug === config('app.tag.calibur'))
+        {
+            return $result;
+        }
+        $result[] = $tag->parent_slug;
+
+        return $this->receiveTagChain($tag->parent_slug, $result);
+    }
 }

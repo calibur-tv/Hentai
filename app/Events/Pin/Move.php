@@ -14,19 +14,12 @@ class Move
 
     public $pin;
     public $user;
-    public $attachTags;
-    public $detachTags;
+    public $tags;
 
     public function __construct(Pin $pin, User $user, array $tags)
     {
         $this->pin = $pin;
         $this->user = $user;
-        $oldTags = $pin
-            ->tags()
-            ->pluck('slug')
-            ->toArray();
-
-        $this->attachTags = array_diff($tags, $oldTags);
-        $this->detachTags = array_diff($oldTags, $tags);
+        $this->tags = $tags;
     }
 }
