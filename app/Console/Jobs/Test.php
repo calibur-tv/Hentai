@@ -32,7 +32,7 @@ class Test extends Command
     public function handle()
     {
         $pins = Pin::where('migration_state', 0)
-            ->take(100)
+            ->take(1000)
             ->get();
 
         $pinRepository = new PinRepository();
