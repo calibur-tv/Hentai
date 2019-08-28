@@ -38,16 +38,11 @@ class Test extends Command
         $pinRepository = new PinRepository();
         foreach ($pins as $pin)
         {
-            $cache = $pinRepository->item($pin->slug);
-            $mainAreaSlug = $cache->area ? $cache->area->slug : '';
-            $mainTopicSlug = $cache->topic ? $cache->topic->slug : '';
-            $mainNotebookSlug = $cache->notebook ? $cache->notebook->slug : '';
-            $pin->update([
-                'main_area_slug' => $mainAreaSlug,
-                'main_topic_slug' => $mainTopicSlug,
-                'main_notebook_slug' => $mainNotebookSlug,
-                'migration_state' => 1
-            ]);
+            try {
+                $cache = $pinRepository->item($pin->slug);
+            } catch (\Exception $e) {
+                $pin->delete();
+            }
         }
 
         return true;

@@ -37,50 +37,53 @@ class PinRepository extends Repository
                 return 'nil';
             }
 
-            $pin->notebook = $pin
-                ->tags()
-                ->where('parent_slug', config('app.tag.notebook'))
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
-                ->orderBy('id', 'ASC')
-                ->first();
+            if ($pin->main_notebook_slug)
+            {
+                $pin->notebook = $pin
+                    ->tags()
+                    ->where('slug', $pin->main_notebook_slug)
+                    ->with(
+                        [
+                            'content' => function ($query)
+                            {
+                                $query->orderBy('created_at', 'desc');
+                            }
+                        ]
+                    )
+                    ->first();
+            }
 
-            $pin->area = $pin
-                ->tags()
-                ->whereIn('parent_slug', [
-                    config('app.tag.bangumi'),
-                    config('app.tag.game')
-                ])
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
-                ->orderBy('id', 'ASC')
-                ->first();
+            if ($pin->main_area_slug)
+            {
+                $pin->area = $pin
+                    ->tags()
+                    ->where('slug', $pin->main_area_slug)
+                    ->with(
+                        [
+                            'content' => function ($query)
+                            {
+                                $query->orderBy('created_at', 'desc');
+                            }
+                        ]
+                    )
+                    ->first();
+            }
 
-            $pin->topic = $pin
-                ->tags()
-                ->where('parent_slug', config('app.tag.topic'))
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
-                ->orderBy('id', 'ASC')
-                ->first();
+            if ($pin->main_topic_slug)
+            {
+                $pin->topic = $pin
+                    ->tags()
+                    ->where('slug', $pin->main_topic_slug)
+                    ->with(
+                        [
+                            'content' => function ($query)
+                            {
+                                $query->orderBy('created_at', 'desc');
+                            }
+                        ]
+                    )
+                    ->first();
+            }
 
             return new PinResource($pin);
         }, $refresh);
