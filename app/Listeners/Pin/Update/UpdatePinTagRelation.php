@@ -4,7 +4,6 @@ namespace App\Listeners\Pin\Update;
 
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\FlowRepository;
-use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -68,9 +67,6 @@ class UpdatePinTagRelation implements ShouldQueue
             }, $attachTags);
             $pin->tags()->attach($attachIds);
         }
-
-        $pinRepository = new PinRepository();
-        $pinRepository->item($pin->slug, true);
 
         if (!$event->published || $pin->content_type != 1)
         {
