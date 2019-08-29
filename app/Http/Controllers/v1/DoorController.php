@@ -332,10 +332,10 @@ class DoorController extends Controller
                 return $this->resErrRole('该QQ号已绑定其它账号');
             }
 
-            $userId = $request->get('id');
+            $userSlug = $request->get('slug');
             $userZone = $request->get('zone');
             $hasUser = User
-                ::where('id', $userId)
+                ::where('slug', $userSlug)
                 ->where('zone', $userZone)
                 ->count();
 
@@ -345,7 +345,7 @@ class DoorController extends Controller
             }
 
             User
-                ::where('id', $userId)
+                ::where('slug', $userSlug)
                 ->update([
                     'qq_open_id' => $openId,
                     'qq_unique_id' => $uniqueId
@@ -442,10 +442,10 @@ class DoorController extends Controller
                 return $this->resErrRole('该微信号已绑定其它账号');
             }
 
-            $userId = $request->get('id');
+            $userSlug = $request->get('slug');
             $userZone = $request->get('zone');
             $hasUser = User
-                ::where('id', $userId)
+                ::where('slug', $userSlug)
                 ->where('zone', $userZone)
                 ->count();
 
@@ -455,7 +455,7 @@ class DoorController extends Controller
             }
 
             User
-                ::where('id', $userId)
+                ::where('slug', $userSlug)
                 ->update([
                     'wechat_open_id' => $openId,
                     'wechat_unique_id' => $uniqueId
@@ -516,7 +516,7 @@ class DoorController extends Controller
     public function bindPhone(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|integer',
+            'slug' => 'required|string',
             'phone' => 'required|digits:11',
             'password' => 'required|min:6|max:16',
             'authCode' => 'required|digits:6'
@@ -539,9 +539,9 @@ class DoorController extends Controller
             return $this->resErrBad('该手机号已绑定另外一个账号');
         }
 
-        $userId = $request->get('id');
+        $slug = $request->get('slug');
         $hasPhone = User
-            ::where('id', $userId)
+            ::where('slug', $slug)
             ->pluck('phone')
             ->first();
 
@@ -554,7 +554,7 @@ class DoorController extends Controller
             return $this->resErrBad('您的账号已绑定了手机号：' . $maskPhone);
         }
 
-        User::where('id', $userId)
+        User::where('slug', $slug)
             ->update([
                 'phone' => $phone,
                 'password' => $request->get('password')
