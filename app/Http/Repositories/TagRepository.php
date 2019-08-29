@@ -9,7 +9,7 @@
 namespace App\Http\Repositories;
 
 
-use App\Http\Transformers\Tag\TagItemResource;
+use App\Http\Transformers\Tag\TagResource;
 use App\Models\QuestionRule;
 use App\Models\Tag;
 use App\User;
@@ -38,7 +38,7 @@ class TagRepository extends Repository
                 return 'nil';
             }
 
-            return new TagItemResource($tag);
+            return new TagResource($tag);
         }, $refresh);
 
         if ($result === 'nil')
@@ -69,7 +69,7 @@ class TagRepository extends Repository
                 )
                 ->get();
 
-            return TagItemResource::collection($tag);
+            return TagResource::collection($tag);
         }, $refresh);
 
         if (gettype($result) === 'string')
@@ -115,7 +115,7 @@ class TagRepository extends Repository
                 )
                 ->get();
 
-            return TagItemResource::collection($tag);
+            return TagResource::collection($tag);
         });
 
         if (gettype($result) === 'string')
@@ -145,7 +145,7 @@ class TagRepository extends Repository
                 )
                 ->get();
 
-            return TagItemResource::collection($tag);
+            return TagResource::collection($tag);
         });
 
         if (gettype($result) === 'string')
@@ -222,7 +222,7 @@ class TagRepository extends Repository
             $topicSlug = config('app.tag.topic');
             $notebookSlug = config('app.tag.notebook');
 
-            $list = TagItemResource::collection($list);
+            $list = TagResource::collection($list);
 
             foreach ($list as $item)
             {

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\TagPatchCounter;
 use App\Http\Repositories\TagRepository;
-use App\Http\Transformers\Tag\TagItemResource;
+use App\Http\Transformers\Tag\TagResource;
 use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\Trial\ImageFilter;
@@ -168,7 +168,7 @@ class TagController extends Controller
 
         $tag = Tag::createTag($name, $user, $parent);
 
-        return $this->resOK(new TagItemResource($tag));
+        return $this->resOK(new TagResource($tag));
     }
 
     /**
