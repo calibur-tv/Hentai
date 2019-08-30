@@ -11,6 +11,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Transformers\PinResource;
 use App\Models\Pin;
+use App\Models\Tag;
 
 class PinRepository extends Repository
 {
@@ -39,9 +40,8 @@ class PinRepository extends Repository
 
             if ($pin->main_notebook_slug)
             {
-                $pin->notebook = $pin
-                    ->tags()
-                    ->where('slug', $pin->main_notebook_slug)
+                $pin->notebook = Tag
+                    ::where('slug', $pin->main_notebook_slug)
                     ->with(
                         [
                             'content' => function ($query)
@@ -55,9 +55,8 @@ class PinRepository extends Repository
 
             if ($pin->main_area_slug)
             {
-                $pin->area = $pin
-                    ->tags()
-                    ->where('slug', $pin->main_area_slug)
+                $pin->area = Tag
+                    ::where('slug', $pin->main_area_slug)
                     ->with(
                         [
                             'content' => function ($query)
@@ -71,9 +70,8 @@ class PinRepository extends Repository
 
             if ($pin->main_topic_slug)
             {
-                $pin->topic = $pin
-                    ->tags()
-                    ->where('slug', $pin->main_topic_slug)
+                $pin->topic = Tag
+                    ::where('slug', $pin->main_topic_slug)
                     ->with(
                         [
                             'content' => function ($query)
