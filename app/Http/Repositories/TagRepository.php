@@ -120,7 +120,7 @@ class TagRepository extends Repository
 
         if (gettype($result) === 'string')
         {
-            $result = json_decode($result, true);
+            $result = json_decode($result);
         }
         return $result;
     }

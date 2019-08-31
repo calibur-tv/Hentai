@@ -71,7 +71,7 @@ class TagController extends Controller
         $result = [];
         foreach ($hottest as $item)
         {
-            $item['type'] = 'grid';
+            $item->type = 'grid';
             $result[] = $item;
         }
 
