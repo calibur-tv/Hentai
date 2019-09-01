@@ -42,6 +42,27 @@ class UpdatePinTagRelation implements ShouldQueue
         }
 
         $newTagSlugs = array_unique($newTagSlugs);
+        $flowRepository = new FlowRepository();
+        $tagPatchCounter = new TagPatchCounter();
+        $pinSlug = $pin->slug;
+
+        if ($event->doPublish)
+        {
+            $attachIds = array_map(function ($slug)
+            {
+                return slug2id($slug);
+            }, $newTagSlugs);
+            $pin->tags()->attach($attachIds);
+
+            foreach ($newTagSlugs as $tagSlug)
+            {
+                $flowRepository->add_pin($tagSlug, $pinSlug);
+                $tagPatchCounter->add($tagSlug, 'pin_count', 1);
+            }
+
+            return;
+        }
+
         $oldTagSlugs = $pin
             ->tags()
             ->pluck('slug')
@@ -73,31 +94,16 @@ class UpdatePinTagRelation implements ShouldQueue
             return;
         }
 
-        $flowRepository = new FlowRepository();
-        $tagPatchCounter = new TagPatchCounter();
-        $pinSlug = $pin->slug;
-
-        if ($event->doPublish)
+        foreach ($detachTags as $tagSlug)
         {
-            foreach ($newTagSlugs as $tagSlug)
-            {
-                $flowRepository->add_pin($tagSlug, $pinSlug);
-                $tagPatchCounter->add($tagSlug, 'pin_count', 1);
-            }
+            $flowRepository->del_pin($tagSlug, $pinSlug);
+            $tagPatchCounter->add($tagSlug, 'pin_count', -1);
         }
-        else
-        {
-            foreach ($detachTags as $tagSlug)
-            {
-                $flowRepository->del_pin($tagSlug, $pinSlug);
-                $tagPatchCounter->add($tagSlug, 'pin_count', -1);
-            }
 
-            foreach ($attachTags as $tagSlug)
-            {
-                $flowRepository->add_pin($tagSlug, $pinSlug);
-                $tagPatchCounter->add($tagSlug, 'pin_count', 1);
-            }
+        foreach ($attachTags as $tagSlug)
+        {
+            $flowRepository->add_pin($tagSlug, $pinSlug);
+            $tagPatchCounter->add($tagSlug, 'pin_count', 1);
         }
     }
 }
