@@ -10,6 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class AddPinTagRelation implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Create the event listener.
      *
