@@ -64,6 +64,7 @@ class FlowRepository extends Repository
                             return $q->where('created_at', '>=', $date);
                         })
                         ->where('trial_type', 0)
+                        ->where('can_up', 1)
                         ->whereNotIn('content_type', [2])
                         ->whereNotNull('published_at')
                         ->whereNull('last_top_at')
@@ -117,6 +118,7 @@ class FlowRepository extends Repository
                 {
                     $query
                         ->where('trial_type', 0)
+                        ->where('can_up', 1)
                         ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
@@ -149,6 +151,7 @@ class FlowRepository extends Repository
                 {
                     $query
                         ->where('trial_type', 0)
+                        ->where('can_up', 1)
                         ->whereNotIn('content_type', [2])
                         ->whereNull('last_top_at')
                         ->whereNotNull('published_at')
