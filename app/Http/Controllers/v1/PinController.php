@@ -521,6 +521,11 @@ class PinController extends Controller
         ]);
     }
 
+    public function down(Request $request)
+    {
+        
+    }
+
     /**
      * 审核列表
      */
