@@ -523,7 +523,7 @@ class PinController extends Controller
 
     public function down(Request $request)
     {
-        
+
     }
 
     /**
