@@ -30,7 +30,7 @@ class RefreshCache
         $tagRepository = new TagRepository();
 
         $tagRepository->item($tag->slug, true);
-        $tagRepository->children($tag->parent_slug, true);
+        $tagRepository->children($tag->parent_slug, 0, 0, true);
 
         if ($tag->parent_slug === config('app.tag.notebook'))
         {
