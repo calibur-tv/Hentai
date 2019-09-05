@@ -22,6 +22,7 @@ class TagResource extends JsonResource
             'avatar' => patchImage($content['avatar'], 'default-poster'),
             'intro' => $content['intro'],
             'alias' => $content['alias'],
+            'creator_slug' => $this->creator_slug,
             'parent_slug' => $this->parent_slug,
             'pin_count' => $this->pin_count,
             'seen_user_count' => $this->seen_user_count,

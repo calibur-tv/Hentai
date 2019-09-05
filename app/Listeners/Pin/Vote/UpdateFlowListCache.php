@@ -28,7 +28,7 @@ class UpdateFlowListCache
     public function handle(\App\Events\Pin\Vote $event)
     {
         $pin = $event->pin;
-        if (!$pin->published_at || $pin->content_type !== 1)
+        if (!$pin->published_at || $pin->content_type !== 1 || !$pin->can_up)
         {
             return;
         }

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Trial implements ShouldQueue
 {
+    use InteractsWithQueue;
     /**
      * Create the event listener.
      *

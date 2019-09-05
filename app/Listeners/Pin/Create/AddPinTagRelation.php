@@ -8,7 +8,7 @@ use App\Http\Repositories\TagRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class AddPinTagRelation implements ShouldQueue
+class AddPinTagRelation
 {
     /**
      * Create the event listener.

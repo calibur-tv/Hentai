@@ -43,7 +43,7 @@ class Pin extends Model
         'main_area_slug',
         'main_topic_slug',
         'main_notebook_slug',
-        'migration_state'
+        'can_up',           // 是否能被顶起来
     ];
 
     public function author()

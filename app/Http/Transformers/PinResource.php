@@ -80,6 +80,7 @@ class PinResource extends JsonResource
             'like_count' => $this->upvoters()->count(),
             'mark_count' => $this->mark_count,
             'reward_count' => $this->reward_count,
+            'can_up' => $this->can_up
         ];
     }
 }
