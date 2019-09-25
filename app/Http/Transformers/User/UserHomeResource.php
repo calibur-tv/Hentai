@@ -40,7 +40,9 @@ class UserHomeResource extends JsonResource
             'stat' => [
                 'activity' => $this->activity_stat,
                 'exposure' => $this->exposure_stat,
-            ]
+            ],
+            'stat_activity' => $this->activity_stat,
+            'stat_exposure' => $this->exposure_stat,
         ];
     }
 }
