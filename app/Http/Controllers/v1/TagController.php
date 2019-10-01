@@ -63,19 +63,19 @@ class TagController extends Controller
     /**
      * 返回热门 tag
      */
-    public function hottest()
+    public function hottest(Request $request)
     {
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 12;
         $tagRepository = new TagRepository();
-        $hottest = $tagRepository->hottest();
+        $hottest = $tagRepository->hottest($page, $take);
 
-        $result = [];
-        foreach ($hottest as $item)
+        foreach ($hottest['result'] as $i => $item)
         {
-            $item->type = 'grid';
-            $result[] = $item;
+            $hottest['result'][$i]->type = 'grid';
         }
 
-        return $this->resOK($result);
+        return $this->resOK($hottest);
     }
 
     public function children(Request $request)

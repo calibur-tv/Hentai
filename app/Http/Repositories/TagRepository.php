@@ -90,9 +90,9 @@ class TagRepository extends Repository
         }, $refresh);
     }
 
-    public function hottest()
+    public function hottest($page, $take)
     {
-        $result = $this->RedisItem('hottest-sub-area', function ()
+        $result = $this->RedisItem('hottest-channel', function ()
         {
             $tag = Tag
                 ::whereIn('parent_slug', [
@@ -104,7 +104,6 @@ class TagRepository extends Repository
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
                 ->orderBy('seen_user_count', 'desc')
-                ->take(10)
                 ->with(
                     [
                         'content' => function ($query)
@@ -122,7 +121,8 @@ class TagRepository extends Repository
         {
             $result = json_decode($result);
         }
-        return $result;
+
+        return $this->filterIdsByPage($result, $page, $take);
     }
 
     public function search()
