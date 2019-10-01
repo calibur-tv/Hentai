@@ -250,6 +250,8 @@ $route->group(['prefix' => 'comment'], function () use ($route)
 $route->group(['prefix' => 'flow'], function () use ($route)
 {
     $route->get('pins', 'FlowController@pins');
+
+    $route->get('index', 'FlowController@index');
 });
 
 $route->group(['prefix' => 'console', 'middleware' => 'auth'], function () use ($route)

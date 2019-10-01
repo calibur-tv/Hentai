@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Models\Pin;
 use App\Models\Tag;
 use Illuminate\Support\Carbon;
 
@@ -32,6 +33,26 @@ class FlowRepository extends Repository
         }
 
         return $idsObj;
+    }
+
+    public function index($seenIds, $take, $refresh = false)
+    {
+        $ids =  $this->RedisSort($this->index_cache_key(), function ()
+        {
+            return Pin
+                ::where('trial_type', 0)
+                ->where('can_up', 1)
+                ->whereNotIn('content_type', [2])
+                ->whereNull('last_top_at')
+                ->whereNotNull('published_at')
+                ->select('slug', 'updated_at')
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'slug')
+                ->toArray();
+
+        }, ['force' => $refresh, 'is_time' => true]);
+
+        return $this->filterIdsBySeenIds($ids, $seenIds, $take);
     }
 
     public function hottest_ids($slug, $time, $refresh = false)
@@ -178,18 +199,21 @@ class FlowRepository extends Repository
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
+        $this->SortAdd($this->index_cache_key(), $pinSlug);
     }
 
     public function update_pin($tagSlug, $pinSlug)
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
+        $this->SortAdd($this->index_cache_key(), $pinSlug);
     }
 
     public function del_pin($tagSlug, $pinSlug)
     {
         $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortRemove($this->active_cache_key($tagSlug), $pinSlug);
+        $this->SortRemove($this->index_cache_key(), $pinSlug);
         foreach ($this->times as $time)
         {
             $this->SortRemove($this->hottest_cache_key($tagSlug, $time), $pinSlug);
@@ -209,5 +233,10 @@ class FlowRepository extends Repository
     protected function active_cache_key(string $slug)
     {
         return "tag-active-{$slug}-all";
+    }
+
+    protected function index_cache_key()
+    {
+        return 'flow-index-ids';
     }
 }

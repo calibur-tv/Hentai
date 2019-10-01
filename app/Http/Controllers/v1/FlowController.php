@@ -70,4 +70,23 @@ class FlowController extends Controller
 
         return $this->resOK($idsObj);
     }
+
+    public function index(Request $request)
+    {
+        $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        $take = $request->get('take') ?: 10;
+
+        $flowRepository = new FlowRepository();
+        $idsObj = $flowRepository->index($seenIds, $take);
+
+        if (!$idsObj['total'])
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $pinRepository = new PinRepository();
+        $idsObj['result'] = $pinRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
+    }
 }
