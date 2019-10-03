@@ -370,6 +370,7 @@ class RichContentService
         $firstImage = null;
         $firstVideo = null;
         $firstMusic = null;
+        $images = [];
 
         foreach ($data as $row)
         {
@@ -381,6 +382,7 @@ class RichContentService
                 {
                     $firstImage = $row;
                 }
+                $images[] = $row['data']['file'];
             }
             else if ($type === 'video')
             {
@@ -415,6 +417,7 @@ class RichContentService
         {
             $banner = $title['banner'];
             $imageCount++;
+            array_unshift($images, $banner);
         }
         else if ($firstImage)
         {
@@ -428,7 +431,8 @@ class RichContentService
             'first_image' => $firstImage,
             'first_video' => $firstVideo,
             'first_music' => $firstMusic,
-            'banner' => $banner
+            'banner' => $banner,
+            'images' => array_slice($images, 0, 3)
         ];
     }
 
