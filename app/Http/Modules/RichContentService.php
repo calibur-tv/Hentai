@@ -357,6 +357,10 @@ class RichContentService
             {
                 $result .= $row['data']['caption'];
             }
+            else if ($type === 'baidu')
+            {
+                $result .= '[百度资源]';
+            }
         }
 
         return $result;
