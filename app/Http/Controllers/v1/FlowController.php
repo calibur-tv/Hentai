@@ -74,10 +74,11 @@ class FlowController extends Controller
     public function index(Request $request)
     {
         $seenIds = $request->get('seen_ids') ? explode(',', $request->get('seen_ids')) : [];
+        $randId = $request->get('rand_id') ?: 1;
         $take = $request->get('take') ?: 10;
 
         $flowRepository = new FlowRepository();
-        $idsObj = $flowRepository->index($seenIds, $take);
+        $idsObj = $flowRepository->index($seenIds, $randId, $take);
 
         if (!$idsObj['total'])
         {

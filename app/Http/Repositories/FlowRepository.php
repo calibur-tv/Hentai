@@ -7,6 +7,7 @@ namespace App\Http\Repositories;
 use App\Models\Pin;
 use App\Models\Tag;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class FlowRepository extends Repository
 {
@@ -35,12 +36,13 @@ class FlowRepository extends Repository
         return $idsObj;
     }
 
-    public function index($seenIds, $take, $refresh = false)
+    public function index($seenIds, $randId, $take, $refresh = false)
     {
-        $ids =  $this->RedisSort($this->index_cache_key(), function ()
+        $ids =  $this->RedisSort($this->index_cache_key($randId, false), function () use ($randId)
         {
             return Pin
                 ::where('trial_type', 0)
+                ->where(DB::raw('id % 10'), $randId)
                 ->where('can_up', 1)
                 ->whereNotIn('content_type', [2])
                 ->whereNull('last_top_at')
@@ -199,21 +201,21 @@ class FlowRepository extends Repository
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key(), $pinSlug);
+        $this->SortAdd($this->index_cache_key($pinSlug), $pinSlug);
     }
 
     public function update_pin($tagSlug, $pinSlug)
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key(), $pinSlug);
+        $this->SortAdd($this->index_cache_key($pinSlug), $pinSlug);
     }
 
     public function del_pin($tagSlug, $pinSlug)
     {
         $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortRemove($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortRemove($this->index_cache_key(), $pinSlug);
+        $this->SortRemove($this->index_cache_key($pinSlug), $pinSlug);
         foreach ($this->times as $time)
         {
             $this->SortRemove($this->hottest_cache_key($tagSlug, $time), $pinSlug);
@@ -235,8 +237,8 @@ class FlowRepository extends Repository
         return "tag-active-{$slug}-all";
     }
 
-    protected function index_cache_key()
+    protected function index_cache_key($slug, $convert = true)
     {
-        return 'flow-index-ids';
+        return 'flow-index-ids-' . ($convert ? substr(slug2id($slug), -1) : $slug);
     }
 }
