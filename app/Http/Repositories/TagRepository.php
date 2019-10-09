@@ -95,12 +95,7 @@ class TagRepository extends Repository
         $result = $this->RedisItem('hottest-channel', function ()
         {
             $tag = Tag
-                ::whereIn('parent_slug', [
-                    config('app.tag.bangumi'),
-                    config('app.tag.topic'),
-                    config('app.tag.game')
-                ])
-                ->orderBy('activity_stat', 'desc')
+                ::orderBy('activity_stat', 'desc')
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
                 ->orderBy('seen_user_count', 'desc')
