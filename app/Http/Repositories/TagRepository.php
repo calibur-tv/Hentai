@@ -107,6 +107,7 @@ class TagRepository extends Repository
                         }
                     ]
                 )
+                ->take(300)
                 ->get();
 
             return TagResource::collection($tag);
