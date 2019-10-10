@@ -101,6 +101,10 @@ class RichContentService
             else if ($type === 'link')
             {
                 $meta = $row['data']['meta'];
+                if (!$meta)
+                {
+                    continue;
+                }
                 $title = trim($meta['title']);
                 $description = trim($meta['description']);
 
