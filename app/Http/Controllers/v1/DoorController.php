@@ -12,6 +12,7 @@ use App\Services\Socialite\AccessToken;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -563,18 +564,6 @@ class DoorController extends Controller
         return $this->resOK('手机号绑定成功');
     }
 
-    // Todo：解绑第三方账号，但是账号会被删除
-    public function unbindProvider()
-    {
-
-    }
-
-    // Todo：更换手机号，需要发短信验证
-    public function changePhone()
-    {
-
-    }
-
     // 微信小程序注册用户或获取当前用户的 token
     public function wechatMiniAppLogin(Request $request)
     {
@@ -643,8 +632,8 @@ class DoorController extends Controller
         }
 
         $client = new Client();
-        $appId = config("app.oauth2.wechat_mini_app.{$appName}.app_id");
-        $appSecret = config("app.oauth2.wechat_mini_app.{$appName}.app_secret");
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.client_id");
+        $appSecret = config("app.oauth2.wechat_mini_app.{$appName}.client_secret");
         $resp = $client->get(
             "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
             [
@@ -653,6 +642,7 @@ class DoorController extends Controller
         );
         $body = json_decode($resp->body, true);
         $uniqueId = $body['unionid'] ?? '';
+
         if (!$uniqueId)
         {
             return $this->resOK([
