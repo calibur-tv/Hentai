@@ -12,7 +12,9 @@ class IdolController extends Controller
      */
     public function list(Request $request)
     {
-
+        $sort = $request->get('sort');
+        $page = $request->get('page');
+        $take = $request->get('take') ?: 10;
     }
 
     /**
