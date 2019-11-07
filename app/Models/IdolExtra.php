@@ -17,9 +17,9 @@ class IdolExtra extends Model
     protected $fillable = [
         'idol_slug',
         'lover_user_slug',
-        'fans_count',
-        'coin_count',
+        'market_price',
         'stock_price',
-        'market_price'
+        'fans_count',
+        'coin_count'
     ];
 }

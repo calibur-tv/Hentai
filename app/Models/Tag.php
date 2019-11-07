@@ -148,6 +148,7 @@ class Tag extends Model
     public function addPin(Pin $pin, $user)
     {
         $this->pins()->attach($pin->id);
+
         event(new \App\Events\Tag\AddPin($this, $pin, $user));
     }
 }
