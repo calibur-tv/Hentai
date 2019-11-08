@@ -48,7 +48,7 @@ class Query
                     'birthday' => $meta[1] ?? ''
                 ];
             });
-        dd($result);
-        return $ql;
+
+        return $result;
     }
 }
