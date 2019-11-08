@@ -120,7 +120,7 @@ return [
         'notebook' => 'uh4f',           // 用户专栏
         'pin' => '1o2bqt',              // 文章标签
         'qa' => '1o34sa',               // 答题
-        'idol' => '',                   // 偶像
+        'idol' => '1ogn45',             // 偶像
     ],
 
     'qiniu' => [
