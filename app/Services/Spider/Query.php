@@ -194,6 +194,7 @@ class Query
             })->all();
 
             $result = [
+                'id' => $id,
                 'name' => $name,
                 'avatar' => "http:{$avatar}",
                 'ep_total' => $count,
