@@ -73,7 +73,7 @@ class Query
         }
         catch (\Exception $e)
         {
-            Log::info("get bangumi - idol {$id} failed", $e);
+            Log::info("get bangumi - idol {$id} failed");
             return [];
         }
     }
@@ -110,7 +110,7 @@ class Query
         }
         catch (\Exception $e)
         {
-            Log::info("get bangumi page {$id} failed", $e);
+            Log::info("get bangumi page {$id} failed");
             return [];
         }
     }
@@ -141,7 +141,7 @@ class Query
         }
         catch (\Exception $e)
         {
-            Log::info("get idol {$id} failed", $e);
+            Log::info("get idol {$id} failed");
             return null;
         }
     }
@@ -208,7 +208,7 @@ class Query
         }
         catch (\Exception $e)
         {
-            Log::info("get bangumi {$id} failed", $e);
+            Log::info("get bangumi {$id} failed");
             return null;
         }
     }
