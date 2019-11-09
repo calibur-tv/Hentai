@@ -36,7 +36,7 @@ class Test extends Command
     {
         $query = new Query();
 
-        $lastPage = Redis::GET('bangumi-fetch-page') ?: 1;
+        $lastPage = Redis::GET('bangumi-fetch-page-2') ?: 1;
         if ((int)$lastPage > 200)
         {
             return true;
@@ -90,7 +90,7 @@ class Test extends Command
             }
         }
 
-        Redis::SET('bangumi-fetch-page', (int)$lastPage + 1);
+        Redis::SET('bangumi-fetch-page-2', (int)$lastPage + 1);
 
         return true;
     }
