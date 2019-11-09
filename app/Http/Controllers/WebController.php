@@ -22,8 +22,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        $query = new Query();
-
-        return $this->resOK($query->getIdols('http://bgm.tv/subject/975/characters'));
+        return $this->resOK('YOU KNOW SPRO?');
     }
 }
