@@ -37,6 +37,10 @@ class Test extends Command
         $query = new Query();
 
         $lastPage = Redis::GET('bangumi-fetch-page') ?: 1;
+        if ((int)$lastPage > 200)
+        {
+            return true;
+        }
 
         $bangumi = $query->getBangumiList($lastPage);
 
