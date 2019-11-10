@@ -34,64 +34,6 @@ class Test extends Command
      */
     public function handle()
     {
-        $query = new Query();
-
-        $lastPage = Redis::GET('bangumi-fetch-page-2') ?: 1;
-        if ((int)$lastPage > 200)
-        {
-            return true;
-        }
-
-        $bangumi = $query->getBangumiList($lastPage);
-
-        foreach ($bangumi as $item)
-        {
-            $bangumiExist = DB
-                ::table('bangumi_copy')
-                ->where('type', 1)
-                ->where('name', $item['name'])
-                ->count();
-
-            if ($bangumiExist)
-            {
-                continue;
-            }
-
-            DB::table('bangumi_copy')
-                ->insert([
-                    'type' => 1,
-                    'name' => $item['name'],
-                    'source_id' => $item['id'],
-                    'text' => json_encode($item),
-                ]);
-
-            $idols = $query->getBangumiIdols($item['id']);
-
-            foreach ($idols as $idol)
-            {
-                $idolExist = DB
-                    ::table('bangumi_copy')
-                    ->where('type', 2)
-                    ->where('name', $idol['name'])
-                    ->count();
-
-                if ($idolExist)
-                {
-                    continue;
-                }
-
-                DB::table('bangumi_copy')
-                    ->insert([
-                        'type' => 2,
-                        'name' => $idol['name'],
-                        'source_id' => $idol['id'],
-                        'text' => json_encode($idol),
-                    ]);
-            }
-        }
-
-        Redis::SET('bangumi-fetch-page-2', (int)$lastPage + 1);
-
         return true;
     }
 }
