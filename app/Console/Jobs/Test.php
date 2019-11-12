@@ -60,7 +60,7 @@ class Test extends Command
         $search = new Search();
         $QShell = new Qshell();
         $creator = User::where('id', 2)->first();
-        $bangumiRoot = config('app.tag.bangumi');
+        $bangumiRoot = Tag::where('slug', config('app.tag.bangumi'))->first();
 
         foreach ($bangumiList as $bangumi)
         {
