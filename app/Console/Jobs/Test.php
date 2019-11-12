@@ -76,7 +76,7 @@ class Test extends Command
                     'avatar' => $avatar,
                     'name' => $idol->name,
                     'intro' => $extra->detail,
-                    'alias' => implode(',', $extra->别名) . isset($extra->简体中文名) ? (',' . $extra->简体中文名) : ''
+                    'alias' => (isset($extra->别名) ? (implode(',', $extra->别名)) : '') . (isset($extra->简体中文名) ? (',' . $extra->简体中文名) : '')
                 ], $creator);
             }
 
