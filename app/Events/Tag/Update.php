@@ -12,14 +12,16 @@ class Update
 
     public $tag;
     public $user;
+    public $isIdol;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Tag $tag, User $user)
+    public function __construct(Tag $tag, User $user, bool $isIdol)
     {
         $this->tag = $tag;
         $this->user = $user;
+        $this->isIdol = $isIdol;
     }
 }

@@ -25,6 +25,10 @@ class InitTagTimeline
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         $tag = $event->tag;
         $tag->timeline()->create([
             'event_type' => 1,

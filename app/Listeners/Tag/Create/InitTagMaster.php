@@ -25,6 +25,10 @@ class InitTagMaster
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         $event->user->favorite($event->tag);
     }
 }

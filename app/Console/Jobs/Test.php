@@ -55,7 +55,6 @@ class Test extends Command
         }
 
         $QShell = new Qshell();
-        $creator = User::where('id', 2)->first();
         $idolRoot = Tag::where('slug', config('app.tag.idol'))->first();
 
         foreach ($bangumiList as $bangumi)
@@ -66,9 +65,11 @@ class Test extends Command
                 ->where('relation_slug', $bangumi->source_id)
                 ->get();
 
+            $creator = Tag::where('slug', $bangumi->relation_slug)->first();
+
             foreach ($idols as $idol)
             {
-                $tag = Tag::createTag($idol->name, $creator, $idolRoot);
+                $tag = Tag::createTag($idol->name, $creator, $idolRoot, true);
 
                 $extra = json_decode($idol->text);
                 $avatar = $QShell->fetch($extra->avatar);
@@ -77,7 +78,7 @@ class Test extends Command
                     'name' => $idol->name,
                     'intro' => $extra->detail,
                     'alias' => (isset($extra->别名) ? (implode(',', $extra->别名)) : '') . (isset($extra->简体中文名) ? (',' . $extra->简体中文名) : '')
-                ], $creator);
+                ], $creator, true);
             }
 
             DB

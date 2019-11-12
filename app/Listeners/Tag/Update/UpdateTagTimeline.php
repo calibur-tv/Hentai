@@ -25,6 +25,10 @@ class UpdateTagTimeline
      */
     public function handle(\App\Events\Tag\Update $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         $tag = $event->tag;
         $tag->timeline()->create([
             'event_type' => 2,

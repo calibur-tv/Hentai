@@ -78,7 +78,7 @@ class Tag extends Model
         return $this->morphMany('App\Models\Timeline', 'timelineable');
     }
 
-    public static function createTag($name, $user, $parent)
+    public static function createTag($name, $user, $parent, $isIdol = false)
     {
         $tag = self::create([
             'creator_slug' => $user->slug,
@@ -98,12 +98,12 @@ class Tag extends Model
             ], JSON_UNESCAPED_UNICODE)
         ]);
 
-        event(new \App\Events\Tag\Create($tag, $user, $parent));
+        event(new \App\Events\Tag\Create($tag, $user, $parent, $isIdol));
 
         return $tag;
     }
 
-    public function updateTag(array $data, $user)
+    public function updateTag(array $data, $user, $isIdol = false)
     {
         $text = $this
             ->content()
@@ -124,7 +124,7 @@ class Tag extends Model
                 'text' => json_encode($newData, JSON_UNESCAPED_UNICODE)
             ]);
 
-        event(new \App\Events\Tag\Update($this, $user));
+        event(new \App\Events\Tag\Update($this, $user, $isIdol));
 
         return $this;
     }

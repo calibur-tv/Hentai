@@ -26,6 +26,10 @@ class UpdateCreatorTimeline
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         if (
             !in_array($event->tag->parent_slug, [
                 config('app.tag.topic'),

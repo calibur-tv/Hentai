@@ -13,15 +13,17 @@ class Create
     public $tag;
     public $user;
     public $parent;
+    public $isIdol;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Tag $tag, User $user, Tag $parent)
+    public function __construct(Tag $tag, $user, Tag $parent, bool $isIdol)
     {
         $this->tag = $tag;
         $this->user = $user;
         $this->parent = $parent;
+        $this->isIdol = $isIdol;
     }
 }

@@ -25,6 +25,10 @@ class CreateQuestionRule
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         $tag = $event->tag;
         if (
             !in_array($tag->parent_slug, [

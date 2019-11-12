@@ -21,7 +21,8 @@ class AddTagToSearch
             !in_array($tag->parent_slug, [
                 config('app.tag.topic'),
                 config('app.tag.bangumi'),
-                config('app.tag.game')
+                config('app.tag.game'),
+                config('app.tag.idol')
             ])
         )
         {

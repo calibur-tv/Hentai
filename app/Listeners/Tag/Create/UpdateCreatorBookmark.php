@@ -27,6 +27,10 @@ class UpdateCreatorBookmark
      */
     public function handle(\App\Events\Tag\Create $event)
     {
+        if ($event->isIdol)
+        {
+            return;
+        }
         $user = $event->user;
         $user->bookmark($event->tag, Tag::class);
 
