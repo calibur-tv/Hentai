@@ -85,7 +85,7 @@ class Test extends Command
             $hasBangumi = $search->retrieve($bangumi->name, 'tag');
             if ($hasBangumi['total'])
             {
-                $tag = Tag::where('slug', $hasBangumi['result'][0]['slug'])->first();
+                $tag = Tag::where('slug', $hasBangumi['result'][0]->slug)->first();
             }
             else
             {
