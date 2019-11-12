@@ -37,17 +37,14 @@ class Test extends Command
     public function handle()
     {
         /**
-         * 1. 从 bangumi_copy 读番剧数据
-         * 2. 如果这个番剧有 idol 就继续，如果没有就标记
-         * 3. 到 search 里查有没有相似的
-         * 4. 如果有相似的，更新相似的，如果没有，就创建
-         * 5. 然后标记 bangumi_copy 和 tags 里的数据，设为已 migration
-         * 6. 把 bangumi_copy 中 idol 类别的 relation_slug 更新一下
+         * 1. 从 bangumi_copy 中读番剧
+         * 2. 查到响应的 idol
+         * 3. 把 idol 写到 tag 表里
          */
         $bangumiList = DB
             ::table('bangumi_copy')
             ->where('type', 1)
-            ->whereNull('relation_slug')
+            ->whereNotNull('relation_slug')
             ->orderBy('id', 'ASC')
             ->take(100)
             ->get();
@@ -57,57 +54,40 @@ class Test extends Command
             return true;
         }
 
-        $search = new Search();
         $QShell = new Qshell();
         $creator = User::where('id', 2)->first();
-        $bangumiRoot = Tag::where('slug', config('app.tag.bangumi'))->first();
+        $idolRoot = Tag::where('slug', config('app.tag.idol'))->first();
 
         foreach ($bangumiList as $bangumi)
         {
-            $idolCount = DB
+            $idols = DB
                 ::table('bangumi_copy')
                 ->where('type', 2)
                 ->where('relation_slug', $bangumi->source_id)
-                ->count();
+                ->get();
 
-            if (!$idolCount)
+            foreach ($idols as $idol)
             {
-                DB
-                    ::table('bangumi_copy')
-                    ->where('id', $bangumi->id)
-                    ->update([
-                        'relation_slug' => ''
-                    ]);
+                $tag = Tag::createTag($idol->name, $creator, $idolRoot);
 
-                continue;
+                $extra = json_decode($idol->text);
+                $avatar = $QShell->fetch($extra->avatar);
+                $tag->updateTag([
+                    'avatar' => $avatar,
+                    'name' => $idol->name,
+                    'intro' => $extra->detail,
+                    'alias' => implode(',', $extra->alias)
+                ], $creator);
             }
-
-            $hasBangumi = $search->retrieve($bangumi->name, 'tag');
-            if ($hasBangumi['total'])
-            {
-                $tag = Tag::where('slug', $hasBangumi['result'][0]->slug)->first();
-            }
-            else
-            {
-                $tag = Tag::createTag($bangumi->name, $creator, $bangumiRoot);
-            }
-
-            $extra = json_decode($bangumi->text);
-            $avatar = $QShell->fetch($extra->avatar);
-            $tag->updateTag([
-                'avatar' => $avatar,
-                'name' => $bangumi->name,
-                'intro' => $extra->detail,
-                'alias' => implode(',', $extra->alias)
-            ], $creator);
 
             DB
                 ::table('bangumi_copy')
                 ->where('id', $bangumi->id)
                 ->update([
-                    'relation_slug' => $tag->slug
+                    'type' => 3
                 ]);
         }
+
         return true;
     }
 }
