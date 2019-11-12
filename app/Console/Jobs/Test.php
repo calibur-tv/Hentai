@@ -50,7 +50,8 @@ class Test extends Command
             ->whereNull('relation_slug')
             ->orderBy('id', 'ASC')
             ->take(100)
-            ->get();
+            ->get()
+            ->toArray();
 
         if (empty($bangumiList))
         {
