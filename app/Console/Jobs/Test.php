@@ -50,8 +50,7 @@ class Test extends Command
             ->whereNull('relation_slug')
             ->orderBy('id', 'ASC')
             ->take(100)
-            ->get()
-            ->toArray();
+            ->get();
 
         if (empty($bangumiList))
         {
@@ -68,14 +67,14 @@ class Test extends Command
             $idolCount = DB
                 ::table('bangumi_copy')
                 ->where('type', 2)
-                ->where('relation_slug', $bangumi['source_id'])
+                ->where('relation_slug', $bangumi->source_id)
                 ->count();
 
             if (!$idolCount)
             {
                 DB
                     ::table('bangumi_copy')
-                    ->where('id', $bangumi['id'])
+                    ->where('id', $bangumi->id)
                     ->update([
                         'relation_slug' => ''
                     ]);
@@ -83,28 +82,28 @@ class Test extends Command
                 continue;
             }
 
-            $hasBangumi = $search->retrieve($bangumi['name'], 'tag');
+            $hasBangumi = $search->retrieve($bangumi->name, 'tag');
             if ($hasBangumi['total'])
             {
                 $tag = Tag::where('slug', $hasBangumi['result'][0]['slug'])->first();
             }
             else
             {
-                $tag = Tag::createTag($bangumi['name'], $creator, $bangumiRoot);
+                $tag = Tag::createTag($bangumi->name, $creator, $bangumiRoot);
             }
 
-            $extra = json_decode($bangumi['text']);
+            $extra = json_decode($bangumi->text);
             $avatar = $QShell->fetch($extra['avatar']);
             $tag->updateTag([
                 'avatar' => $avatar,
-                'name' => $bangumi['name'],
+                'name' => $bangumi->name,
                 'intro' => $extra['detail'],
                 'alias' => $extra['alias']
             ], $creator);
 
             DB
                 ::table('bangumi_copy')
-                ->where('id', $bangumi['id'])
+                ->where('id', $bangumi->id)
                 ->update([
                     'relation_slug' => $tag->slug
                 ]);
