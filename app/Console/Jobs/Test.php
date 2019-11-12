@@ -5,6 +5,7 @@ namespace App\Console\Jobs;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\Repository;
 use App\Http\Repositories\UserRepository;
+use App\Models\IdolExtra;
 use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\OpenSearch\Search;
@@ -36,57 +37,26 @@ class Test extends Command
      */
     public function handle()
     {
-        /**
-         * 1. 从 bangumi_copy 中读番剧
-         * 2. 查到响应的 idol
-         * 3. 把 idol 写到 tag 表里
-         */
-        $bangumiList = DB
-            ::table('bangumi_copy')
-            ->where('type', 1)
-            ->whereNotNull('relation_slug')
-            ->orderBy('id', 'ASC')
-            ->take(100)
+        $list = Tag
+            ::where('parent_slug', config('app.tag.idol'))
+            ->where('migration_state', '<>', 5)
+            ->take(400)
             ->get();
 
-        if (empty($bangumiList))
+        foreach ($list as $item)
         {
-            return true;
-        }
+            IdolExtra::create([
+                'idol_slug' => $item->slug,
+                'lover_user_slug' => '',
+                'market_price' => 0,
+                'stock_price' => 0,
+                'fans_count' => 0,
+                'coin_count' => 0
+            ]);
 
-        $QShell = new Qshell();
-        $idolRoot = Tag::where('slug', config('app.tag.idol'))->first();
-
-        foreach ($bangumiList as $bangumi)
-        {
-            $idols = DB
-                ::table('bangumi_copy')
-                ->where('type', 2)
-                ->where('relation_slug', $bangumi->source_id)
-                ->get();
-
-            $creator = Tag::where('slug', $bangumi->relation_slug)->first();
-
-            foreach ($idols as $idol)
-            {
-                $tag = Tag::createTag($idol->name, $creator, $idolRoot, true);
-
-                $extra = json_decode($idol->text);
-                $avatar = $QShell->fetch($extra->avatar);
-                $tag->updateTag([
-                    'avatar' => $avatar,
-                    'name' => $idol->name,
-                    'intro' => $extra->detail,
-                    'alias' => (isset($extra->别名) ? (implode(',', $extra->别名)) : '') . (isset($extra->简体中文名) ? (',' . $extra->简体中文名) : '')
-                ], $creator, true);
-            }
-
-            DB
-                ::table('bangumi_copy')
-                ->where('id', $bangumi->id)
-                ->update([
-                    'type' => 3
-                ]);
+            $item->update([
+                'migration_state' => 5
+            ]);
         }
 
         return true;
