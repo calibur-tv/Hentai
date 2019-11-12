@@ -98,7 +98,7 @@ class Test extends Command
                 'avatar' => $avatar,
                 'name' => $bangumi->name,
                 'intro' => $extra->detail,
-                'alias' => $extra->alias
+                'alias' => implode(',', $extra->alias)
             ], $creator);
 
             DB
