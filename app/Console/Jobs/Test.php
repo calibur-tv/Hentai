@@ -93,12 +93,12 @@ class Test extends Command
             }
 
             $extra = json_decode($bangumi->text);
-            $avatar = $QShell->fetch($extra['avatar']);
+            $avatar = $QShell->fetch($extra->avatar);
             $tag->updateTag([
                 'avatar' => $avatar,
                 'name' => $bangumi->name,
-                'intro' => $extra['detail'],
-                'alias' => $extra['alias']
+                'intro' => $extra->detail,
+                'alias' => $extra->alias
             ], $creator);
 
             DB
