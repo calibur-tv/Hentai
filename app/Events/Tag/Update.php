@@ -18,7 +18,7 @@ class Update
      *
      * @return void
      */
-    public function __construct(Tag $tag, User $user, bool $isIdol)
+    public function __construct(Tag $tag, $user, bool $isIdol)
     {
         $this->tag = $tag;
         $this->user = $user;
