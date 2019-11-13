@@ -45,18 +45,19 @@ class IdolRepository extends Repository
 
     public function idolHotIds($page, $take, $refresh = false)
     {
-        $list = $this->RedisList($this->idolIdsCacheKey('hot'), function ()
+        $list = $this->RedisList($this->idolIdsCacheKey('hottest'), function ()
         {
-            $keyVal = IdolExtra
+            $list = IdolExtra
                 ::orderBy('market_price', 'DESC')
                 ->orderBy('fans_count', 'DESC')
-                ->pluck('idol_slug', 'lover_user_slug')
+                ->select('lover_user_slug', 'idol_slug')
+                ->get()
                 ->toArray();
 
             $result = [];
-            foreach ($keyVal as $user => $slug)
+            foreach ($list as $item)
             {
-                $result[] = $slug . '#' . $user;
+                $result[] = $item->idol_slug . '#' . $item->lover_user_slug;
             }
 
             return $result;
