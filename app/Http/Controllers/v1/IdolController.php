@@ -20,6 +20,12 @@ class IdolController extends Controller
 
         $idolRepository = new IdolRepository();
         $idsObj = $idolRepository->idolHotIds($page, $take);
+        if (!count($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idsObj['result'] = $idolRepository->list($idsObj['result']);
 
         return $this->resOK($idsObj);
     }

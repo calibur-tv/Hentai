@@ -47,20 +47,11 @@ class IdolRepository extends Repository
     {
         $list = $this->RedisList($this->idolIdsCacheKey('hottest'), function ()
         {
-            $list = IdolExtra
+            return IdolExtra
                 ::orderBy('market_price', 'DESC')
                 ->orderBy('fans_count', 'DESC')
-                ->select('lover_user_slug', 'idol_slug')
-                ->get()
+                ->pluck('idol_slug')
                 ->toArray();
-
-            $result = [];
-            foreach ($list as $item)
-            {
-                $result[] = $item['idol_slug'] . '#' . $item['lover_user_slug'];
-            }
-
-            return $result;
 
         }, $refresh);
 
