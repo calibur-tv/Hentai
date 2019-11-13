@@ -57,7 +57,7 @@ class IdolRepository extends Repository
             $result = [];
             foreach ($list as $item)
             {
-                $result[] = $item->idol_slug . '#' . $item->lover_user_slug;
+                $result[] = $item['idol_slug'] . '#' . $item['lover_user_slug'];
             }
 
             return $result;
