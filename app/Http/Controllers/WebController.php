@@ -22,6 +22,8 @@ class WebController extends Controller
 {
     public function index()
     {
-        return $this->resOK('YOU KNOW SPRO?');
+        $query = new Query();
+        $result = $query->getBangumiDetail(153);
+        return $this->resOK($result);
     }
 }
