@@ -212,4 +212,44 @@ class Query
             return null;
         }
     }
+
+    public function getNewsBangumi()
+    {
+        try
+        {
+            $url = 'http://bangumi.tv/calendar';
+            $ql = QueryList::get($url);
+            $data = $ql
+                ->find('.coverList')
+                ->map(function ($item)
+                {
+                    return $item
+                        ->find('li')
+                        ->map(function ($li)
+                        {
+                            $info = $li->find('.nav')->eq(1);
+                            return [
+                                'id' => last(explode('/', $info->href)),
+                                'name' => $info->text()
+                            ];
+                        })
+                        ->all();
+                })
+                ->all();
+
+            $result = [];
+
+            foreach ($data as $row)
+            {
+                $result = array_merge($result, $row);
+            }
+
+            return $result;
+        }
+        catch (\Exception $e)
+        {
+            Log::info("[--spider--]：get news bangumi failed");
+            return [];
+        }
+    }
 }
