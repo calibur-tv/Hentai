@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\IdolRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +17,11 @@ class IdolController extends Controller
         $sort = $request->get('sort');
         $page = $request->get('page');
         $take = $request->get('take') ?: 10;
+
+        $idolRepository = new IdolRepository();
+        $idsObj = $idolRepository->idolHotIds($page, $take);
+
+        return $this->resOK($idsObj);
     }
 
     /**

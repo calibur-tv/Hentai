@@ -73,6 +73,11 @@ $route->group(['prefix' => 'search'], function () use ($route)
     $route->get('tags', 'TagController@search');
 });
 
+$route->group(['prefix' => 'idol'], function () use ($route)
+{
+    $route->get('list', 'IdolController@list');
+});
+
 $route->group(['prefix' => 'message'], function () use ($route)
 {
     $route->get('total', 'MessageController@getMessageTotal');

@@ -48,6 +48,11 @@ class Tag extends Model
         return $this->belongsTo('App\User', 'id', 'user_id');
     }
 
+    public function extra()
+    {
+        return $this->belongsTo('App\Models\IdolExtra', 'slug', 'idol_slug');
+    }
+
     public function children()
     {
         return $this->hasMany('App\Models\Tag', 'parent_slug', 'slug');

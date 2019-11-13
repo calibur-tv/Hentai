@@ -22,4 +22,9 @@ class IdolExtra extends Model
         'fans_count',
         'coin_count'
     ];
+
+    public function info()
+    {
+        return $this->belongsTo('App\Models\Tag', 'idol_slug', 'slug');
+    }
 }
