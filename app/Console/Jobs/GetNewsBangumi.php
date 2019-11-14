@@ -55,13 +55,13 @@ class GetNewsBangumi extends Command
 
             $bangumi = $query->getBangumiDetail($item['id']);
             $avatar = $QShell->fetch($bangumi['avatar']);
-            $tag = Tag::createTag($bangumi['name'], $creator, $bangumiRoot, true);
+            $tag = Tag::createTag($bangumi['name'], $creator, $bangumiRoot);
             $tag->updateTag([
                 'playing' => 1,
                 'avatar' => trimImage($avatar),
                 'alias' => implode(',', $bangumi['alias']),
                 'intro' => $bangumi['detail']
-            ], $creator, true);
+            ], $creator);
         }
         return true;
     }

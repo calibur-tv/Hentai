@@ -23,7 +23,7 @@ class WebController extends Controller
     public function index()
     {
         $query = new Query();
-        $result = $query->getBangumiDetail(153);
+        $result = $query->getNewsBangumi();
         return $this->resOK($result);
     }
 }
