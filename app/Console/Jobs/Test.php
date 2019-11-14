@@ -10,6 +10,7 @@ use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\OpenSearch\Search;
 use App\Services\Qiniu\Qshell;
+use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
 use App\User;
 use Illuminate\Console\Command;
@@ -37,6 +38,8 @@ class Test extends Command
      */
     public function handle()
     {
+        $bangumiSource = new BangumiSource();
+        $bangumiSource->loadHottestBangumi();
         return true;
     }
 }
