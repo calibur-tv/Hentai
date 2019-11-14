@@ -30,6 +30,7 @@ class GetNewsBangumi extends Command
      */
     public function handle()
     {
+        return true;
         $query = new Query();
         $news = $query->getNewsBangumi();
         if (empty($news))
@@ -40,10 +41,11 @@ class GetNewsBangumi extends Command
         $QShell = new Qshell();
         $creator = User::where('id', 2)->first();
         $bangumiRoot = Tag::where('slug', config('app.tag.bangumi'))->first();
-        foreach ($news as $item)
+        foreach ($news as $index => $item)
         {
             if (!$item['name'])
             {
+                unset($news[$index]);
                 continue;
             }
 
@@ -56,8 +58,10 @@ class GetNewsBangumi extends Command
             $bangumi = $query->getBangumiDetail($item['id']);
             if (!$bangumi['name'])
             {
+                unset($news[$index]);
                 continue;
             }
+
             $avatar = $QShell->fetch($bangumi['avatar']);
             $tag = Tag::createTag($bangumi['name'], $creator, $bangumiRoot);
             $tag->updateTag([
