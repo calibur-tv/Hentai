@@ -170,7 +170,7 @@ class Query
                 $arr = explode(': ', $item);
                 if ($arr[0] === '中文名')
                 {
-                    $name = $arr[1];
+                    $name = trim($arr[1]);
                     $alias[] = $name;
                 }
                 else if ($arr[0] === '话数')
@@ -227,11 +227,8 @@ class Query
                         ->find('li')
                         ->map(function ($li)
                         {
-                            $info = $li->find('.nav')->eq(1);
-                            return [
-                                'id' => last(explode('/', $info->href)),
-                                'name' => $info->text()
-                            ];
+                            $info = $li->find('.nav')->eq(0);
+                            return last(explode('/', $info->href));
                         })
                         ->all();
                 })

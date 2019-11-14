@@ -30,7 +30,6 @@ class GetNewsBangumi extends Command
      */
     public function handle()
     {
-        return true;
         $query = new Query();
         $news = $query->getNewsBangumi();
         if (empty($news))
@@ -43,22 +42,10 @@ class GetNewsBangumi extends Command
         $bangumiRoot = Tag::where('slug', config('app.tag.bangumi'))->first();
         foreach ($news as $index => $item)
         {
-            if (!$item['name'])
-            {
-                unset($news[$index]);
-                continue;
-            }
-
-            $result = $search->retrieve(strtolower($item['name']), 'tag');
+            $bangumi = $query->getBangumiDetail($item);
+            $result = $search->retrieve(strtolower($bangumi['name']), 'tag');
             if ($result['total'])
             {
-                continue;
-            }
-
-            $bangumi = $query->getBangumiDetail($item['id']);
-            if (!$bangumi['name'])
-            {
-                unset($news[$index]);
                 continue;
             }
 
