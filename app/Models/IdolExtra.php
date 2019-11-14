@@ -16,6 +16,7 @@ class IdolExtra extends Model
 
     protected $fillable = [
         'idol_slug',
+        'is_new',
         'lover_user_slug',
         'market_price',
         'stock_price',

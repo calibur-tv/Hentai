@@ -22,6 +22,7 @@ class IdolItemResource extends JsonResource
 
         return [
             'slug' => $this->slug,
+            'is_new' => $this->is_new,
             'name' => $content['name'],
             'intro' => $content['intro'],
             'avatar' => patchImage($content['avatar'], 'default-poster'),
