@@ -32,7 +32,6 @@ class GetNewsBangumi extends Command
     {
         $query = new Query();
         $news = $query->getNewsBangumi();
-        return;
         if (empty($news))
         {
             return true;
@@ -55,6 +54,10 @@ class GetNewsBangumi extends Command
             }
 
             $bangumi = $query->getBangumiDetail($item['id']);
+            if (!$bangumi['name'])
+            {
+                continue;
+            }
             $avatar = $QShell->fetch($bangumi['avatar']);
             $tag = Tag::createTag($bangumi['name'], $creator, $bangumiRoot);
             $tag->updateTag([
