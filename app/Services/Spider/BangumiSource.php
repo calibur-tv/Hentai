@@ -102,6 +102,8 @@ class BangumiSource
 
     protected function getBangumiIdols($id)
     {
+        $query = new Query();
+        $QShell = new Qshell();
         $idols = $query->getBangumiIdols($id);
         foreach ($idols as $idol)
         {
