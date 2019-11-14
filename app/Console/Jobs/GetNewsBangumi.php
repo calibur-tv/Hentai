@@ -61,7 +61,7 @@ class GetNewsBangumi extends Command
                 'avatar' => trimImage($avatar),
                 'alias' => implode(',', $bangumi['alias']),
                 'intro' => $bangumi['detail']
-            ]);
+            ], $creator, true);
         }
         return true;
     }
