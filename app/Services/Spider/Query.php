@@ -128,11 +128,11 @@ class Query
 
             $detail = trim($ql->find('.detail')->text());
             $extra['alias'] = [];
-            if ($extra['简体中文名'])
+            if (isset($extra['简体中文名']))
             {
                 $extra['alias'][] = $extra['简体中文名'];
             }
-            if ($extra['别名'])
+            if (isset($extra['别名']))
             {
                 $extra['alias'][] = $extra['别名'];
             }
