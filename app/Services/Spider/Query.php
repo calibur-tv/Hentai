@@ -131,7 +131,7 @@ class Query
                 $extra[$arr[0]] = $arr[1];
             }
 
-            $detail = $ql->find('.detail')->text();
+            $detail = trim($ql->find('.detail')->text());
 
             return [
                 'avatar' => "http:{$avatar}",
@@ -187,7 +187,7 @@ class Query
                 }
             }
 
-            $detail = $ql->find('#subject_summary')->text();
+            $detail = trim($ql->find('#subject_summary')->text());
 
             $tags = $ql->find('.subject_tag_section')->eq(0)->find('span')->map(function ($item){
                 return $item->text();
