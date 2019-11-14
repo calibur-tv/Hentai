@@ -40,9 +40,7 @@ class GetNewsBangumi extends Command
         if (!$cache)
         {
             Redis::SET($cacheKey, json_encode($news));
-            // TODO 之后删除
-            $cache = json_encode([]);
-            // return true;
+            return true;
         }
         $cache = json_decode($cache);
 
@@ -71,9 +69,10 @@ class GetNewsBangumi extends Command
             {
                 // TODO 之后删除
                 $tag = Tag::where('slug', $result['result'][0]->slug)->first();
+                $bangumiCreator = User::where('id', 2)->first();
                 $tag->updateTag([
                     'playing' => 1
-                ]);
+                ], $bangumiCreator);
                 continue;
             }
 
@@ -102,6 +101,7 @@ class GetNewsBangumi extends Command
             }
 
             $bangumiSlug = $result['result'][0]->slug;
+            $bangumiCreator = User::where('id', 2)->first();
             $tag = Tag::where('slug', $bangumiSlug)->first();
             if (is_null($tag))
             {
@@ -109,7 +109,7 @@ class GetNewsBangumi extends Command
             }
             $tag->updateTag([
                 'playing' => 0,
-            ]);
+            ], $bangumiCreator);
 
             $idolSlug = Tag
                 ::where('parent_slug', config('app.tag.idol'))
