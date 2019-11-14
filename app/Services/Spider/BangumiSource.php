@@ -42,6 +42,8 @@ class BangumiSource
                 'alias' => implode('|', $info['alias']),
                 'source_id' => $id
             ]);
+
+            $this->getBangumiIdols($id);
         }
 
         Idol
