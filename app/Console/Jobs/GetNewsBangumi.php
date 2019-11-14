@@ -32,6 +32,7 @@ class GetNewsBangumi extends Command
     {
         $query = new Query();
         $news = $query->getNewsBangumi();
+        return;
         if (empty($news))
         {
             return true;
