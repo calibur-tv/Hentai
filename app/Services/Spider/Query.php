@@ -59,13 +59,18 @@ class Query
                 return (isset($item['sex']) && $item['sex']) && (isset($item['birthday']) && $item['birthday']);
             });
 
-            $filtered = [];
-            foreach ($result as $i => $item)
+            $result = array_map(function ($item)
             {
-                $detail = $this->getIdolDetail($item['id']);
+                return $item['id'];
+            }, $result);
+
+            $filtered = [];
+            foreach ($result as $id)
+            {
+                $detail = $this->getIdolDetail($id);
                 if ($detail)
                 {
-                    $filtered[] = array_merge($item, $detail);
+                    $filtered[] = $detail;
                 }
             }
 
@@ -132,11 +137,22 @@ class Query
             }
 
             $detail = trim($ql->find('.detail')->text());
+            $extra['alias'] = [];
+            if ($extra['简体中文名'])
+            {
+                $extra['alias'][] = $extra['简体中文名'];
+            }
+            if ($extra['别名'])
+            {
+                $extra['alias'][] = $extra['别名'];
+            }
 
             return [
+                'id' => $id,
                 'avatar' => "http:{$avatar}",
-                'detail' => $detail,
-                'extra' => $extra
+                'name' => $extra['简体中文名'],
+                'intro' => $detail,
+                'alias' => $extra['alias']
             ];
         }
         catch (\Exception $e)
@@ -187,24 +203,22 @@ class Query
                 }
             }
 
-            $detail = trim($ql->find('#subject_summary')->text());
+            $intro = trim($ql->find('#subject_summary')->text());
 
             $tags = $ql->find('.subject_tag_section')->eq(0)->find('span')->map(function ($item){
                 return $item->text();
             })->all();
 
-            $result = [
+            return [
                 'id' => $id,
                 'name' => $name,
                 'avatar' => "http:{$avatar}",
                 'ep_total' => $count,
                 'published_at' => $publish,
                 'alias' => $alias,
-                'detail' => $detail,
+                'intro' => $intro,
                 'tags' => $tags
             ];
-
-            return $result;
         }
         catch (\Exception $e)
         {

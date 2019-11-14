@@ -13,6 +13,7 @@ use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Tag;
+use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
 use App\User;
 use Illuminate\Http\Request;
@@ -22,8 +23,8 @@ class WebController extends Controller
 {
     public function index()
     {
-        $query = new Query();
-        $result = $query->getNewsBangumi();
-        return $this->resOK($result);
+        $bangumiSource = new BangumiSource();
+        $bangumiSource->updateReleaseBangumi();
+        return $this->resOK('ok');
     }
 }
