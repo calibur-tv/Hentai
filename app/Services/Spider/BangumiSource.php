@@ -28,7 +28,13 @@ class BangumiSource
             }
 
             $info = $query->getBangumiDetail($id);
-            if (!$info || !$info['name'])
+            if (!$info)
+            {
+                Redis::SADD('load-bangumi-failed-ids', $id);
+                continue;
+            }
+
+            if (!$info['name'])
             {
                 continue;
             }
@@ -70,9 +76,20 @@ class BangumiSource
         $QShell = new Qshell();
         $list = $query->getBangumiList($page);
 
+        if (empty($list))
+        {
+            Redis::SADD('load-bangumi-failed-page', $page);
+        }
+
         foreach ($list as $item)
         {
-            if (!$item || !$item['name'])
+            if (!$item)
+            {
+                Redis::SADD('load-bangumi-failed-ids', $id);
+                continue;
+            }
+
+            if (!$item['name'])
             {
                 continue;
             }
@@ -102,13 +119,30 @@ class BangumiSource
         Redis::SET('load-hottest-bangumi-page', intval($page) + 1);
     }
 
-    protected function getBangumiIdols($id)
+    protected function getBangumiIdols($bangumiId)
     {
         $query = new Query();
         $QShell = new Qshell();
-        $idols = $query->getBangumiIdols($id);
-        foreach ($idols as $idol)
+        $ids = $query->getBangumiIdols($bangumiId);
+        if (empty($ids))
         {
+            Redis::SADD('load-bangumi-idol-failed', $bangumiId);
+        }
+
+        foreach ($ids as $id)
+        {
+            $idol = $query->getIdolDetail($id);
+            if (!$idol)
+            {
+                Redis::SADD('load-idol-failed-ids', $id);
+                continue;
+            }
+
+            if (!$idol['name'])
+            {
+                continue;
+            }
+
             $has = Idol
                 ::where('source_id', $idol['id'])
                 ->first();

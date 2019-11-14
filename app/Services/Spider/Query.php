@@ -64,17 +64,7 @@ class Query
                 return $item['id'];
             }, $result);
 
-            $filtered = [];
-            foreach ($result as $id)
-            {
-                $detail = $this->getIdolDetail($id);
-                if ($detail)
-                {
-                    $filtered[] = $detail;
-                }
-            }
-
-            return $filtered;
+            return $result;
         }
         catch (\Exception $e)
         {
