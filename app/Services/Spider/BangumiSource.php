@@ -154,7 +154,7 @@ class BangumiSource
     {
         $query = new Query();
         $ids = $query->getBangumiIdols($sourceId);
-        if (empty($ids))
+        if (false === $ids)
         {
             Redis::SADD('load-bangumi-idol-failed', "{$sourceId}##{$bangumiSlug}");
             return false;

@@ -69,7 +69,7 @@ class Query
         catch (\Exception $e)
         {
             Log::info("[--spider--]：get bangumi - idol {$id} failed");
-            return [];
+            return false;
         }
     }
 

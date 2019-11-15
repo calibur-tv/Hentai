@@ -23,6 +23,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        return $this->resOK('');
+        return $this->resOK();
     }
 }
