@@ -76,35 +76,35 @@ class BangumiSource
         }
     }
 
-    public function retryFailedBangumi()
+    public function retryFailedBangumiIdols()
     {
         $ids = Redis::SMEMBERS('load-bangumi-idol-failed');
         if (!$ids)
         {
             return;
         }
-        $id = $ids[0];
+        $arr = implode('##', $ids[0]);
 
-        $result = $this->getBangumiIdols($id);
+        $result = $this->getBangumiIdols($arr[0], $arr[1]);
         if ($result)
         {
-            Redis::SREM('load-bangumi-idol-failed', $id);
+            Redis::SREM('load-bangumi-idol-failed', $ids[0]);
         }
     }
 
-    public function retryFailedIdol()
+    public function retryFailedIdolDetail()
     {
         $ids = Redis::SMEMBERS('load-idol-failed-ids');
         if (!$ids)
         {
             return;
         }
-        $id = $ids[0];
+        $arr = implode('##', $ids[0]);
 
-        $result = $this->loadIdolItem($id);
+        $result = $this->loadIdolItem($arr[0], $arr[1]);
         if ($result)
         {
-            Redis::SREM('load-idol-failed-ids', $id);
+            Redis::SREM('load-idol-failed-ids', $ids[0]);
         }
     }
 
@@ -134,28 +134,29 @@ class BangumiSource
                 'source_id' => $source['id']
             ]);
 
+        $bangumiSlug = id2slug($bangumi->id);
         $bangumi->update([
-            'slug' => id2slug($bangumi->id)
+            'slug' => $bangumiSlug
         ]);
 
-        $this->getBangumiIdols($source['id']);
+        $this->getBangumiIdols($source['id'], $bangumiSlug);
 
         return $bangumi;
     }
 
-    public function getBangumiIdols($sourceId)
+    public function getBangumiIdols($sourceId, $bangumiSlug)
     {
         $query = new Query();
         $ids = $query->getBangumiIdols($sourceId);
         if (empty($ids))
         {
-            Redis::SADD('load-bangumi-idol-failed', $sourceId);
+            Redis::SADD('load-bangumi-idol-failed', "{$sourceId}##{$bangumiSlug}");
             return false;
         }
 
         foreach ($ids as $id)
         {
-            $this->loadIdolItem($id);
+            $this->loadIdolItem($id, $bangumiSlug);
         }
 
         return true;
@@ -183,18 +184,19 @@ class BangumiSource
         }
     }
 
-    protected function loadIdolItem($id)
+    protected function loadIdolItem($id, $bangumiSlug)
     {
         if (!$id)
         {
             return true;
         }
+
         $query = new Query();
         $QShell = new Qshell();
         $idol = $query->getIdolDetail($id);
         if (!$idol)
         {
-            Redis::SADD('load-idol-failed-ids', $id);
+            Redis::SADD('load-idol-failed-ids', "{$id}##{$bangumiSlug}");
             return false;
         }
 
@@ -212,14 +214,17 @@ class BangumiSource
             return true;
         }
 
-        $avatar = $QShell->fetch($idol['avatar']);
-
-        Idol::create([
+        $idol = Idol::create([
             'title' => $idol['name'],
-            'avatar' => $avatar,
+            'avatar' => $QShell->fetch($idol['avatar']),
             'intro' => $idol['intro'],
+            'source_id' => $idol['id'],
             'alias' => implode('|', $idol['alias']),
-            'source_id' => $idol['id']
+            'bangumi_slug' => $bangumiSlug
+        ]);
+
+        $idol->update([
+            'slug' => id2slug($idol->id)
         ]);
 
         return true;

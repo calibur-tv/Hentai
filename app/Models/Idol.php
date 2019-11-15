@@ -11,14 +11,15 @@ class Idol extends Model
     protected $table = 'idols';
 
     protected $fillable = [
+        'slug',
         'title',
         'alias',
         'intro',
         'avatar',
         'source_id',
-        'bangumi_id',
-        'is_newbie',
+        'bangumi_slug',
         'lover_slug',
+        'is_newbie',
         'market_price',
         'stock_price',
         'fans_count',

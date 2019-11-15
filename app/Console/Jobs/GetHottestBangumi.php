@@ -40,8 +40,8 @@ class GetHottestBangumi extends Command
     {
         $bangumiSource = new BangumiSource();
         $bangumiSource->loadHottestBangumi();
-        $bangumiSource->retryFailedBangumi();
-        $bangumiSource->retryFailedIdol();
+        $bangumiSource->retryFailedBangumiIdols();
+        $bangumiSource->retryFailedIdolDetail();
         return true;
     }
 }
