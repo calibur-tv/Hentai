@@ -27,7 +27,7 @@ class BangumiController extends Controller
 
     public function create(Request $request)
     {
-        $sourceId = $request->get('id');
+        $sourceId = $request->get('source_id');
         $hasBangumi = Bangumi
             ::where('source_id', $sourceId)
             ->first();
@@ -63,9 +63,9 @@ class BangumiController extends Controller
 
     public function updateAsParent(Request $request)
     {
-        $bangumiId = $request->get('bangumi_id');
+        $bangumiSlug = $request->get('bangumi_slug');
         $bangumi = Bangumi
-            ::where('id', $bangumiId)
+            ::where('slug', $bangumiSlug)
             ->first();
 
         $bangumi->update([
@@ -77,11 +77,11 @@ class BangumiController extends Controller
 
     public function updateAsChild(Request $request)
     {
-        $parentId = $request->get('parent_id');
-        $childId = $request->get('child_id');
+        $parentSlug = $request->get('parent_slug');
+        $childSlug = $request->get('child_slug');
 
         $parent = Bangumi
-            ::where('id', $parentId)
+            ::where('slug', $parentSlug)
             ->first();
 
         if (!$parent || !$parent->is_parent)
@@ -90,7 +90,7 @@ class BangumiController extends Controller
         }
 
         $child = Bangumi
-            ::where('id', $childId)
+            ::where('slug', $childSlug)
             ->first();
 
         if (!$child)
@@ -99,7 +99,7 @@ class BangumiController extends Controller
         }
 
         $child->update([
-            'parent_id' => $parent->id
+            'parent_slug' => $parent->slug
         ]);
 
         return $this->resNoContent();

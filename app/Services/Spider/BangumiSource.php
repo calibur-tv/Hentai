@@ -134,6 +134,10 @@ class BangumiSource
                 'source_id' => $source['id']
             ]);
 
+        $bangumi->update([
+            'slug' => id2slug($bangumi->id)
+        ]);
+
         $this->getBangumiIdols($source['id']);
 
         return $bangumi;
