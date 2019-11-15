@@ -15,6 +15,7 @@ class BangumiSource
     {
         $query = new Query();
         $newIds = $query->getNewsBangumi();
+        $bangumiSlugs = [];
         foreach ($newIds as $id)
         {
             $bangumi = Bangumi
@@ -23,6 +24,7 @@ class BangumiSource
 
             if ($bangumi)
             {
+                $bangumiSlugs[] = $bangumi->slug;
                 continue;
             }
 
@@ -33,17 +35,21 @@ class BangumiSource
                 continue;
             }
 
-            $this->importBangumi($info);
+            $bangumi = $this->importBangumi($info);
+            if ($bangumi)
+            {
+                $bangumiSlugs[] = $bangumi->slug;
+            }
         }
 
         Idol
-            ::whereNotIn('bangumi_id', $newIds)
+            ::whereNotIn('bangumi_slug', $bangumiSlugs)
             ->update([
                 'is_newbie' => 0
             ]);
 
         Idol
-            ::whereIn('bangumi_id', $newIds)
+            ::whereIn('bangumi_slug', $bangumiSlugs)
             ->update([
                 'is_newbie' => 1
             ]);
@@ -121,7 +127,7 @@ class BangumiSource
 
         if ($bangumi)
         {
-            return null;
+            return $bangumi;
         }
 
         $QShell = new Qshell();
