@@ -58,11 +58,45 @@ class BangumiController extends Controller
 
     public function updateAsParent(Request $request)
     {
+        $bangumiId = $request->get('bangumi_id');
+        $bangumi = Bangumi
+            ::where('id', $bangumiId)
+            ->first();
 
+        $bangumi->update([
+            'is_parent' => false
+        ]);
+
+        return $this->resNoContent();
     }
 
     public function updateAsChild(Request $request)
     {
+        $parentId = $request->get('parent_id');
+        $childId = $request->get('child_id');
 
+        $parent = Bangumi
+            ::where('id', $parentId)
+            ->first();
+
+        if (!$parent || !$parent->is_parent)
+        {
+            return $this->resErrBad('指定节点非合集');
+        }
+
+        $child = Bangumi
+            ::where('id', $childId)
+            ->first();
+
+        if (!$child)
+        {
+            return $this->resErrBad();
+        }
+
+        $child->update([
+            'parent_id' => $parent->id
+        ]);
+
+        return $this->resNoContent();
     }
 }
