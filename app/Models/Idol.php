@@ -17,6 +17,11 @@ class Idol extends Model
         'avatar',
         'source_id',
         'bangumi_id',
-        'is_newbie'
+        'is_newbie',
+        'lover_slug',
+        'market_price',
+        'stock_price',
+        'fans_count',
+        'coin_count'
     ];
 }
