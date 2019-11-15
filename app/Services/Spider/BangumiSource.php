@@ -83,7 +83,7 @@ class BangumiSource
         {
             return;
         }
-        $arr = implode('##', $ids[0]);
+        $arr = explode('##', $ids[0]);
 
         $result = $this->getBangumiIdols($arr[0], $arr[1]);
         if ($result)
@@ -99,7 +99,7 @@ class BangumiSource
         {
             return;
         }
-        $arr = implode('##', $ids[0]);
+        $arr = explode('##', $ids[0]);
 
         $result = $this->loadIdolItem($arr[0], $arr[1]);
         if ($result)
