@@ -14,7 +14,6 @@ class BangumiSource
     public function updateReleaseBangumi()
     {
         $query = new Query();
-        $QShell = new Qshell();
         $newIds = $query->getNewsBangumi();
         foreach ($newIds as $id)
         {
@@ -34,34 +33,18 @@ class BangumiSource
                 continue;
             }
 
-            if (!$info['name'])
-            {
-                continue;
-            }
-
-            $avatar = $QShell->fetch($info['avatar']);
-
-            Bangumi::create([
-                'title' => $info['name'],
-                'avatar' => $avatar,
-                'intro' => $info['intro'],
-                'alias' => implode('|', $info['alias']),
-                'source_id' => $id
-            ]);
-
-            $this->getBangumiIdols($id);
+            $this->importBangumi($info);
         }
+
+        Idol
+            ::update([
+                'is_newbie' => 0
+            ]);
 
         Idol
             ::whereIn('bangumi_id', $newIds)
             ->update([
                 'is_newbie' => 1
-            ]);
-
-        Idol
-            ::whereNotIn('bangumi_id', $newIds)
-            ->update([
-                'is_newbie' => 0
             ]);
     }
 
@@ -124,10 +107,58 @@ class BangumiSource
         }
     }
 
+    public function importBangumi($source)
+    {
+        if (!$source || !$source['name'])
+        {
+            return null;
+        }
+
+        $bangumi = Bangumi
+            ::where('source_id', $source['id'])
+            ->first();
+
+        if ($bangumi)
+        {
+            return null;
+        }
+
+        $QShell = new Qshell();
+        $bangumi = Bangumi
+            ::create([
+                'title' => $source['name'],
+                'avatar' => $QShell->fetch($source['avatar']),
+                'intro' => $source['intro'],
+                'alias' => implode('|', $source['alias']),
+                'source_id' => $source['id']
+            ]);
+
+        $this->getBangumiIdols($source['id']);
+
+        return $bangumi;
+    }
+
+    public function getBangumiIdols($sourceId)
+    {
+        $query = new Query();
+        $ids = $query->getBangumiIdols($sourceId);
+        if (empty($ids))
+        {
+            Redis::SADD('load-bangumi-idol-failed', $sourceId);
+            return false;
+        }
+
+        foreach ($ids as $id)
+        {
+            $this->loadIdolItem($id);
+        }
+
+        return true;
+    }
+
     protected function getHottestBangumi($page)
     {
         $query = new Query();
-        $QShell = new Qshell();
         $list = $query->getBangumiList($page);
 
         if (empty($list))
@@ -143,50 +174,8 @@ class BangumiSource
                 continue;
             }
 
-            if (!$item['name'])
-            {
-                continue;
-            }
-
-            $bangumi = Bangumi
-                ::where('source_id', $item['id'])
-                ->first();
-
-            if ($bangumi)
-            {
-                continue;
-            }
-
-            $avatar = $QShell->fetch($item['avatar']);
-            Bangumi
-                ::create([
-                    'title' => $item['name'],
-                    'avatar' => $avatar,
-                    'intro' => $item['intro'],
-                    'alias' => implode('|', $item['alias']),
-                    'source_id' => $item['id']
-                ]);
-
-            $this->getBangumiIdols($item['id']);
+            $this->importBangumi($item);
         }
-    }
-
-    protected function getBangumiIdols($bangumiId)
-    {
-        $query = new Query();
-        $ids = $query->getBangumiIdols($bangumiId);
-        if (empty($ids))
-        {
-            Redis::SADD('load-bangumi-idol-failed', $bangumiId);
-            return false;
-        }
-
-        foreach ($ids as $id)
-        {
-            $this->loadIdolItem($id);
-        }
-
-        return true;
     }
 
     protected function loadIdolItem($id)
