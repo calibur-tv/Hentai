@@ -68,10 +68,33 @@ class BangumiSource
     public function loadHottestBangumi()
     {
         $page = Redis::GET('load-hottest-bangumi-page') ?: 1;
+        $fetchFailed = false;
         if ($page > 200)
         {
-            return;
+            $pages = Redis::SMEMBERS('load-hottest-bangumi-page');
+            if (!$pages)
+            {
+                return;
+            }
+            $fetchFailed = true;
+            $page = $pages[0];
         }
+
+        $this->getHottestBangumi($page);
+
+        if ($fetchFailed)
+        {
+            Redis::SREM($page);
+        }
+        else
+        {
+            Redis::SET('load-hottest-bangumi-page', intval($page) + 1);
+        }
+    }
+
+    protected function getHottestBangumi($page)
+    {
+
         $query = new Query();
         $QShell = new Qshell();
         $list = $query->getBangumiList($page);
@@ -115,8 +138,6 @@ class BangumiSource
 
             $this->getBangumiIdols($item['id']);
         }
-
-        Redis::SET('load-hottest-bangumi-page', intval($page) + 1);
     }
 
     protected function getBangumiIdols($bangumiId)

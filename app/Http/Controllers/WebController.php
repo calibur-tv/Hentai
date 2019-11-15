@@ -23,8 +23,6 @@ class WebController extends Controller
 {
     public function index()
     {
-        $bangumiSource = new BangumiSource();
-        $bangumiSource->updateReleaseBangumi();
-        return $this->resOK('ok');
+        return $this->resOK('');
     }
 }
