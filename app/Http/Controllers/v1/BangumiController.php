@@ -20,6 +20,11 @@ class BangumiController extends Controller
 
     }
 
+    public function score(Request $request)
+    {
+
+    }
+
     public function create(Request $request)
     {
         $sourceId = $request->get('id');
@@ -37,7 +42,7 @@ class BangumiController extends Controller
 
         if (is_null($info))
         {
-            return $this->resErrThrottle('数据爬去失败');
+            return $this->resErrThrottle('数据爬取失败');
         }
 
         $bangumiSource = new BangumiSource();

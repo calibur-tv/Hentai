@@ -37,7 +37,8 @@ class BangumiSource
         }
 
         Idol
-            ::update([
+            ::whereNotIn('bangumi_id', $newIds)
+            ->update([
                 'is_newbie' => 0
             ]);
 
