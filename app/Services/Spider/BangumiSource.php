@@ -71,7 +71,7 @@ class BangumiSource
         $fetchFailed = false;
         if ($page > 200)
         {
-            $pages = Redis::SMEMBERS('load-hottest-bangumi-page');
+            $pages = Redis::SMEMBERS('load-bangumi-failed-page');
             if (!$pages)
             {
                 return;
@@ -84,7 +84,7 @@ class BangumiSource
 
         if ($fetchFailed)
         {
-            Redis::SREM('load-hottest-bangumi-page', $page);
+            Redis::SREM('load-bangumi-failed-page', $page);
         }
         else
         {
