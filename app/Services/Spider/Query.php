@@ -128,19 +128,27 @@ class Query
 
             $detail = trim($ql->find('.detail')->text());
             $extra['alias'] = [];
+            $validate = false;
             if (isset($extra['简体中文名']))
             {
+                $validate = true;
                 $extra['alias'][] = $extra['简体中文名'];
             }
             if (isset($extra['别名']))
             {
+                $validate = true;
                 $extra['alias'][] = $extra['别名'];
+            }
+
+            if (!$validate)
+            {
+                return null;
             }
 
             return [
                 'id' => $id,
                 'avatar' => "http:{$avatar}",
-                'name' => $extra['简体中文名'],
+                'name' => $extra['alias'][0],
                 'intro' => $detail,
                 'alias' => $extra['alias']
             ];

@@ -84,7 +84,7 @@ class BangumiSource
 
         if ($fetchFailed)
         {
-            Redis::SREM($page);
+            Redis::SREM('load-hottest-bangumi-page', $page);
         }
         else
         {
@@ -92,9 +92,40 @@ class BangumiSource
         }
     }
 
+    public function retryFailedBangumi()
+    {
+        $ids = Redis::SMEMBERS('load-bangumi-idol-failed');
+        if (!$ids)
+        {
+            return;
+        }
+        $id = $ids[0];
+
+        $result = $this->getBangumiIdols($id);
+        if ($result)
+        {
+            Redis::SREM('load-bangumi-idol-failed', $id);
+        }
+    }
+
+    public function retryFailedIdol()
+    {
+        $ids = Redis::SMEMBERS('load-idol-failed-ids');
+        if (!$ids)
+        {
+            return;
+        }
+        $id = $ids[0];
+
+        $result = $this->loadIdolItem($id);
+        if ($result)
+        {
+            Redis::SREM('load-idol-failed-ids', $id);
+        }
+    }
+
     protected function getHottestBangumi($page)
     {
-
         $query = new Query();
         $QShell = new Qshell();
         $list = $query->getBangumiList($page);
@@ -143,45 +174,60 @@ class BangumiSource
     protected function getBangumiIdols($bangumiId)
     {
         $query = new Query();
-        $QShell = new Qshell();
         $ids = $query->getBangumiIdols($bangumiId);
         if (empty($ids))
         {
             Redis::SADD('load-bangumi-idol-failed', $bangumiId);
+            return false;
         }
 
         foreach ($ids as $id)
         {
-            $idol = $query->getIdolDetail($id);
-            if (!$idol)
-            {
-                Redis::SADD('load-idol-failed-ids', $id);
-                continue;
-            }
-
-            if (!$idol['name'])
-            {
-                continue;
-            }
-
-            $has = Idol
-                ::where('source_id', $idol['id'])
-                ->first();
-
-            if ($has)
-            {
-                continue;
-            }
-
-            $avatar = $QShell->fetch($idol['avatar']);
-
-            Idol::create([
-                'title' => $idol['name'],
-                'avatar' => $avatar,
-                'intro' => $idol['intro'],
-                'alias' => implode('|', $idol['alias']),
-                'source_id' => $idol['id']
-            ]);
+            $this->loadIdolItem($id);
         }
+
+        return true;
+    }
+
+    protected function loadIdolItem($id)
+    {
+        if (!$id)
+        {
+            return true;
+        }
+        $query = new Query();
+        $QShell = new Qshell();
+        $idol = $query->getIdolDetail($id);
+        if (!$idol)
+        {
+            Redis::SADD('load-idol-failed-ids', $id);
+            return false;
+        }
+
+        if (!$idol['name'])
+        {
+            return false;
+        }
+
+        $has = Idol
+            ::where('source_id', $idol['id'])
+            ->first();
+
+        if ($has)
+        {
+            return true;
+        }
+
+        $avatar = $QShell->fetch($idol['avatar']);
+
+        Idol::create([
+            'title' => $idol['name'],
+            'avatar' => $avatar,
+            'intro' => $idol['intro'],
+            'alias' => implode('|', $idol['alias']),
+            'source_id' => $idol['id']
+        ]);
+
+        return true;
     }
 }
