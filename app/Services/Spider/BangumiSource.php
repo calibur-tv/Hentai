@@ -6,6 +6,7 @@ namespace App\Services\Spider;
 
 use App\Models\Bangumi;
 use App\Models\Idol;
+use App\Models\Search;
 use App\Services\Qiniu\Qshell;
 use Illuminate\Support\Facades\Redis;
 
@@ -131,12 +132,13 @@ class BangumiSource
         }
 
         $QShell = new Qshell();
+        $alias = implode('|', $source['alias']);
         $bangumi = Bangumi
             ::create([
                 'title' => $source['name'],
                 'avatar' => $QShell->fetch($source['avatar']),
                 'intro' => $source['intro'],
-                'alias' => implode('|', $source['alias']),
+                'alias' => $alias,
                 'source_id' => $source['id']
             ]);
 
@@ -146,6 +148,13 @@ class BangumiSource
         ]);
 
         $this->getBangumiIdols($source['id'], $bangumiSlug);
+
+        Search::create([
+            'type' => 4,
+            'slug' => $bangumiSlug,
+            'text' => $alias,
+            'score' => 0
+        ]);
 
         return $bangumi;
     }
@@ -220,17 +229,27 @@ class BangumiSource
             return true;
         }
 
-        $idol = Idol::create([
-            'title' => $idol['name'],
-            'avatar' => $QShell->fetch($idol['avatar']),
-            'intro' => $idol['intro'],
-            'source_id' => $idol['id'],
-            'alias' => implode('|', $idol['alias']),
-            'bangumi_slug' => $bangumiSlug
+        $alias = implode('|', $idol['alias']);
+        $idol = Idol
+            ::create([
+                'title' => $idol['name'],
+                'avatar' => $QShell->fetch($idol['avatar']),
+                'intro' => $idol['intro'],
+                'source_id' => $idol['id'],
+                'alias' => $alias,
+                'bangumi_slug' => $bangumiSlug
+            ]);
+
+        $slug = id2slug($idol->id);
+        $idol->update([
+            'slug' => $slug
         ]);
 
-        $idol->update([
-            'slug' => id2slug($idol->id)
+        Search::create([
+            'type' => 5,
+            'slug' => $slug,
+            'text' => $alias,
+            'score' => 0
         ]);
 
         return true;
