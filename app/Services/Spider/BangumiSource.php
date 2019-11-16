@@ -152,7 +152,7 @@ class BangumiSource
         Search::create([
             'type' => 4,
             'slug' => $bangumiSlug,
-            'text' => $alias,
+            'text' => str_replace('|', ',', $alias),
             'score' => 0
         ]);
 
@@ -248,7 +248,7 @@ class BangumiSource
         Search::create([
             'type' => 5,
             'slug' => $slug,
-            'text' => $alias,
+            'text' => str_replace('|', ',', $alias),
             'score' => 0
         ]);
 
