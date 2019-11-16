@@ -23,7 +23,8 @@ class Idol extends Model
         'market_price',
         'stock_price',
         'fans_count',
-        'coin_count'
+        'coin_count',
+        'migration_state'
     ];
 
     protected $casts = [

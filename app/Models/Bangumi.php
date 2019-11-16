@@ -18,7 +18,8 @@ class Bangumi extends Model
         'avatar',
         'source_id',
         'parent_slug',
-        'is_parent'
+        'is_parent',
+        'migration_state'
     ];
 
     protected $casts = [
