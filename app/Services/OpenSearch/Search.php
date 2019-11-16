@@ -7,6 +7,9 @@ namespace App\Services\OpenSearch;
  * Date: 2018/2/11
  * Time: 上午11:02
  */
+
+use App\Http\Repositories\BangumiRepository;
+use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
@@ -120,7 +123,9 @@ class Search
             'all' => 0,
             'tag' => 1,
             'pin' => 2,
-            'user' => 3
+            'user' => 3,
+            'bangumi' => 4,
+            'idol' => 5
         ];
 
         try
@@ -151,6 +156,14 @@ class Search
         else if ($type == 3)
         {
             return new UserRepository();
+        }
+        else if ($type == 4)
+        {
+            return new BangumiRepository();
+        }
+        else if ($type == 5)
+        {
+            return new IdolRepository();
         }
 
         return null;
