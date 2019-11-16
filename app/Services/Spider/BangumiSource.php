@@ -26,6 +26,7 @@ class BangumiSource
             if ($bangumi)
             {
                 $bangumiSlugs[] = $bangumi->slug;
+                $this->getBangumiIdols($id, $bangumi->slug);
                 continue;
             }
 

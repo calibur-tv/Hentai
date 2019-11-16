@@ -7,7 +7,6 @@ use App\Http\Repositories\Repository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
 use App\Models\Idol;
-use App\Models\IdolExtra;
 use App\Models\Pin;
 use App\Models\Tag;
 use App\Services\OpenSearch\Search;
