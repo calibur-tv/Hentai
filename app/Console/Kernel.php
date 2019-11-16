@@ -36,6 +36,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('ClearSearchRepeatData')->dailyAt('05:00');
         $schedule->command('GetHottestBangumi')->everyMinute()->withoutOverlapping();
         $schedule->command('GetNewsBangumi')->hourly()->withoutOverlapping();
-        // $schedule->command('Test')->everyMinute()->withoutOverlapping();
+        $schedule->command('Test')->everyMinute()->withoutOverlapping();
     }
 }
