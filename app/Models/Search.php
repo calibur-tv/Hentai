@@ -14,6 +14,8 @@ class Search extends Model
      * 1 => tag
      * 2 => pin
      * 3 => user
+     * 4 => bangumi
+     * 5 => idol
      */
     protected $fillable = [
         'type',

@@ -5,6 +5,8 @@ namespace App\Console\Jobs;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\Repository;
 use App\Http\Repositories\UserRepository;
+use App\Models\Bangumi;
+use App\Models\Idol;
 use App\Models\IdolExtra;
 use App\Models\Pin;
 use App\Models\Tag;
@@ -38,6 +40,44 @@ class Test extends Command
      */
     public function handle()
     {
+        $bangumi = Bangumi
+            ::where('migration_state', 0)
+            ->take(1000)
+            ->get();
+
+        foreach ($bangumi as $item)
+        {
+            \App\Models\Search::create([
+                'type' => 4,
+                'slug' => $item->slug,
+                'text' => $item->alias,
+                'score' => 0
+            ]);
+
+            $item->update([
+                'migration_state' => 1
+            ]);
+        }
+
+        $idol = Idol
+            ::where('migration_state', 0)
+            ->take(1000)
+            ->get();
+
+        foreach ($idol as $item)
+        {
+            \App\Models\Search::create([
+                'type' => 5,
+                'slug' => $item->slug,
+                'text' => $item->alias,
+                'score' => 0
+            ]);
+
+            $item->update([
+                'migration_state' => 1
+            ]);
+        }
+
         return true;
     }
 }
