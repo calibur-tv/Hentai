@@ -25,4 +25,18 @@ class Idol extends Model
         'fans_count',
         'coin_count'
     ];
+
+    protected $casts = [
+        'is_newbie' => 'boolean'
+    ];
+
+    public function bangumi()
+    {
+        return $this->belongsTo('App\Models\Bangumi', 'bangumi_slug', 'slug');
+    }
+
+    public function lover()
+    {
+        return $this->hasOne('App\User', 'slug', 'lover_slug');
+    }
 }

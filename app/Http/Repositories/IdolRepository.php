@@ -5,6 +5,7 @@ namespace App\Http\Repositories;
 
 
 use App\Http\Transformers\Idol\IdolItemResource;
+use App\Models\Idol;
 use App\Models\IdolExtra;
 use App\Models\Tag;
 
@@ -19,12 +20,8 @@ class IdolRepository extends Repository
 
         $result = $this->RedisItem("idol:{$slug}", function () use ($slug)
         {
-            $idol = Tag
+            $idol = Idol
                 ::where('slug', $slug)
-                ->with(['extra', 'content' => function ($query)
-                {
-                    $query->orderBy('created_at', 'desc');
-                }])
                 ->first();
 
             if (is_null($idol))
@@ -47,10 +44,40 @@ class IdolRepository extends Repository
     {
         $list = $this->RedisList($this->idolIdsCacheKey('hottest'), function ()
         {
-            return IdolExtra
+            return Idol
                 ::orderBy('market_price', 'DESC')
-                ->orderBy('fans_count', 'DESC')
-                ->pluck('idol_slug')
+                ->orderBy('stock_price', 'DESC')
+                ->pluck('slug')
+                ->toArray();
+
+        }, $refresh);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
+    public function idolReleaseIds($page, $take, $refresh = false)
+    {
+        $list = $this->RedisList($this->idolIdsCacheKey('release'), function ()
+        {
+            return Idol
+                ::where('is_newbie', 1)
+                ->orderBy('market_price', 'DESC')
+                ->orderBy('stock_price', 'DESC')
+                ->pluck('slug')
+                ->toArray();
+
+        }, $refresh);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
+    public function idolActiveIds($page, $take, $refresh = false)
+    {
+        $list = $this->RedisList($this->idolIdsCacheKey('active'), function ()
+        {
+            return Idol
+                ::orderBy('updated_at', 'DESC')
+                ->pluck('slug')
                 ->toArray();
 
         }, $refresh);

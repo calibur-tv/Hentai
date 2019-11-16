@@ -5,7 +5,6 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\IdolRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class IdolController extends Controller
 {
@@ -19,8 +18,19 @@ class IdolController extends Controller
         $take = $request->get('take') ?: 10;
 
         $idolRepository = new IdolRepository();
-        $idsObj = $idolRepository->idolHotIds($page, $take);
-        if (!count($idsObj['result']))
+        if ($sort === 'active')
+        {
+            $idsObj = $idolRepository->idolActiveIds($page, $take);
+        }
+        else if ($sort === 'release')
+        {
+            $idsObj = $idolRepository->idolReleaseIds($page, $take);
+        }
+        else
+        {
+            $idsObj = $idolRepository->idolHotIds($page, $take);
+        }
+        if (!$idsObj['total'])
         {
             return $this->resOK($idsObj);
         }
