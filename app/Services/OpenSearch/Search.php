@@ -86,6 +86,10 @@ class Search
                 $typeId = (int)$item['type'];
                 $slug = $item['slug'];
                 $repository = $this->getRepositoryByType($typeId);
+                if (!$repository)
+                {
+                    continue;
+                }
                 $item = $repository->item($slug);
                 if (!$item)
                 {
