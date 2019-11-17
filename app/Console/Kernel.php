@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
         Jobs\ComputeUserDailyStat::class,
         Jobs\ClearSearchRepeatData::class,
         Jobs\GetNewsBangumi::class,
-        Jobs\GetHottestBangumi::class
+        Jobs\GetHottestBangumi::class,
+        Jobs\UpdateIdolRank::class,
     ];
 
     /**
@@ -36,6 +37,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('ClearSearchRepeatData')->dailyAt('05:00');
         $schedule->command('GetHottestBangumi')->everyMinute()->withoutOverlapping();
         $schedule->command('GetNewsBangumi')->hourly()->withoutOverlapping();
+        $schedule->command('UpdateIdolRank')->hourly()->withoutOverlapping();
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
     }
 }

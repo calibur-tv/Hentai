@@ -2,15 +2,8 @@
 
 namespace App\Console\Jobs;
 
-use App\Models\IdolExtra;
-use App\Models\Tag;
-use App\Services\OpenSearch\Search;
-use App\Services\Qiniu\Qshell;
 use App\Services\Spider\BangumiSource;
-use App\Services\Spider\Query;
-use App\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Redis;
 
 class GetNewsBangumi extends Command
 {

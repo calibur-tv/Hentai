@@ -15,6 +15,7 @@ class Idol extends Model
         'title',
         'alias',
         'intro',
+        'rank',
         'avatar',
         'source_id',
         'bangumi_slug',
