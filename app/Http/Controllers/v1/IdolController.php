@@ -45,6 +45,20 @@ class IdolController extends Controller
      */
     public function show(Request $request)
     {
+        $slug = $request->get('slug');
+        $idolRepository = new IdolRepository();
+
+        $result = $idolRepository->item($slug);
+        if (!$result)
+        {
+            return $this->resErrNotFound();
+        }
+
+        return $this->resOK($result);
+    }
+
+    public function patch(Request $request)
+    {
 
     }
 

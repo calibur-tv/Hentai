@@ -76,6 +76,10 @@ $route->group(['prefix' => 'search'], function () use ($route)
 $route->group(['prefix' => 'idol'], function () use ($route)
 {
     $route->get('list', 'IdolController@list');
+
+    $route->get('show', 'IdolController@show');
+
+    $route->get('patch', 'IdolController@patch');
 });
 
 $route->group(['prefix' => 'message'], function () use ($route)
