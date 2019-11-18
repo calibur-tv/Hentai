@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\IdolPatchCounter;
+use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\IdolRepository;
 use App\Models\IdolFans;
 use Illuminate\Http\Request;
@@ -116,21 +117,29 @@ class IdolController extends Controller
      */
     public function vote(Request $request)
     {
+        $slug = $request->get('slug');
 
+        $idolRepository = new IdolRepository();
+        $idol = $idolRepository->item($slug);
+        if (!$idol)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $user = $request->user();
+        $virtualCoinService = new VirtualCoinService();
+        $amount = $request->get('amount');
+
+        if ($virtualCoinService->hasCoinCount($user) < $amount)
+        {
+            return $this->resErrBad('没有足够的团子');
+        }
     }
 
     /**
      * 股势
      */
     public function trend(Request $request)
-    {
-
-    }
-
-    /**
-     * 创建偶像
-     */
-    public function create(Request $request)
     {
 
     }
