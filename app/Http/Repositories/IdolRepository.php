@@ -78,7 +78,7 @@ class IdolRepository extends Repository
                 ->pluck('updated_at', 'slug')
                 ->toArray();
 
-        }, ['force' => $refresh]);
+        }, ['force' => $refresh, 'is_time' => true]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }
