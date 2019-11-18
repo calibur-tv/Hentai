@@ -40,6 +40,10 @@ class AuthServiceProvider extends ServiceProvider
             try
             {
                 $maskId = explode(':', $token)[0];
+                if (strlen($maskId) > 11)
+                {
+                    return null;
+                }
                 $userId = slug2id($maskId);
 
                 return User::where('id', $userId)->first();
