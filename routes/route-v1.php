@@ -79,7 +79,12 @@ $route->group(['prefix' => 'idol'], function () use ($route)
 
     $route->get('show', 'IdolController@show');
 
-    $route->get('patch', 'IdolController@patch');
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('patch', 'IdolController@patch');
+    });
+
+    $route->get('batch_patch', 'IdolController@batch_patch');
 });
 
 $route->group(['prefix' => 'message'], function () use ($route)

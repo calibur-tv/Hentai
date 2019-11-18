@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Repositories\IdolRepository;
+use App\Models\IdolFans;
 use Illuminate\Http\Request;
 
 class IdolController extends Controller
@@ -73,16 +74,41 @@ class IdolController extends Controller
         $patch = $idolPathCounter->all($slug);
 
         $user = $request->user();
+        $info = null;
         if ($user)
         {
+            $info = IdolFans
+                ::where('idol_slug', $slug)
+                ->where('user_slug', $user->slug)
+                ->first();
+        }
 
+        if ($info)
+        {
+            $patch['star_count'] = $info->star_count;
+            $patch['total_price'] = $info->total_price;
         }
         else
         {
-
+            $patch['star_count'] = 0;
+            $patch['total_price'] = 0;
         }
 
         return $this->resOK($patch);
+    }
+
+    public function batchPatch(Request $request)
+    {
+        $list = $request->get('slug') ? explode(',', $request->get('slug')) : [];
+        $idolPatchCounter = new IdolPatchCounter();
+
+        $result = [];
+        foreach ($list as $slug)
+        {
+            $result[$slug] = $idolPatchCounter->all($slug);
+        }
+
+        return $this->resOK($result);
     }
 
     /**
