@@ -20,11 +20,11 @@ class UpdateIdolData
 
     public function handle(\App\Events\Idol\BuyStock $event)
     {
-        $event->idol->increment('coin_count', $event->coinCount);
+        $event->idol->increment('coin_count', $event->coinAmount);
 
         if ($event->fansData)
         {
-            $event->fansData->increment('coin_count', $event->coinCount);
+            $event->fansData->increment('coin_count', $event->coinAmount);
             $event->fansData->increment('stock_count', $event->stockCount);
         }
         else
@@ -34,7 +34,7 @@ class UpdateIdolData
             IdolFans::create([
                 'user_slug' => $event->user->slug,
                 'idol_slug' => $event->idol->slug,
-                'coin_count' => $event->coinCount,
+                'coin_count' => $event->coinAmount,
                 'stock_count' => $event->stockCount
             ]);
         }

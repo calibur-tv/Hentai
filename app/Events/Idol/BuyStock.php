@@ -13,7 +13,7 @@ class BuyStock
 
     public $user;
     public $idol;
-    public $coinCount;
+    public $coinAmount;
     public $stockCount;
     public $fansData;
 
@@ -22,11 +22,11 @@ class BuyStock
      *
      * @return void
      */
-    public function __construct(User $user, Idol $idol, $coinCount, $stockCount)
+    public function __construct(User $user, Idol $idol, $coinAmount, $stockCount)
     {
         $this->user = $user;
         $this->idol = $idol;
-        $this->coinCount = $coinCount;
+        $this->coinAmount = $coinAmount;
         $this->stockCount = $stockCount;
         $this->fansData = IdolFans
             ::where('user_slug', $user->slug)

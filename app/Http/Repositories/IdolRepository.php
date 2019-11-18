@@ -83,7 +83,7 @@ class IdolRepository extends Repository
         return $this->filterIdsByPage($list, $page, $take);
     }
 
-    protected function idolIdsCacheKey($sort)
+    public function idolIdsCacheKey($sort)
     {
         return "idol-list-{$sort}-ids";
     }

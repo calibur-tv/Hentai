@@ -119,7 +119,7 @@ class IdolController extends Controller
     public function vote(Request $request)
     {
         $slug = $request->get('slug');                  // slug
-        $coinCount = $request->get('coin_count');       // 需要支付的团子数
+        $coinAmount = $request->get('coin_amount');     // 需要支付的团子数
         $stockCount = $request->get('stock_count');     // 购入的股份数
 
         $idol = Idol
@@ -130,25 +130,25 @@ class IdolController extends Controller
             return $this->resErrNotFound();
         }
 
-        if ($idol->stock_price * $stockCount != $coinCount)
+        if ($idol->stock_price * $stockCount != $coinAmount)
         {
             return $this->resErrBad('股价已经变更');
         }
 
         $user = $request->user();
         $virtualCoinService = new VirtualCoinService();
-        if ($virtualCoinService->hasCoinCount($user) < $coinCount)
+        if ($virtualCoinService->hasCoinCount($user) < $coinAmount)
         {
             return $this->resErrBad('没有足够的团子');
         }
 
-        $result = $virtualCoinService->buyIdolStock($user->slug, $slug, $coinCount);
+        $result = $virtualCoinService->buyIdolStock($user->slug, $slug, $coinAmount);
         if (!$result)
         {
             return $this->resErrServiceUnavailable('交易失败');
         }
 
-        event(new \App\Events\Idol\BuyStock($user, $idol, $coinCount, $stockCount));
+        event(new \App\Events\Idol\BuyStock($user, $idol, $coinAmount, $stockCount));
 
         return $this->resNoContent();
     }

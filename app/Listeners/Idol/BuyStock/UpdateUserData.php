@@ -19,6 +19,6 @@ class UpdateUserData
 
     public function handle(\App\Events\Idol\BuyStock $event)
     {
-        //
+        $event->user->increment('buy_idol_count', $event->coinAmount);
     }
 }

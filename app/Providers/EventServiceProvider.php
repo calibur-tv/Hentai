@@ -128,5 +128,11 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\User\JoinZone\RefreshUserTimeline',
             'App\Listeners\User\JoinZone\RefreshUserCache',
         ],
+        'App\Events\Idol\BuyStock' => [
+            'App\Listeners\Idol\BuyStock\UpdateIdolData',
+            'App\Listeners\Idol\BuyStock\UpdateIdolPatch',
+            'App\Listeners\Idol\BuyStock\UpdateIdolRankList',
+            'App\Listeners\Idol\BuyStock\UpdateUserData',
+        ],
     ];
 }
