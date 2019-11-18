@@ -32,6 +32,11 @@ class UserHomeResource extends JsonResource
             'friends_count' => $this->friends_count,
             'visit_count' => $this->visit_count,
             'daily_signed' => $userDailySign->check($this->slug),
+            'continuous_sign_count' => $this->continuous_sign_count,
+            'total_sign_count' => $this->total_sign_count,
+            'latest_signed_at' => $this->latest_signed_at,
+            'buy_idol_count' => $this->buy_idol_count,
+            'get_idol_count' => $this->get_idol_count,
             'sign' => [
                 'continuous_sign_count' => $this->continuous_sign_count,
                 'total_sign_count' => $this->total_sign_count,
