@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\IdolRepository;
+use App\Models\Idol;
 use App\Models\IdolFans;
 use Illuminate\Http\Request;
 
@@ -117,23 +118,39 @@ class IdolController extends Controller
      */
     public function vote(Request $request)
     {
-        $slug = $request->get('slug');
+        $slug = $request->get('slug');      // slug
+        $amount = $request->get('amount');  // 需要支付的团子数
+        $count = $request->get('count');    // 购入的股份数
 
-        $idolRepository = new IdolRepository();
-        $idol = $idolRepository->item($slug);
+        $idol = Idol
+            ::where('slug', $slug)
+            ->first();
         if (!$idol)
         {
             return $this->resErrNotFound();
         }
 
+        if ($idol->stock_price * $count != $amount)
+        {
+            return $this->resErrBad('股价已经变更');
+        }
+
         $user = $request->user();
         $virtualCoinService = new VirtualCoinService();
-        $amount = $request->get('amount');
-
         if ($virtualCoinService->hasCoinCount($user) < $amount)
         {
             return $this->resErrBad('没有足够的团子');
         }
+
+        $result = $virtualCoinService->buyIdolStock($user->slug, $slug, $amount);
+        if (!$result)
+        {
+            return $this->resErrServiceUnavailable('交易失败');
+        }
+
+        event(new \App\Events\Idol\BuyStock($user, $idol, $amount, $count));
+
+        return $this->resNoContent();
     }
 
     /**

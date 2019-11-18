@@ -56,43 +56,7 @@ class VirtualCoinService
     // 每日签到送团子
     public function daySign($userSlug, $amount = 1)
     {
-        $this->addCoin($userSlug, $amount, 0, '', 0);
-    }
-
-    // 邀请用户注册赠送团子
-    public function inviteUser($oldUserSlug, $newUserSlug, $amount = 5)
-    {
-        $this->addCoin($oldUserSlug, $amount, 1, '', $newUserSlug);
-    }
-
-    // 被邀请注册用户送团子
-    public function invitedNewbieCoinGift($oldUserSlug, $newUserSlug, $amount = 2)
-    {
-        $this->addCoin($newUserSlug, $amount, 20, '', $oldUserSlug);
-    }
-
-    // 用户活跃送团子
-    public function userActivityReward($userSlug)
-    {
-        $this->addCoin($userSlug, 1, 2, '', 0);
-    }
-
-    // 管理活跃送光玉
-    public function adminActiveReward($userSlug)
-    {
-        $this->addMoney($userSlug, 1, 19, '', 0);
-    }
-
-    // 给用户赠送团子
-    public function coinGift($toUserId, $amount)
-    {
-        $this->addCoin($toUserId, $amount, 16, '', 0);
-    }
-
-    // 给用户赠送光玉
-    public function lightGift($toUserId, $amount)
-    {
-        $this->addMoney($toUserId, $amount, 17, '', 0);
+        $this->addCoin($userSlug, $amount, 0);
     }
 
     // 给帖子投食
@@ -107,6 +71,63 @@ class VirtualCoinService
         $this->addMoney($toUserSlug, $amount, $channelType, $productSlug, $fromUserSlug);
 
         return true;
+    }
+
+    public function buyIdolStock($userSlug, $idolSlug, $amount)
+    {
+        return $this->useCoinFirst($userSlug, $amount, 2, $idolSlug, '');
+    }
+
+    // 用户活跃送团子
+    public function userActivityReward($userSlug)
+    {
+        $this->addCoin($userSlug, 1, 3);
+    }
+
+    // 管理活跃送光玉
+    public function adminActiveReward($userSlug)
+    {
+        $this->addMoney($userSlug, 1, 4);
+    }
+
+    // 给用户赠送团子
+    public function coinGift($toUserSlug, $amount)
+    {
+        $this->addCoin($toUserSlug, $amount, 5);
+    }
+
+    // 给用户赠送光玉
+    public function lightGift($toUserSlug, $amount)
+    {
+        $this->addMoney($toUserSlug, $amount, 6);
+    }
+
+    // 邀请用户注册赠送团子
+    public function inviteUser($oldUserSlug, $newUserSlug, $amount = 5)
+    {
+        $this->addCoin($oldUserSlug, $amount, 7, '', $newUserSlug);
+    }
+
+    // 被邀请注册用户送团子
+    public function invitedNewbieCoinGift($oldUserSlug, $newUserSlug, $amount = 2)
+    {
+        $this->addCoin($newUserSlug, $amount, 8, '', $oldUserSlug);
+    }
+
+    // 四舍六入算法
+    public function calculate($num, $precision = 2)
+    {
+        $pow = pow(10, $precision);
+        if (
+            (floor($num * $pow * 10) % 5 == 0) &&
+            (floor($num * $pow * 10) == $num * $pow * 10) &&
+            (floor($num * $pow) % 2 == 0)
+        )
+        {
+            return floor($num * $pow) / $pow;
+        } else {
+            return round($num, $precision);
+        }
     }
 
     private function useCoinFirst($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
@@ -209,7 +230,7 @@ class VirtualCoinService
         return true;
     }
 
-    private function addCoin($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
+    private function addCoin($user_slug, $amount, $channel_type, $product_slug = '', $about_user_slug = '')
     {
         if ($amount < 0)
         {
@@ -230,7 +251,7 @@ class VirtualCoinService
             ->increment('virtual_coin', $amount);
     }
 
-    private function addMoney($user_slug, $amount, $channel_type, $product_slug, $about_user_slug)
+    private function addMoney($user_slug, $amount, $channel_type, $product_slug = '', $about_user_slug = '')
     {
         if ($amount < 0)
         {
