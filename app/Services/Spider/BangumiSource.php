@@ -237,6 +237,7 @@ class BangumiSource
                 'avatar' => $QShell->fetch($idol['avatar']),
                 'intro' => $idol['intro'],
                 'source_id' => $idol['id'],
+                'stock_price' => 1,
                 'alias' => $alias,
                 'bangumi_slug' => $bangumiSlug
             ]);
