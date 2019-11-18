@@ -6,8 +6,6 @@ namespace App\Http\Repositories;
 
 use App\Http\Transformers\Idol\IdolItemResource;
 use App\Models\Idol;
-use App\Models\IdolExtra;
-use App\Models\Tag;
 
 class IdolRepository extends Repository
 {
@@ -42,45 +40,45 @@ class IdolRepository extends Repository
 
     public function idolHotIds($page, $take, $refresh = false)
     {
-        $list = $this->RedisList($this->idolIdsCacheKey('hottest'), function ()
+        $list = $this->RedisSort($this->idolIdsCacheKey('topped'), function ()
         {
             return Idol
                 ::orderBy('market_price', 'DESC')
                 ->orderBy('stock_price', 'DESC')
-                ->pluck('slug')
+                ->pluck('market_price', 'slug')
                 ->toArray();
 
-        }, $refresh);
+        }, ['force' => $refresh]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }
 
     public function idolReleaseIds($page, $take, $refresh = false)
     {
-        $list = $this->RedisList($this->idolIdsCacheKey('release'), function ()
+        $list = $this->RedisSort($this->idolIdsCacheKey('newbie'), function ()
         {
             return Idol
                 ::where('is_newbie', 1)
                 ->orderBy('market_price', 'DESC')
                 ->orderBy('stock_price', 'DESC')
-                ->pluck('slug')
+                ->pluck('market_price', 'slug')
                 ->toArray();
 
-        }, $refresh);
+        }, ['force' => $refresh]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }
 
     public function idolActiveIds($page, $take, $refresh = false)
     {
-        $list = $this->RedisList($this->idolIdsCacheKey('active'), function ()
+        $list = $this->RedisSort($this->idolIdsCacheKey('activity'), function ()
         {
             return Idol
                 ::orderBy('updated_at', 'DESC')
-                ->pluck('slug')
+                ->pluck('updated_at', 'slug')
                 ->toArray();
 
-        }, $refresh);
+        }, ['force' => $refresh]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }
