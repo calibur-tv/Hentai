@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Repositories\IdolRepository;
 use Illuminate\Http\Request;
 
@@ -59,7 +60,29 @@ class IdolController extends Controller
 
     public function patch(Request $request)
     {
+        $slug = $request->get('slug');
+        $idolRepository = new IdolRepository();
+        $idol = $idolRepository->item($slug);
 
+        if (!$idol)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idolPathCounter = new IdolPatchCounter();
+        $patch = $idolPathCounter->all($slug);
+
+        $user = $request->user();
+        if ($user)
+        {
+
+        }
+        else
+        {
+
+        }
+
+        return $this->resOK($patch);
     }
 
     /**
