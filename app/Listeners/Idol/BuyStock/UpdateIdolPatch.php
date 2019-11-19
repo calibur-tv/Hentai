@@ -27,5 +27,6 @@ class UpdateIdolPatch
             $idolPatchCounter->add($slug, 'fans_count', 1);
         }
         $idolPatchCounter->add($slug, 'coin_count', $event->coinAmount);
+        $idolPatchCounter->add($slug, 'stock_count', $event->stockCount);
     }
 }

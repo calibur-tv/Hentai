@@ -30,6 +30,7 @@ class IdolItemResource extends JsonResource
             'stock_price' => $this->stock_price,
             'fans_count' => $this->fans_count,
             'coin_count' => $this->coin_count,
+            'stock_count' => $this->stock_count,
             'lover' => $userRepository->item($this->lover_slug),
             'bangumi' => $bangumiRepository->item($this->bangumi_slug)
         ];

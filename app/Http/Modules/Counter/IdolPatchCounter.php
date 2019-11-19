@@ -27,6 +27,7 @@ class IdolPatchCounter extends HashCounter
                 'stock_price' => 0,
                 'fans_count' => 0,
                 'coin_count' => 0,
+                'stock_count' => 0,
                 'rank' => 0
             ];
         }
@@ -36,6 +37,7 @@ class IdolPatchCounter extends HashCounter
             'stock_price' => $idol->stock_price,
             'fans_count' => $idol->fans_count,
             'coin_count' => $idol->coin_count,
+            'stock_count' => $idol->stock_count,
             'rank' => $idol->rank
         ];
     }
@@ -46,9 +48,7 @@ class IdolPatchCounter extends HashCounter
             ::where('slug', $slug)
             ->where('type', 5)
             ->update([
-                'score' =>
-                    $result['fans_count'] +
-                    $result['coin_count']
+                'score' => $result['market_price']
             ]);
     }
 }

@@ -21,6 +21,7 @@ class UpdateIdolData
     public function handle(\App\Events\Idol\BuyStock $event)
     {
         $event->idol->increment('coin_count', $event->coinAmount);
+        $event->idol->increment('stock_count', $event->stockCount);
 
         if ($event->fansData)
         {

@@ -21,8 +21,9 @@ class Idol extends Model
         'bangumi_slug',
         'lover_slug',
         'is_newbie',
-        'market_price',
+        'market_price', // stock_price * stock_count
         'stock_price',
+        'stock_count',
         'fans_count',
         'coin_count',
         'migration_state'
