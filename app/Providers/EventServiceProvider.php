@@ -132,6 +132,7 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Idol\BuyStock\UpdateIdolData',
             'App\Listeners\Idol\BuyStock\UpdateIdolPatch',
             'App\Listeners\Idol\BuyStock\UpdateIdolRankList',
+            'App\Listeners\Idol\BuyStock\UpdateIdolFansList',
             'App\Listeners\Idol\BuyStock\UpdateUserData',
         ],
     ];
