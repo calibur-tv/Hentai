@@ -4,21 +4,22 @@ namespace App\Console\Jobs;
 
 use App\Models\Idol;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
-class UpdateIdolRank extends Command
+class UpdateIdolMarketPrice extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'UpdateIdolRank';
+    protected $signature = 'UpdateIdolMarketPrice';
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'update idol rank';
+    protected $description = 'update idol market price';
     /**
      * Execute the console command.
      *
@@ -26,6 +27,17 @@ class UpdateIdolRank extends Command
      */
     public function handle()
     {
+        $list = Idol
+            ::where('updated_at', '>=', Carbon::now()->addHours(-1))
+            ->get();
+
+        foreach ($list as $item)
+        {
+            $item->update([
+                'market_price' => $item->stock_price * $item->stock_count
+            ]);
+        }
+
         $list = Idol
             ::orderBy('market_price', 'DESC')
             ->orderBy('stock_price', 'DESC')
