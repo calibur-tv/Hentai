@@ -9,8 +9,8 @@
 namespace App\Http\Modules;
 
 
+use App\Models\VirtualCoinRecord;
 use App\User;
-use App\Models\VirtualCoin;
 
 class VirtualCoinService
 {
@@ -35,17 +35,17 @@ class VirtualCoinService
     // 用户的收入支出成交额
     public function getUserBalance($userSlug)
     {
-        $get = VirtualCoin
-            ::where('user_slug', $userSlug)
-            ->where('amount', '>', 0)
+        $get = VirtualCoinRecord
+            ::where('from_user_slug', $userSlug)
+            ->where('order_amount', '>', 0)
             ->withTrashed()
-            ->sum('amount');
+            ->sum('order_amount');
 
-        $set = VirtualCoin
-            ::where('user_slug', $userSlug)
-            ->where('amount', '<', 0)
+        $set = VirtualCoinRecord
+            ::where('from_user_slug', $userSlug)
+            ->where('order_amount', '<', 0)
             ->withTrashed()
-            ->sum('amount');
+            ->sum('order_amount');
 
         return [
             'get' => sprintf("%.2f", $get),
@@ -149,12 +149,12 @@ class VirtualCoinService
             return false;
         }
 
-        VirtualCoin::create([
-            'user_slug' => $user_slug,
-            'amount' => $amount,
-            'channel_type' => $channel_type,
-            'product_slug' => $product_slug,
-            'about_user_slug' => $about_user_slug
+        VirtualCoinRecord::create([
+            'from_user_slug' => $user_slug,
+            'order_amount' => $amount,
+            'target_type' => $channel_type,
+            'target_slug' => $product_slug,
+            'to_user_slug' => $about_user_slug
         ]);
 
         if ($balance['virtual_coin'] + $amount < 0)
@@ -199,12 +199,12 @@ class VirtualCoinService
             return false;
         }
 
-        VirtualCoin::create([
-            'user_slug' => $user_slug,
-            'amount' => $amount,
-            'channel_type' => $channel_type,
-            'product_slug' => $product_slug,
-            'about_user_slug' => $about_user_slug
+        VirtualCoinRecord::create([
+            'from_user_slug' => $user_slug,
+            'to_user_slug' => $about_user_slug,
+            'order_amount' => $amount,
+            'target_type' => $channel_type,
+            'target_slug' => $product_slug,
         ]);
 
         if ($balance['money_coin'] + $amount < 0)
@@ -237,12 +237,12 @@ class VirtualCoinService
             $amount = +$amount;
         }
 
-        VirtualCoin::create([
-            'user_slug' => $user_slug,
-            'amount' => $amount,
-            'channel_type' => $channel_type,
-            'product_slug' => $product_slug,
-            'about_user_slug' => $about_user_slug
+        VirtualCoinRecord::create([
+            'from_user_slug' => $user_slug,
+            'to_user_slug' => $about_user_slug,
+            'order_amount' => $amount,
+            'target_type' => $channel_type,
+            'target_slug' => $product_slug,
         ]);
 
         User
@@ -258,12 +258,12 @@ class VirtualCoinService
             $amount = +$amount;
         }
 
-        VirtualCoin::create([
-            'user_slug' => $user_slug,
-            'amount' => $amount,
-            'channel_type' => $channel_type,
-            'product_slug' => $product_slug,
-            'about_user_slug' => $about_user_slug
+        VirtualCoinRecord::create([
+            'from_user_slug' => $user_slug,
+            'to_user_slug' => $about_user_slug,
+            'order_amount' => $amount,
+            'target_type' => $channel_type,
+            'target_slug' => $product_slug,
         ]);
 
         User
