@@ -24,7 +24,14 @@ class UpdateIdolFansList
         $idolSlug = $event->idol->slug;
 
         $idolRepository = new IdolRepository();
-        $idolRepository->SortAdd($idolRepository->idolFansCacheKey($idolSlug, 'biggest'), $userSlug, $event->stockCount);
         $idolRepository->SortAdd($idolRepository->idolFansCacheKey($idolSlug, 'activity'), $userSlug);
+        if ($event->fansData)
+        {
+            $idolRepository->SortAdd($idolRepository->idolFansCacheKey($idolSlug, 'biggest'), $userSlug, $event->fansData->stock_count + $event->stockCount);
+        }
+        else
+        {
+            $idolRepository->SortAdd($idolRepository->idolFansCacheKey($idolSlug, 'biggest'), $userSlug, $event->stockCount);
+        }
     }
 }
