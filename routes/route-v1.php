@@ -90,7 +90,7 @@ $route->group(['prefix' => 'idol'], function () use ($route)
         $route->post('update', 'IdolController@update');
     });
 
-    $route->get('batch_patch', 'IdolController@batch_patch');
+    $route->get('batch_patch', 'IdolController@batchPatch');
 });
 
 $route->group(['prefix' => 'message'], function () use ($route)
