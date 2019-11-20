@@ -89,7 +89,7 @@ class IdolRepository extends Repository
         $list = $this->RedisSort($this->idolFansCacheKey($slug, 'biggest'), function () use ($slug)
         {
             return IdolFans
-                ::where('slug', $slug)
+                ::where('user_slug', $slug)
                 ->orderBy('stock_count', 'DESC')
                 ->pluck('stock_count', 'slug')
                 ->toArray();
@@ -104,7 +104,7 @@ class IdolRepository extends Repository
         $list = $this->RedisSort($this->idolFansCacheKey($slug, 'activity'), function () use ($slug)
         {
             return IdolFans
-                ::where('slug', $slug)
+                ::where('user_slug', $slug)
                 ->orderBy('updated_at', 'DESC')
                 ->pluck('updated_at', 'slug')
                 ->toArray();
