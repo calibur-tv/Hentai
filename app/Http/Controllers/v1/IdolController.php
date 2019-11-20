@@ -121,6 +121,12 @@ class IdolController extends Controller
         $slug = $request->get('slug');                  // slug
         $coinAmount = $request->get('coin_amount');     // 需要支付的团子数
         $stockCount = $request->get('stock_count');     // 购入的股份数
+        $user = $request->user();
+
+        if (!$user)
+        {
+            return $this->resErrRole('请先登录');
+        }
 
         $idol = Idol
             ::where('slug', $slug)
@@ -135,7 +141,6 @@ class IdolController extends Controller
             return $this->resErrBad('股价已经变更');
         }
 
-        $user = $request->user();
         $virtualCoinService = new VirtualCoinService();
         if ($virtualCoinService->hasCoinCount($user) < $coinAmount)
         {
