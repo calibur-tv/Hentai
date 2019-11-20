@@ -22,6 +22,7 @@ class UpdateIdolData
     {
         $event->idol->increment('coin_count', $event->coinAmount);
         $event->idol->increment('stock_count', $event->stockCount);
+        $event->idol->increment('market_price', $event->coinAmount);
 
         if ($event->fansData)
         {
