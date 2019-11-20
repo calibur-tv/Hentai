@@ -31,6 +31,8 @@ class IdolItemResource extends JsonResource
             'fans_count' => $this->fans_count,
             'coin_count' => $this->coin_count,
             'stock_count' => $this->stock_count,
+            'buy_coin_count' => 0,
+            'buy_stock_count' => 0,
             'lover' => $userRepository->item($this->lover_slug),
             'bangumi' => $bangumiRepository->item($this->bangumi_slug)
         ];

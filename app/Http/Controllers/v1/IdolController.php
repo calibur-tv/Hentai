@@ -87,13 +87,13 @@ class IdolController extends Controller
 
         if ($info)
         {
-            $patch['star_count'] = $info->star_count;
-            $patch['total_price'] = $info->total_price;
+            $patch['buy_coin_count'] = $info->coin_count;
+            $patch['buy_stock_count'] = $info->stock_count;
         }
         else
         {
-            $patch['star_count'] = 0;
-            $patch['total_price'] = 0;
+            $patch['buy_coin_count'] = 0;
+            $patch['buy_stock_count'] = 0;
         }
 
         return $this->resOK($patch);
