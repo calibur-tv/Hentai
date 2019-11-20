@@ -91,7 +91,7 @@ class IdolRepository extends Repository
             return IdolFans
                 ::where('user_slug', $slug)
                 ->orderBy('stock_count', 'DESC')
-                ->pluck('stock_count', 'slug')
+                ->pluck('stock_count', 'user_slug')
                 ->toArray();
 
         }, ['force' => $refresh]);
@@ -106,7 +106,7 @@ class IdolRepository extends Repository
             return IdolFans
                 ::where('user_slug', $slug)
                 ->orderBy('updated_at', 'DESC')
-                ->pluck('updated_at', 'slug')
+                ->pluck('updated_at', 'user_slug')
                 ->toArray();
 
         }, ['force' => $refresh, 'is_time' => true]);
