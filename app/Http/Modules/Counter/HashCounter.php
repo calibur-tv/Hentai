@@ -22,10 +22,10 @@ class HashCounter
     /**
      * 获取所有的值
      */
-    public function all($slug)
+    public function all($slug, $refresh = false)
     {
         $cacheKey = $this->cacheKey($slug);
-        $result = Redis::HGETALL($cacheKey);
+        $result = $refresh ? [] : Redis::HGETALL($cacheKey);
 
         if (empty($result))
         {

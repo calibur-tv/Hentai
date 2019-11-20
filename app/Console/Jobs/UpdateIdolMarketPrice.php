@@ -2,7 +2,11 @@
 
 namespace App\Console\Jobs;
 
+use App\Http\Modules\Counter\IdolPatchCounter;
+use App\Http\Modules\VirtualCoinService;
+use App\Http\Repositories\IdolRepository;
 use App\Models\Idol;
+use App\Services\WilsonScoreInterval;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -28,8 +32,46 @@ class UpdateIdolMarketPrice extends Command
      */
     public function handle()
     {
+        $this->updateStockPrice();
+        $this->updateMarketPrice();
+        $this->updateRank();
+        $this->updateCache();
+
+        return true;
+    }
+
+    protected function updateStockPrice()
+    {
+        $total = Idol
+            ::sum('coin_count');
+
+        $list = Idol
+            ::where('fans_count', '>', 0)
+            ->select('slug', 'coin_count')
+            ->get();
+
+        $virtualCoinService = new VirtualCoinService();
+
+        foreach ($list as $item)
+        {
+            $score = $item->coin_count;
+            $calc = new WilsonScoreInterval($score, $total - $score);
+            $rate = $calc->score();
+
+            DB
+                ::table('idols')
+                ->where('slug', $item->slug)
+                ->update([
+                    'stock_price' => $virtualCoinService->calculate($rate * $total / $score + 1)
+                ]);
+        }
+    }
+
+    protected function updateMarketPrice()
+    {
         $list = Idol
             ::where('updated_at', '>=', Carbon::now()->addHours(-1))
+            ->select('slug', 'stock_price', 'stock_count')
             ->get();
 
         foreach ($list as $item)
@@ -41,11 +83,15 @@ class UpdateIdolMarketPrice extends Command
                     'market_price' => $item->stock_price * $item->stock_count
                 ]);
         }
+    }
 
+    protected function updateRank()
+    {
         $list = Idol
             ::orderBy('market_price', 'DESC')
             ->orderBy('stock_price', 'DESC')
             ->where('fans_count', '>', 0)
+            ->select('slug')
             ->get();
 
         foreach ($list as $index => $item)
@@ -57,7 +103,24 @@ class UpdateIdolMarketPrice extends Command
                     'rank' => $index + 1
                 ]);
         }
+    }
 
-        return true;
+    protected function updateCache()
+    {
+        $list = Idol
+            ::orderBy('market_price', 'DESC')
+            ->orderBy('stock_price', 'DESC')
+            ->where('fans_count', '>', 0)
+            ->pluck('slug')
+            ->toArray();
+
+        $idolRepository = new IdolRepository();
+        $idolPatchCounter = new IdolPatchCounter();
+
+        foreach ($list as $slug)
+        {
+            $idolRepository->item($slug, true);
+            $idolPatchCounter->all($slug, true);
+        }
     }
 }
