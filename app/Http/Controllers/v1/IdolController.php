@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\IdolRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Idol;
 use App\Models\IdolFans;
 use Illuminate\Http\Request;
@@ -18,10 +19,11 @@ class IdolController extends Controller
     public function list(Request $request)
     {
         $sort = $request->get('sort');
-        $page = $request->get('page');
+        $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 10;
 
         $idolRepository = new IdolRepository();
+        $page = $page - 1;
         if ($sort === 'active')
         {
             $idsObj = $idolRepository->idolActiveIds($page, $take);
@@ -121,11 +123,17 @@ class IdolController extends Controller
         $slug = $request->get('slug');                  // slug
         $coinAmount = $request->get('coin_amount');     // 需要支付的团子数
         $stockCount = $request->get('stock_count');     // 购入的股份数
+        $user = $request->user();
+
+        if (!$user)
+        {
+            return $this->resErrRole('请先登录');
+        }
 
         $idol = Idol
             ::where('slug', $slug)
             ->first();
-        if (!$idol)
+        if (is_null($idol))
         {
             return $this->resErrNotFound();
         }
@@ -135,7 +143,6 @@ class IdolController extends Controller
             return $this->resErrBad('股价已经变更');
         }
 
-        $user = $request->user();
         $virtualCoinService = new VirtualCoinService();
         if ($virtualCoinService->hasCoinCount($user) < $coinAmount)
         {
@@ -159,6 +166,31 @@ class IdolController extends Controller
     public function trend(Request $request)
     {
 
+    }
+
+    public function fans(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page');
+        $take = $request->get('take');
+        $idolRepository = new IdolRepository();
+        $idol = $idolRepository->item($slug);
+
+        if (is_null($idol))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idsObj = $idolRepository->idolNewsFans($slug, $page, $take);
+        if (!$idsObj['total'])
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $userRepository = new UserRepository();
+        $idsObj['result'] = $userRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     /**

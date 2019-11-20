@@ -28,5 +28,6 @@ class UpdateIdolPatch
         }
         $idolPatchCounter->add($slug, 'coin_count', $event->coinAmount);
         $idolPatchCounter->add($slug, 'stock_count', $event->stockCount);
+        $idolPatchCounter->add($slug, 'market_price', $event->coinAmount);
     }
 }
