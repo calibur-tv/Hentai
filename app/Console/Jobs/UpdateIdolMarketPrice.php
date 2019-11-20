@@ -5,6 +5,7 @@ namespace App\Console\Jobs;
 use App\Models\Idol;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UpdateIdolMarketPrice extends Command
 {
@@ -33,9 +34,12 @@ class UpdateIdolMarketPrice extends Command
 
         foreach ($list as $item)
         {
-            $item->update([
-                'market_price' => $item->stock_price * $item->stock_count
-            ]);
+            DB
+                ::table('idols')
+                ->where('slug', $item->slug)
+                ->update([
+                    'market_price' => $item->stock_price * $item->stock_count
+                ]);
         }
 
         $list = Idol
@@ -46,9 +50,12 @@ class UpdateIdolMarketPrice extends Command
 
         foreach ($list as $index => $item)
         {
-            $item->update([
-                'rank' => $index + 1
-            ]);
+            DB
+                ::table('idols')
+                ->where('slug', $item->slug)
+                ->update([
+                    'rank' => $index + 1
+                ]);
         }
 
         return true;
