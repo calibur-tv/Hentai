@@ -125,7 +125,7 @@ class IdolController extends Controller
         $idol = Idol
             ::where('slug', $slug)
             ->first();
-        if (!$idol)
+        if (is_null($idol))
         {
             return $this->resErrNotFound();
         }
