@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\IdolPatchCounter;
 use App\Http\Modules\VirtualCoinService;
 use App\Http\Repositories\IdolRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Idol;
 use App\Models\IdolFans;
 use Illuminate\Http\Request;
@@ -165,6 +166,31 @@ class IdolController extends Controller
     public function trend(Request $request)
     {
 
+    }
+
+    public function fans(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page');
+        $take = $request->get('take');
+        $idolRepository = new IdolRepository();
+        $idol = $idolRepository->item($slug);
+
+        if (is_null($idol))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idsObj = $idolRepository->idolNewsFans($slug, $page, $take);
+        if (!$idsObj['total'])
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $userRepository = new UserRepository();
+        $idsObj['result'] = $userRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     /**

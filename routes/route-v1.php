@@ -79,6 +79,8 @@ $route->group(['prefix' => 'idol'], function () use ($route)
 
     $route->get('show', 'IdolController@show');
 
+    $route->get('fans', 'IdolController@fans');
+
     $route->get('trend', 'IdolController@trend');
 
     $route->group(['middleware' => 'user'], function () use ($route)
