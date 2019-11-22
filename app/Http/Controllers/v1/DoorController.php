@@ -669,6 +669,111 @@ class DoorController extends Controller
         ]);
     }
 
+    // QQ小程序注册用户或获取当前用户的 token
+    public function qqMiniAppLogin(Request $request)
+    {
+        $appName = $request->get('app_name');
+        if (!in_array($appName, ['moe_idol']))
+        {
+            return $this->resErrBad();
+        }
+        $user = $request->get('user');
+        $encryptedData = $request->get('encrypted_data');
+        $iv = $request->get('iv');
+        $sessionKey = $request->get('session_key');
+
+        $appId = config("app.oauth2.qq_mini_app.{$appName}.app_id");
+
+        $tool = new WXBizDataCrypt($appId, $sessionKey);
+        $code = $tool->decryptData($encryptedData, $iv, $data);
+
+        if ($code)
+        {
+            return $this->resErrServiceUnavailable();
+        }
+
+        $data = json_decode($data, true);
+        $uniqueId = $data['unionId'];
+        $isNewUser = $this->accessIsNew('qq_unique_id', $uniqueId);
+        if ($isNewUser)
+        {
+            $qshell = new Qshell();
+            $avatar = $qshell->fetch($user['avatar']);
+            // signUp
+            $data = [
+                'avatar' => $avatar,
+                'nickname' => $user['nickname'],
+                'sex' => $user['sex'] ?: 0,
+                'qq_open_id' => $data['openId'],
+                'qq_unique_id' => $uniqueId,
+                'password' => str_rand()
+            ];
+
+            $user = User::createUser($data);
+        }
+        else
+        {
+            $user = User
+                ::where('qq_unique_id', $uniqueId)
+                ->first();
+
+            if (is_null($user))
+            {
+                return $this->resErrNotFound('这个用户已经消失了');
+            }
+        }
+
+        return $this->resOK($user->api_token);
+    }
+
+    // QQ小程序获取用户的 session_key 或获取当前用户的 token
+    public function qqMiniAppToken(Request $request)
+    {
+        $code = $request->get('code');
+        $appName = $request->get('app_name');
+        if (!$code || !in_array($appName, ['moe_idol']))
+        {
+            return $this->resErrBad();
+        }
+
+        $client = new Client();
+        $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
+        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_secret");
+        $resp = $client->get(
+            "https://api.q.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
+            [
+                'Accept' => 'application/json'
+            ]
+        );
+        $body = json_decode($resp->body, true);
+        $uniqueId = $body['unionid'] ?? '';
+
+        if (!$uniqueId)
+        {
+            return $this->resOK([
+                'type' => 'key',
+                'data' => $body['session_key']
+            ]);
+        }
+
+        $user = User
+            ::where('qq_unique_id', $uniqueId)
+            ->first();
+
+        if (is_null($user))
+        {
+            return $this->resOK([
+                'type' => 'key',
+                'data' => $body['session_key']
+            ]);
+        }
+
+        return $this->resOK([
+            'type' => 'token',
+            'data' => $user->api_token
+        ]);
+    }
+
     /**
      * 重置密码
      *

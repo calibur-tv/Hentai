@@ -183,6 +183,12 @@ return [
                 'client_id' => env('WECHAT_APP_SEARCH_BAD_HISTORY_OPEN_ID'),
                 'client_secret' => env('WECHAT_APP_SEARCH_BAD_HISTORY_SECRET'),
             ]
+        ],
+        'qq_mini_app' => [
+            'moe_idol' => [
+                'client_id' => env('QQ_APP_MOE_IDOL_OPEN_ID'),
+                'client_secret' => env('QQ_APP_MOE_IDOL_OPEN_SECRET'),
+            ]
         ]
     ]
 ];

@@ -21,6 +21,10 @@ $route->group(['prefix' => 'door'], function () use ($route)
 
     $route->post('/wechat_mini_app_get_token', 'DoorController@wechatMiniAppToken');
 
+    $route->post('/qq_mini_app_login', 'DoorController@qqMiniAppLogin');
+
+    $route->post('/qq_mini_app_get_token', 'DoorController@qqMiniAppToken');
+
     $route->post('/reset_password', 'DoorController@resetPassword');
 
     $route->group(['prefix' => '/oauth2'], function () use ($route)
