@@ -8,6 +8,7 @@ use App\Models\Bangumi;
 use App\Models\Idol;
 use App\Models\Search;
 use App\Services\Qiniu\Qshell;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class BangumiSource
@@ -44,14 +45,16 @@ class BangumiSource
             }
         }
 
-        Idol
-            ::whereNotIn('bangumi_slug', $bangumiSlugs)
+        DB
+            ::table('idols')
+            ->whereNotIn('bangumi_slug', $bangumiSlugs)
             ->update([
                 'is_newbie' => 0
             ]);
 
-        Idol
-            ::whereIn('bangumi_slug', $bangumiSlugs)
+        DB
+            ::table('idols')
+            ->whereIn('bangumi_slug', $bangumiSlugs)
             ->update([
                 'is_newbie' => 1
             ]);
