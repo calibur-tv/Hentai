@@ -693,7 +693,7 @@ class DoorController extends Controller
         }
 
         $data = json_decode($data, true);
-        $uniqueId = $data['unionId'];
+        $uniqueId = $data['unionid'];
         $isNewUser = $this->accessIsNew('qq_unique_id', $uniqueId);
         if ($isNewUser)
         {
@@ -703,8 +703,8 @@ class DoorController extends Controller
             $data = [
                 'avatar' => $avatar,
                 'nickname' => $user['nickname'],
-                'sex' => $user['sex'] ?: 0,
-                'qq_open_id' => $data['openId'],
+                'sex' => $user['gender'] === '男' ? 1 : ($user['gender'] === '女' ? 2 : 0),
+                'qq_open_id' => $data['id'],
                 'qq_unique_id' => $uniqueId,
                 'password' => str_rand()
             ];
