@@ -738,7 +738,7 @@ class DoorController extends Controller
 
         $client = new Client();
         $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
-        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_secret");
+        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_token");
         $resp = $client->get(
             "https://api.q.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
             [

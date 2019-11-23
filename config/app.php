@@ -187,6 +187,7 @@ return [
         'qq_mini_app' => [
             'moe_idol' => [
                 'client_id' => env('QQ_APP_MOE_IDOL_OPEN_ID'),
+                'client_token' => env('QQ_APP_MOE_IDOL_OPEN_TOKEN'),
                 'client_secret' => env('QQ_APP_MOE_IDOL_OPEN_SECRET'),
             ]
         ]
