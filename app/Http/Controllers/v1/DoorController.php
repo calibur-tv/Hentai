@@ -6,14 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Qiniu\Qshell;
-use App\Services\QQBizDataCrypt;
 use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
 use App\Services\Socialite\AccessToken;
 use App\Services\Socialite\SocialiteManager;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -594,12 +592,12 @@ class DoorController extends Controller
         if ($isNewUser)
         {
             $qshell = new Qshell();
-            $avatar = $qshell->fetch($user['avatar']);
+            $avatar = $qshell->fetch($user['avatarUrl']);
             // signUp
             $data = [
                 'avatar' => $avatar,
-                'nickname' => $user['nickname'],
-                'sex' => $user['sex'] ?: 0,
+                'nickname' => $user['nickName'],
+                'sex' => $user['gender'] ?: 0,
                 'wechat_open_id' => $data['openId'],
                 'wechat_unique_id' => $uniqueId,
                 'password' => str_rand()
