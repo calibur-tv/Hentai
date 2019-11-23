@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\UserRepository;
 use App\Http\Transformers\User\UserAuthResource;
 use App\Services\Qiniu\Qshell;
+use App\Services\QQBizDataCrypt;
 use App\Services\Sms\Message;
 use App\Services\WXBizDataCrypt;
 use App\Services\Socialite\AccessToken;
@@ -577,7 +578,7 @@ class DoorController extends Controller
         $iv = $request->get('iv');
         $sessionKey = $request->get('session_key');
 
-        $appId = config("app.oauth2.wechat_mini_app.{$appName}.app_id");
+        $appId = config("app.oauth2.wechat_mini_app.{$appName}.client_id");
 
         $tool = new WXBizDataCrypt($appId, $sessionKey);
         $code = $tool->decryptData($encryptedData, $iv, $data);
@@ -682,7 +683,7 @@ class DoorController extends Controller
         $iv = $request->get('iv');
         $sessionKey = $request->get('session_key');
 
-        $appId = config("app.oauth2.qq_mini_app.{$appName}.app_id");
+        $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
 
         $tool = new WXBizDataCrypt($appId, $sessionKey);
         $code = $tool->decryptData($encryptedData, $iv, $data);
@@ -693,18 +694,19 @@ class DoorController extends Controller
         }
 
         $data = json_decode($data, true);
-        $uniqueId = $data['unionid'];
+
+        $uniqueId = $data['unionId'];
         $isNewUser = $this->accessIsNew('qq_unique_id', $uniqueId);
         if ($isNewUser)
         {
             $qshell = new Qshell();
-            $avatar = $qshell->fetch($user['avatar']);
+            $avatar = $qshell->fetch($user['avatarUrl']);
             // signUp
             $data = [
                 'avatar' => $avatar,
-                'nickname' => $user['nickname'],
-                'sex' => $user['gender'] === '男' ? 1 : ($user['gender'] === '女' ? 2 : 0),
-                'qq_open_id' => $data['id'],
+                'nickname' => $user['nickName'],
+                'sex' => $user['gender'] ?: 0,
+                'qq_open_id' => $data['openId'],
                 'qq_unique_id' => $uniqueId,
                 'password' => str_rand()
             ];
@@ -738,7 +740,7 @@ class DoorController extends Controller
 
         $client = new Client();
         $appId = config("app.oauth2.qq_mini_app.{$appName}.client_id");
-        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_token");
+        $appSecret = config("app.oauth2.qq_mini_app.{$appName}.client_secret");
         $resp = $client->get(
             "https://api.q.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code",
             [
