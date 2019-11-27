@@ -229,7 +229,7 @@ class Query
     {
         try
         {
-            $url = 'http://bangumi.tv/calendar';
+            $url = 'http://bgm.tv/calendar';
             $ql = QueryList::get($url);
             $data = $ql
                 ->find('.coverList')
