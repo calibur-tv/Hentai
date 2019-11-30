@@ -272,6 +272,7 @@ class Query
             }
 
             $intro = trim($ql->find('#subject_summary')->text());
+            $alias = array_unique($alias);
 
             $tags = $ql->find('.subject_tag_section')->eq(0)->find('span')->map(function ($item){
                 return $item->text();
