@@ -199,6 +199,10 @@ class Query
                 {
                     $alias[] = $arr[1];
                 }
+                else
+                {
+                    $alias[] = $name;
+                }
             }
 
             $intro = trim($ql->find('#subject_summary')->text());
