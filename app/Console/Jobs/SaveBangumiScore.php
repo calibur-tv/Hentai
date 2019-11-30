@@ -542,8 +542,8 @@ class SaveBangumiScore extends Command
             '7.42 - 1994 - 平成狸合战'
         ];
 
-        $page = intval(Redis::GET('bangumi-score-page') ?: 0);
-        $length = 10;
+        $page = intval(Redis::GET('save-bangumi-score-page') ?: 0);
+        $length = 50;
         $data = array_slice($source, $page, $length);
         if (empty($data))
         {
@@ -602,7 +602,7 @@ class SaveBangumiScore extends Command
             ]);
         }
 
-        Redis::SET('bangumi-score-page', $page + $length);
+        Redis::SET('save-bangumi-score-page', $page + $length);
 
         return true;
     }

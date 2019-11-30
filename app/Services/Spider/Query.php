@@ -44,17 +44,33 @@ class Query
                     $year = '';
                     foreach ($meta as $one)
                     {
-                        if (preg_match('/年/', $one))
+                        if (preg_match('/(年|\.|-|\/)/', $one))
                         {
                             $year = $one;
                             break;
                         }
                     }
 
+                    if ($year)
+                    {
+                        $year = explode('---', preg_replace('/(年|\.|-|\/)/', '---', $year))[0];
+                        if (strlen($year) === 2)
+                        {
+                            if ($year[0] === '1')
+                            {
+                                $year = '19' . $year;
+                            }
+                            else if ($year[0] === '0')
+                            {
+                                $year = '20' . $year;
+                            }
+                        }
+                    }
+
                     return [
                         'id' => $id,
                         'name' => $name,
-                        'year' => explode('年', $year)[0],
+                        'year' => $year,
                         'meta' => $meta
                     ];
                 })
