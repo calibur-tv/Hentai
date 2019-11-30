@@ -25,6 +25,50 @@ class Query
         ];
     }
 
+    public function searchBangumi($name)
+    {
+        try
+        {
+            $query = urlencode($name);
+            $url = "http://bgm.tv/subject_search/{$query}?cat=2";
+            $ql = QueryList::get($url);
+            $result = $ql
+                ->find('#browserItemList')
+                ->eq(0)
+                ->find('.item')
+                ->map(function ($item)
+                {
+                    $id = last(explode('/', $item->find('a.subjectCover')->eq(0)->href));
+                    $name = $item->find('a.l')->text();
+                    $meta = explode(' / ', $item->find('p.tip')->text());
+                    $year = '';
+                    foreach ($meta as $one)
+                    {
+                        if (preg_match('/年/', $one))
+                        {
+                            $year = $one;
+                            break;
+                        }
+                    }
+
+                    return [
+                        'id' => $id,
+                        'name' => $name,
+                        'year' => explode('年', $year)[0],
+                        'meta' => $meta
+                    ];
+                })
+                ->all();
+
+            return $result;
+        }
+        catch (\Exception $e)
+        {
+            Log::info("[--spider--]：search bangumi - name {$name} failed");
+            return [];
+        }
+    }
+
     public function getBangumiIdols($id)
     {
         try

@@ -19,7 +19,8 @@ class Bangumi extends Model
         'source_id',
         'parent_slug',
         'is_parent',
-        'migration_state'
+        'migration_state',
+        'score'
     ];
 
     protected $casts = [
