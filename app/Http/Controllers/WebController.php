@@ -33,16 +33,11 @@ class WebController extends Controller
         $query = new Query();
 
         $source = $query->getBangumiDetail($id);
-        if (!$source)
-        {
-            return $this->resOK([
-                'source' => $source
-            ]);
-        }
         $bangumi = $bangumiSource->importBangumi($source);
 
         return $this->resOK([
-            'bangumi' => $bangumi
+            'bangumi' => $bangumi,
+            'source' => $source
         ]);
     }
 }
