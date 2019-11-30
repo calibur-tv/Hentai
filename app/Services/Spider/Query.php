@@ -175,7 +175,7 @@ class Query
                 ->src;
 
             $meta = explode(PHP_EOL, $ql->find('#infobox')->text());
-            $name = '';
+            $name = $ql->find('.nameSingle')->eq(0)->find('a')->eq(0)->text();
             $count = 0;
             $publish = '';
             $alias = [];
