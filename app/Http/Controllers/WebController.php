@@ -21,8 +21,20 @@ use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return $this->resOK();
+        $id = $request->get('id');
+        if (!$id)
+        {
+            return $this->resOK();
+        }
+
+        $bangumiSource = new BangumiSource();
+        $query = new Query();
+
+        $source = $query->getBangumiDetail($id);
+        $bangumi = $bangumiSource->importBangumi($source);
+
+        return $this->resOK($bangumi);
     }
 }
