@@ -568,9 +568,13 @@ class SaveBangumiScore extends Command
             {
                 if ($one['year'] === $year)
                 {
-                    $matched[] = $one['id'];
+                    $matched[] = $one;
                 }
             }
+            $matched = array_filter($matched, function ($item)
+            {
+               return $item['rank'];
+            });
             if (count($matched) === 0)
             {
                 Redis::SADD('save-bangumi-score-no-matched', $name);
@@ -582,12 +586,12 @@ class SaveBangumiScore extends Command
                 continue;
             }
             $bangumi = Bangumi
-                ::where('source_id', $matched[0])
+                ::where('source_id', $matched[0]['id'])
                 ->first();
 
             if (is_null($bangumi))
             {
-                $fetch = $query->getBangumiDetail($matched[0]);
+                $fetch = $query->getBangumiDetail($matched[0]['id']);
                 $bangumi = $bangumiSource->importBangumi($fetch);
             }
 

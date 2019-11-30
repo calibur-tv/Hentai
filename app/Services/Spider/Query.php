@@ -42,6 +42,11 @@ class Query
                     $name = $item->find('a.l')->text();
                     $meta = explode(' / ', $item->find('p.tip')->text());
                     $year = '';
+                    $rank = $item->find('.rank')->eq(0)->text() ?: '';
+                    if ($rank)
+                    {
+                        $rank = explode(' ', $rank)[1];
+                    }
                     foreach ($meta as $one)
                     {
                         if (preg_match('/(年|\.|-|\/)/', $one))
@@ -71,6 +76,7 @@ class Query
                         'id' => $id,
                         'name' => $name,
                         'year' => $year,
+                        'rank' => $rank,
                         'meta' => $meta
                     ];
                 })
