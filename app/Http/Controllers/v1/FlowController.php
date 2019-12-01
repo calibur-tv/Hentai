@@ -60,7 +60,7 @@ class FlowController extends Controller
         $flowRepository = new FlowRepository();
         $idsObj = $flowRepository->pins($slug, $sort, $isUp, $specId, $time, $take);
 
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }
@@ -80,7 +80,7 @@ class FlowController extends Controller
         $flowRepository = new FlowRepository();
         $idsObj = $flowRepository->index($seenIds, $randId, $take);
 
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }

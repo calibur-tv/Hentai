@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\BangumiRepository;
 use App\Models\Bangumi;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
@@ -17,7 +18,20 @@ class BangumiController extends Controller
 
     public function rank(Request $request)
     {
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 20;
 
+        $bangumiRepository = new BangumiRepository();
+        $idsObj = $bangumiRepository->rank($page, $take);
+
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idsObj['result'] = $bangumiRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     public function score(Request $request)

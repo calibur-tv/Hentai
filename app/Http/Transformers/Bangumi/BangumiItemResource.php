@@ -17,6 +17,7 @@ class BangumiItemResource extends JsonResource
         return [
             'slug' => $this->slug,
             'name' => $this->title,
+            'score' => $this->score,
             'avatar' => patchImage($this->avatar, 'default-poster')
         ];
     }

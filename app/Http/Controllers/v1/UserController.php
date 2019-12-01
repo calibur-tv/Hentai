@@ -126,7 +126,7 @@ class UserController extends Controller
 
         $idsObj = $userRepository->timeline($slug, false, $page - 1, $count);
 
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }

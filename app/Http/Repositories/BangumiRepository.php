@@ -37,4 +37,20 @@ class BangumiRepository extends Repository
 
         return $result;
     }
+
+    public function rank($page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort('bangumi-rank-slug', function ()
+        {
+            return Bangumi
+                ::where('score', '>', 0)
+                ->orderBy('score', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->pluck('score', 'slug')
+                ->toArray();
+
+        }, ['force' => $refresh]);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
 }

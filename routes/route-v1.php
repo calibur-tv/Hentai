@@ -77,6 +77,13 @@ $route->group(['prefix' => 'search'], function () use ($route)
     $route->get('tags', 'TagController@search');
 });
 
+$route->group(['prefix' => 'bangumi'], function () use ($route)
+{
+    $route->get('show', 'BangumiController@show');
+
+    $route->get('rank', 'BangumiController@rank');
+});
+
 $route->group(['prefix' => 'idol'], function () use ($route)
 {
     $route->get('list', 'IdolController@list');

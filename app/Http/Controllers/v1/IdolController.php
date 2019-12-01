@@ -36,7 +36,7 @@ class IdolController extends Controller
         {
             $idsObj = $idolRepository->idolHotIds($page, $take);
         }
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }
@@ -182,7 +182,7 @@ class IdolController extends Controller
         }
 
         $idsObj = $idolRepository->idolNewsFans($slug, $page, $take);
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }

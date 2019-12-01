@@ -50,7 +50,7 @@ class CommentController extends Controller
 
         $commentRepository = new CommentRepository();
         $idsObj = $commentRepository->flow($slug, $sort, $mode, $page - 1, $count, $specId);
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }
