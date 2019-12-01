@@ -26,4 +26,14 @@ class Bangumi extends Model
     protected $casts = [
         'is_parent' => 'boolean'
     ];
+
+    public function setAvatarAttribute($url)
+    {
+        $this->attributes['avatar'] = trimImage($url);
+    }
+
+    public function getAvatarAttribute($avatar)
+    {
+        return patchImage($avatar, 'default-avatar');
+    }
 }
