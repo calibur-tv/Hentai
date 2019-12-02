@@ -13,7 +13,21 @@ class BangumiController extends Controller
 {
     public function show(Request $request)
     {
+        $slug = $request->get('slug');
+        if (!$slug)
+        {
+            return $this->resErrBad();
+        }
 
+        $bangumiRepository = new BangumiRepository();
+
+        $bangumi = $bangumiRepository->item($slug);
+        if (!$bangumi)
+        {
+            return $this->resErrNotFound();
+        }
+
+        return $this->resOK($bangumi);
     }
 
     public function rank(Request $request)
