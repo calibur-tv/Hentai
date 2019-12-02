@@ -82,6 +82,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
     $route->get('show', 'BangumiController@show');
 
     $route->get('rank', 'BangumiController@rank');
+
+    $route->get('idols', 'BangumiController@idols');
 });
 
 $route->group(['prefix' => 'idol'], function () use ($route)

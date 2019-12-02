@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
+use App\Models\Idol;
 
 class BangumiRepository extends Repository
 {
@@ -36,6 +37,22 @@ class BangumiRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function idol_slugs($slug, $page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort('bangumi-idol-slug', function () use ($slug)
+        {
+            return Idol
+                ::where('bangumi_slug', $slug)
+                ->orderBy('market_price', 'DESC')
+                ->orderBy('stock_price', 'DESC')
+                ->pluck('market_price', 'slug')
+                ->toArray();
+
+        }, ['force' => $refresh]);
+
+        return $this->filterIdsByPage($list, $page, $take);
     }
 
     public function rank($page, $take, $refresh = false)

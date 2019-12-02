@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\BangumiRepository;
+use App\Http\Repositories\IdolRepository;
 use App\Models\Bangumi;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
@@ -51,6 +52,32 @@ class BangumiController extends Controller
     public function score(Request $request)
     {
 
+    }
+
+    public function idols(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 20;
+
+        $bangumiRepository = new BangumiRepository();
+        $bangumi = $bangumiRepository->item($slug);
+        if (!$bangumi)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idsObj = $bangumiRepository->idol_slugs($slug, $page, $take);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idolRepository = new IdolRepository();
+
+        $idsObj['result'] = $idolRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     public function create(Request $request)
