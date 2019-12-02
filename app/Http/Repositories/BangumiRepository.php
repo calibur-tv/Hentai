@@ -41,7 +41,7 @@ class BangumiRepository extends Repository
 
     public function idol_slugs($slug, $page, $take, $refresh = false)
     {
-        $list = $this->RedisSort('bangumi-idol-slug', function () use ($slug)
+        $list = $this->RedisSort($this->bangumiIdolsCacheKey($slug), function () use ($slug)
         {
             return Idol
                 ::where('bangumi_slug', $slug)
@@ -69,5 +69,10 @@ class BangumiRepository extends Repository
         }, ['force' => $refresh]);
 
         return $this->filterIdsByPage($list, $page, $take);
+    }
+
+    public function bangumiIdolsCacheKey($slug)
+    {
+        return "bangumi-{$slug}-idol-slug";
     }
 }
