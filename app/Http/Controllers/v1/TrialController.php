@@ -86,11 +86,12 @@ class TrialController extends Controller
 
         foreach ($words as $item)
         {
+            $item = explode(' (', $item)[0];
             if ($item)
             {
                 Redis::LREM($this->wordsCacheKey($filename), 0, $item);
             }
-            Redis::LREM('blocked-risk-words', 0, $item);
+            Redis::ZREM('blocked-risk-words-v2', $item);
         }
         $this->changeBlackWordsFile($filename);
 
@@ -99,9 +100,14 @@ class TrialController extends Controller
 
     public function getBlockedWords(Request $request)
     {
-        $data = Redis::LRANGE('blocked-risk-words', 0, -1);
+        $data = Redis::ZREVRANGE('blocked-risk-words-v2', 0, -1, 'WITHSCORES');
+        $result = [];
+        foreach ($data as $key => $score)
+        {
+            $result[] = $key . ' (' . $score . ')';
+        }
 
-        return $this->resOK($data);
+        return $this->resOK($result);
     }
 
     public function clearBlockedWords(Request $request)
@@ -112,7 +118,7 @@ class TrialController extends Controller
             return $this->resErrRole();
         }
 
-        Redis::DEL('blocked-risk-words');
+        Redis::DEL('blocked-risk-words-v2');
 
         return $this->resNoContent();
     }
