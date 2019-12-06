@@ -19,6 +19,8 @@ class BangumiItemResource extends JsonResource
             'name' => $this->title,
             'score' => $this->score,
             'intro' => $this->intro,
+            'is_parent' => $this->is_parent,
+            'parent_slug' => $this->parent_slug,
             'avatar' => patchImage($this->avatar, 'default-poster')
         ];
     }

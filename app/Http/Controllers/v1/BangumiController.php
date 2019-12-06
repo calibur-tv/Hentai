@@ -54,6 +54,40 @@ class BangumiController extends Controller
 
     }
 
+    public function relation(Request $request)
+    {
+        $slug = $request->get('slug');
+
+        $bangumiRepository = new BangumiRepository();
+        $bangumi = $bangumiRepository->item($slug);
+        if (!$bangumi)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $result = [
+            'parent' => null,
+            'children' => []
+        ];
+
+        if ($bangumi->is_parent)
+        {
+            $childrenSlug = Bangumi
+                ::where('parent_slug', $bangumi->slug)
+                ->pluck('slug')
+                ->toArray();
+
+            $result['children'] = $bangumiRepository->list($childrenSlug);
+        }
+
+        if ($bangumi->parent_slug)
+        {
+            $result['parent'] = $bangumiRepository->item($bangumi->parent_slug);
+        }
+
+        return $this->resOK($result);
+    }
+
     public function idols(Request $request)
     {
         $slug = $request->get('slug');
@@ -113,7 +147,30 @@ class BangumiController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $avatar = $request->get('avatar');
+        $title = $request->get('title');
+        $alias = $request->get('alias');
+        $intro = $request->get('intro');
+        $slug = $request->get('slug');
 
+        $bangumiRepository = new BangumiRepository();
+        $bangumi = $bangumiRepository->item($slug);
+        if (!$bangumi)
+        {
+            return $this->resErrNotFound();
+        }
+
+        Bangumi
+            ::update([
+                'avatar' => $avatar,
+                'title' => $title,
+                'intro' => $intro,
+                'alias' => implode('|', $alias)
+            ]);
+
+        $bangumiRepository->item($slug, true);
+
+        return $this->resNoContent();
     }
 
     public function updateAsParent(Request $request)
@@ -124,7 +181,7 @@ class BangumiController extends Controller
             ->first();
 
         $bangumi->update([
-            'is_parent' => false
+            'is_parent' => true
         ]);
 
         return $this->resNoContent();
