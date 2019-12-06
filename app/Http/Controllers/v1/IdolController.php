@@ -198,6 +198,35 @@ class IdolController extends Controller
      */
     public function update(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('update_idol'))
+        {
+            return $this->resErrRole();
+        }
+        $slug = $request->get('slug');
+        $title = $request->get('title');
+        $alias = $request->get('alias');
+        $intro = $request->get('intro');
+        $avatar = $request->get('avatar');
 
+        $idolRepository = new IdolRepository();
+        $idol = $idolRepository->item($slug);
+        if (!$idol)
+        {
+            return $this->resErrNotFound();
+        }
+
+        Idol
+            ::where('slug', $slug)
+            ->update([
+                'title' => $title,
+                'intro' => $intro,
+                'avatar' => $avatar,
+                'alias' => implode('|', $alias)
+            ]);
+
+        $idolRepository->item($slug, true);
+
+        return $this->resNoContent();
     }
 }

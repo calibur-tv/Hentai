@@ -147,6 +147,11 @@ class BangumiController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('update_bangumi'))
+        {
+            return $this->resErrRole();
+        }
         $avatar = $request->get('avatar');
         $title = $request->get('title');
         $alias = $request->get('alias');
@@ -175,6 +180,11 @@ class BangumiController extends Controller
 
     public function updateAsParent(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('update_bangumi'))
+        {
+            return $this->resErrRole();
+        }
         $bangumiSlug = $request->get('bangumi_slug');
         $bangumi = Bangumi
             ::where('slug', $bangumiSlug)
@@ -189,6 +199,11 @@ class BangumiController extends Controller
 
     public function updateAsChild(Request $request)
     {
+        $user = $request->user();
+        if ($user->cant('update_bangumi'))
+        {
+            return $this->resErrRole();
+        }
         $parentSlug = $request->get('parent_slug');
         $childSlug = $request->get('child_slug');
 
