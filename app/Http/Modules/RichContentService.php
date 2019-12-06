@@ -563,7 +563,7 @@ class RichContentService
 
         if ($riskScore > 0)
         {
-            Redis::RPUSH('blocked-risk-words', $riskWords);
+            Redis::ZINCRBY('blocked-risk-words-v2', 1, $riskWords);
         }
 
         return [
