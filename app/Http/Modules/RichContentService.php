@@ -563,7 +563,10 @@ class RichContentService
 
         if ($riskScore > 0)
         {
-            Redis::ZINCRBY('blocked-risk-words-v2', 1, $riskWords);
+            foreach ($riskWords as $word)
+            {
+                Redis::ZINCRBY('blocked-risk-words-v2', 1, $word);
+            }
         }
 
         return [
