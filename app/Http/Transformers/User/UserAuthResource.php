@@ -26,6 +26,7 @@ class UserAuthResource extends JsonResource
             'signature' => $this->signature,
             'title' => $this->title,
             'level' => $this->level,
+            'level2' => $this->level2,
             'providers' => [
                 'bind_qq' => !!$this->qq_unique_id,
                 'bind_wechat' => !!$this->wechat_unique_id,
