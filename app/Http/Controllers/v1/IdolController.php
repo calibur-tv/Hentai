@@ -204,7 +204,7 @@ class IdolController extends Controller
             return $this->resErrRole();
         }
         $slug = $request->get('slug');
-        $title = $request->get('title');
+        $title = $request->get('name');
         $alias = $request->get('alias');
         $intro = $request->get('intro');
         $avatar = $request->get('avatar');

@@ -153,7 +153,7 @@ class BangumiController extends Controller
             return $this->resErrRole();
         }
         $avatar = $request->get('avatar');
-        $title = $request->get('title');
+        $title = $request->get('name');
         $alias = $request->get('alias');
         $intro = $request->get('intro');
         $slug = $request->get('slug');

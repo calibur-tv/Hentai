@@ -24,7 +24,7 @@ class RoleController extends Controller
     public function createRole(Request $request)
     {
         $user = $request->user();
-        if ($user->cant('control_admin'))
+        if ($user->cant('control_admin') || $user->id !== 1)
         {
             return $this->resErrRole();
         }
@@ -43,7 +43,7 @@ class RoleController extends Controller
     public function createPermission(Request $request)
     {
         $user = $request->user();
-        if ($user->cant('control_admin'))
+        if ($user->cant('control_admin') || $user->id !== 1)
         {
             return $this->resErrRole();
         }
@@ -59,7 +59,7 @@ class RoleController extends Controller
     public function togglePermissionToRole(Request $request)
     {
         $user = $request->user();
-        if ($user->cant('control_admin'))
+        if ($user->cant('control_admin') || $user->id !== 1)
         {
             return $this->resErrRole();
         }
@@ -89,7 +89,7 @@ class RoleController extends Controller
     public function toggleRoleToUser(Request $request)
     {
         $user = $request->user();
-        if ($user->cant('control_admin'))
+        if ($user->cant('control_admin') || $user->id !== 1)
         {
             return $this->resErrRole();
         }
