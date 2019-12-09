@@ -165,6 +165,9 @@ class BangumiController extends Controller
             return $this->resErrNotFound();
         }
 
+        array_push($alias, $title);
+        $alias = array_unique($alias);
+
         Bangumi
             ::where('slug', $slug)
             ->update([

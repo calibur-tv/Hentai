@@ -216,6 +216,9 @@ class IdolController extends Controller
             return $this->resErrNotFound();
         }
 
+        array_push($alias, $title);
+        $alias = array_unique($alias);
+
         Idol
             ::where('slug', $slug)
             ->update([
