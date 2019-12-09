@@ -181,6 +181,32 @@ class BangumiSource
         return true;
     }
 
+    public function moveBangumiIdol($slug, $sourceId)
+    {
+        if (!$sourceId || !$slug)
+        {
+            return;
+        }
+
+        $ids = $query->getBangumiIdols($sourceId);
+        if (empty($ids))
+        {
+            return;
+        }
+
+        foreach ($ids as $id)
+        {
+            $this->loadIdolItem($id, $slug);
+            Idol
+                ::where('source_id', $id)
+                ->update([
+                    'bangumi_slug' =>  $slug
+                ]);
+        }
+
+        return;
+    }
+
     protected function getHottestBangumi($page)
     {
         $query = new Query();
