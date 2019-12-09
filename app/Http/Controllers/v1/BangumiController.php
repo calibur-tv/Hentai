@@ -166,7 +166,8 @@ class BangumiController extends Controller
         }
 
         Bangumi
-            ::update([
+            ::where('slug', $slug)
+            ->update([
                 'avatar' => $avatar,
                 'title' => $title,
                 'intro' => $intro,

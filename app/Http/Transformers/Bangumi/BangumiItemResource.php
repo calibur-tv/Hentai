@@ -17,6 +17,7 @@ class BangumiItemResource extends JsonResource
         return [
             'slug' => $this->slug,
             'name' => $this->title,
+            'alias' => explode('|', $this->alias),
             'score' => $this->score,
             'intro' => $this->intro,
             'is_parent' => $this->is_parent,
