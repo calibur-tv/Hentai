@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
 use App\Models\Bangumi;
+use App\Models\Search;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
 use Illuminate\Http\Request;
@@ -170,6 +171,7 @@ class BangumiController extends Controller
         {
             return $this->resErrRole();
         }
+
         $avatar = $request->get('avatar');
         $title = $request->get('name');
         $alias = $request->get('alias');
@@ -184,7 +186,7 @@ class BangumiController extends Controller
         }
 
         array_push($alias, $title);
-        $alias = array_unique($alias);
+        $alias = implode('|', array_unique($alias));
 
         Bangumi
             ::where('slug', $slug)
@@ -192,7 +194,14 @@ class BangumiController extends Controller
                 'avatar' => $avatar,
                 'title' => $title,
                 'intro' => $intro,
-                'alias' => implode('|', $alias)
+                'alias' => $alias
+            ]);
+
+        Search
+            ::where('slug', $slug)
+            ->where('type', 4)
+            ->update([
+                'alias' => str_replace('|', ',', $alias)
             ]);
 
         $bangumiRepository->item($slug, true);

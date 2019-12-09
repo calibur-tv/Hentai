@@ -9,6 +9,7 @@ use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Idol;
 use App\Models\IdolFans;
+use App\Models\Search;
 use Illuminate\Http\Request;
 
 class IdolController extends Controller
@@ -203,6 +204,7 @@ class IdolController extends Controller
         {
             return $this->resErrRole();
         }
+
         $slug = $request->get('slug');
         $title = $request->get('name');
         $alias = $request->get('alias');
@@ -217,7 +219,7 @@ class IdolController extends Controller
         }
 
         array_push($alias, $title);
-        $alias = array_unique($alias);
+        $alias = implode('|', array_unique($alias));
 
         Idol
             ::where('slug', $slug)
@@ -225,7 +227,14 @@ class IdolController extends Controller
                 'title' => $title,
                 'intro' => $intro,
                 'avatar' => $avatar,
-                'alias' => implode('|', $alias)
+                'alias' => $alias
+            ]);
+
+        Search
+            ::where('slug', $slug)
+            ->where('type', 5)
+            ->update([
+                'alias' => str_replace('|', ',', $alias)
             ]);
 
         $idolRepository->item($slug, true);
