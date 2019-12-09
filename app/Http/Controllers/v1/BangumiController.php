@@ -158,6 +158,7 @@ class BangumiController extends Controller
 
         $bangumiSource = new BangumiSource();
         $bangumiSource->moveBangumiIdol($bangumi->slug, $bangumi->source_id);
+        $bangumiRepository->idol_slugs($slug, 0, 0, true);
 
         return $this->resNoContent();
     }
