@@ -83,9 +83,9 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('rank', 'BangumiController@rank');
 
-    $route->get('relation', 'BangumiController@relation');
-
     $route->get('idols', 'BangumiController@idols');
+
+    $route->get('relation', 'BangumiController@relation');
 
     $route->group(['prefix' => 'update', 'middleware' => 'user'], function () use ($route)
     {
@@ -94,6 +94,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
         $route->post('set_parent', 'BangumiController@updateAsParent');
 
         $route->post('set_child', 'BangumiController@updateAsChild');
+
+        $route->post('fetch_idols', 'BangumiController@fetchIdols');
     });
 });
 

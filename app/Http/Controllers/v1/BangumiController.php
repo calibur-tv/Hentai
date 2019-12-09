@@ -145,6 +145,24 @@ class BangumiController extends Controller
         return $this->resOK($bangumi);
     }
 
+    public function fetchIdols(Request $request)
+    {
+        $slug = $request->get('slug');
+        $bangumiRepository = new BangumiRepository();
+        $bangumi = $bangumiRepository->item($slug);
+
+        if (!$bangumi)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $bangumiSource = new BangumiSource();
+        $bangumiSource->moveBangumiIdol($bangumi->slug, $bangumi->source_id);
+        $bangumiRepository->idol_slugs($slug, 0, 0, true);
+
+        return $this->resNoContent();
+    }
+
     public function updateProfile(Request $request)
     {
         $user = $request->user();
