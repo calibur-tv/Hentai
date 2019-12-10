@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
+use App\Models\BangumiQuestionRule;
 use App\Models\Idol;
 
 class BangumiRepository extends Repository
@@ -69,6 +70,16 @@ class BangumiRepository extends Repository
         }, ['force' => $refresh]);
 
         return $this->filterIdsByPage($list, $page, $take);
+    }
+
+    public function rule($slug, $refresh = false)
+    {
+        return $this->RedisItem("bangumi-join-rule:{$slug}", function () use ($slug)
+        {
+            return BangumiQuestionRule
+                ::where('tag_slug', $slug)
+                ->first();
+        }, $refresh);
     }
 
     public function bangumiIdolsCacheKey($slug)
