@@ -188,6 +188,7 @@ class BangumiSource
             return;
         }
 
+        $query = new Query();
         $ids = $query->getBangumiIdols($sourceId);
         if (empty($ids))
         {
