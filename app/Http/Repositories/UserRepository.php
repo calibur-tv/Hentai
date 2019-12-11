@@ -312,7 +312,7 @@ class UserRepository extends Repository
         return "user-friends:{$slug}";
     }
 
-    public function bangumiIdolsCacheKey($slug)
+    public function userIdolsCacheKey($slug)
     {
         return "user-{$slug}-idol-slug";
     }
