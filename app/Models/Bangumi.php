@@ -20,6 +20,7 @@ class Bangumi extends Model
         'parent_slug',
         'is_parent',
         'migration_state',
+        'rank',
         'score'
     ];
 
