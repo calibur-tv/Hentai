@@ -172,8 +172,8 @@ class IdolController extends Controller
     public function fans(Request $request)
     {
         $slug = $request->get('slug');
-        $page = $request->get('page');
-        $take = $request->get('take');
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 15;
         $idolRepository = new IdolRepository();
         $idol = $idolRepository->item($slug);
 
