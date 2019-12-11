@@ -10,6 +10,7 @@ namespace App\Http\Repositories;
 
 
 use App\Http\Transformers\User\UserHomeResource;
+use App\Models\IdolFans;
 use App\Services\Qiniu\Http\Client;
 use App\User;
 use Spatie\Permission\Models\Role;
@@ -181,6 +182,21 @@ class UserRepository extends Repository
         ];
     }
 
+    public function idol_slugs($slug, $page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort($this->userIdolsCacheKey($slug), function () use ($slug)
+        {
+            return IdolFans
+                ::where('user_slug', $slug)
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('updated_at', 'idol_slug')
+                ->toArray();
+
+        }, ['force' => $refresh, 'is_time' => true]);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
     public function managers($refresh = false)
     {
         $cache = $this->RedisItem('school-managers', function ()
@@ -294,5 +310,10 @@ class UserRepository extends Repository
     public function friends_cache_key($slug)
     {
         return "user-friends:{$slug}";
+    }
+
+    public function bangumiIdolsCacheKey($slug)
+    {
+        return "user-{$slug}-idol-slug";
     }
 }

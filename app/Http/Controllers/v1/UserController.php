@@ -7,6 +7,7 @@ use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
+use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
@@ -165,6 +166,32 @@ class UserController extends Controller
             }
         }
         $idsObj['result'] = $result;
+
+        return $this->resOK($idsObj);
+    }
+
+    public function idols(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 0;
+        $take = $request->get('take') ?: 20;
+
+        $userRepository = new UserRepository();
+        $user = $userRepository->item($slug);
+        if (!$user)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $idsObj = $userRepository->idol_slugs($slug, $page, $take);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $idolRepository = new IdolRepository();
+
+        $idsObj['result'] = $idolRepository->list($idsObj['result']);
 
         return $this->resOK($idsObj);
     }

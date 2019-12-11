@@ -4,25 +4,14 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\BangumiRepository;
-use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\QuestionRepository;
-use App\Http\Repositories\TagRepository;
-use App\Http\Repositories\UserRepository;
 use App\Models\BangumiQuestionAnswer;
 use App\Models\BangumiQuestion;
 use App\Models\BangumiQuestionSheet;
 use App\Models\BangumiQuestionRule;
-use App\Models\Pin;
-use App\Models\PinAnswer;
-use App\Models\QuestionRule;
-use App\Models\QuestionSheet;
-use App\Models\Tag;
 use App\Services\Trial\WordsFilter;
-use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 
 class JoinController extends Controller
 {
