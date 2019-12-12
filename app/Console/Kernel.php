@@ -42,6 +42,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('UpdateIdolMarketPrice')->hourly()->withoutOverlapping();
 //        $schedule->command('SaveBangumiScore')->everyMinute()->withoutOverlapping();
         $schedule->command('Test')->everyMinute()->withoutOverlapping();
-        $schedule->command('UpdateBangumiRank')->everyMinute()->withoutOverlapping();
+        $schedule->command('UpdateBangumiRank')->daily();
     }
 }
