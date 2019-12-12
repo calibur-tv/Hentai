@@ -25,6 +25,6 @@ class UpdateUserIdolList
         $idolSlug = $event->idol->slug;
 
         $userRepository = new UserRepository();
-        $userRepository->SortAdd($userRepository->bangumiIdolsCacheKey($userSlug), $idolSlug);
+        $userRepository->SortAdd($userRepository->userIdolsCacheKey($userSlug), $idolSlug);
     }
 }
