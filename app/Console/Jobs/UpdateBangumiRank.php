@@ -44,7 +44,7 @@ class UpdateBangumiRank extends Command
         foreach ($list as $index => $slug)
         {
             Bangumi
-                ::where('slug')
+                ::where('slug', $slug)
                 ->update([
                     'rank' => $index + 1
                 ]);

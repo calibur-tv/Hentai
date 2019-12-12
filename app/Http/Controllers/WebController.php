@@ -9,9 +9,11 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\UserRepository;
+use App\Models\Bangumi;
 use App\Models\Tag;
 use App\Services\Spider\BangumiSource;
 use App\Services\Spider\Query;
