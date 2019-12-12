@@ -198,8 +198,9 @@ class BangumiSource
         foreach ($ids as $id)
         {
             $this->loadIdolItem($id, $slug);
-            Idol
-                ::where('source_id', $id)
+            DB
+                ::table('idols')
+                ->where('source_id', $id)
                 ->update([
                     'bangumi_slug' =>  $slug
                 ]);
