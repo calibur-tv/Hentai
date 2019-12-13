@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\QuestionRepository;
+use App\Models\Bangumi;
 use App\Models\BangumiQuestionAnswer;
 use App\Models\BangumiQuestion;
 use App\Models\BangumiQuestionSheet;
@@ -373,9 +374,9 @@ class JoinController extends Controller
             return $this->resErrNotFound('请重新开始答题');
         }
 
-        $bangumiRepository = new BangumiRepository();
-        $bangumi = $bangumiRepository->item($slug);
-
+        $bangumi = Bangumi
+            ::where('slug', $slug)
+            ->first();
         if (is_null($bangumi))
         {
             return $this->resErrNotFound('没有找到对应的番剧');
@@ -410,7 +411,10 @@ class JoinController extends Controller
             'result_type' => 1
         ]);
 
-        // TODO user mark bangumi
+        if (!$bangumi->isLikedBy($user))
+        {
+            event(new \App\Events\Bangumi\Pass($user, $bangumi));
+        }
 
         return $this->resOK('pass');
     }

@@ -4,10 +4,14 @@
 namespace App\Models;
 
 
+use App\Services\Relation\Traits\CanBeLiked;
+use App\Services\Relation\Traits\CanBeSubscribed;
 use Illuminate\Database\Eloquent\Model;
 
 class Bangumi extends Model
 {
+    use CanBeLiked, CanBeSubscribed;
+
     protected $table = 'bangumis';
 
     protected $fillable = [

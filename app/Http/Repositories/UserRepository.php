@@ -10,6 +10,7 @@ namespace App\Http\Repositories;
 
 
 use App\Http\Transformers\User\UserHomeResource;
+use App\Models\Bangumi;
 use App\Models\IdolFans;
 use App\Services\Qiniu\Http\Client;
 use App\User;
@@ -197,6 +198,28 @@ class UserRepository extends Repository
         return $this->filterIdsByPage($list, $page, $take);
     }
 
+    public function likeBangumi($slug, $page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort($this->userLikeBanguiCacheKey($slug), function () use ($slug)
+        {
+            $user = User
+                ::where('slug', $slug)
+                ->first();
+
+            if (!$user)
+            {
+                return [];
+            }
+
+            $user
+                ->likers(Bangumi::class)
+                ->pluck('slug')
+                ->toArray();
+        }, ['force' => $refresh]);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
     public function managers($refresh = false)
     {
         $cache = $this->RedisItem('school-managers', function ()
@@ -315,5 +338,10 @@ class UserRepository extends Repository
     public function userIdolsCacheKey($slug)
     {
         return "user-{$slug}-idol-slug";
+    }
+
+    public function userLikeBanguiCacheKey($slug)
+    {
+        return "user-{$slug}-like-bangumi-slug";
     }
 }

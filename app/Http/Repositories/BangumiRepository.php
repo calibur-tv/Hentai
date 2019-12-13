@@ -8,6 +8,7 @@ use App\Http\Transformers\Bangumi\BangumiItemResource;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestionRule;
 use App\Models\Idol;
+use App\User;
 
 class BangumiRepository extends Repository
 {
@@ -82,8 +83,32 @@ class BangumiRepository extends Repository
         }, $refresh);
     }
 
+    public function likeUsers($slug, $page, $take, $refresh = false)
+    {
+        $list = $this->RedisSort($this->bangumiLikerCacheKey($slug), function () use ($slug)
+        {
+            $bangumi = Bangumi::where('slug', $slug)->first();
+            if (!$bangumi)
+            {
+                return [];
+            }
+
+            return $bangumi
+                ->fans(User::class)
+                ->pluck('slug')
+                ->toArray();
+        }, ['force' => $refresh]);
+
+        return $this->filterIdsByPage($list, $page, $take);
+    }
+
     public function bangumiIdolsCacheKey($slug)
     {
         return "bangumi-{$slug}-idol-slug";
+    }
+
+    public function bangumiLikerCacheKey($slug)
+    {
+        return "bangumi-{$slug}-liker-slug";
     }
 }

@@ -136,5 +136,13 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Idol\BuyStock\UpdateUserData',
             'App\Listeners\Idol\BuyStock\UpdateUserIdolList',
         ],
+        'App\Events\Bangumi\Pass' => [
+            'App\Listeners\Bangumi\Pass\AppendBangumiUserList',
+            'App\Listeners\Bangumi\Pass\AppendUserBangumiList',
+            'App\Listeners\Bangumi\Pass\UpgradeUserLevel',
+            'App\Listeners\Bangumi\Pass\UpdateTagCounter',
+            'App\Listeners\Bangumi\Pass\RefreshUserTimeline',
+            'App\Listeners\Bangumi\Pass\RefreshUserCache',
+        ],
     ];
 }
