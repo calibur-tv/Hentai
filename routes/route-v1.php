@@ -89,6 +89,11 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('relation', 'BangumiController@relation');
 
+    $route->group(['middleware' => 'user'], function () use ($route)
+    {
+        $route->get('patch', 'BangumiController@patch');
+    });
+
     $route->group(['prefix' => 'update', 'middleware' => 'user'], function () use ($route)
     {
         $route->post('profile', 'BangumiController@updateProfile');
@@ -98,6 +103,32 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
         $route->post('set_child', 'BangumiController@updateAsChild');
 
         $route->post('fetch_idols', 'BangumiController@fetchIdols');
+    });
+});
+
+$route->group(['prefix' => 'join', 'middleware' => 'auth'], function () use ($route)
+{
+    $route->post('create', 'JoinController@create');
+
+    $route->post('recommend', 'JoinController@recommend');
+
+    $route->post('delete', 'JoinController@delete');
+
+    $route->post('begin', 'JoinController@begin');
+
+    $route->get('list', 'JoinController@list');
+
+    $route->post('submit', 'JoinController@submit');
+
+    $route->get('result', 'JoinController@result');
+
+    $route->get('flow', 'JoinController@flow');
+
+    $route->group(['prefix' => 'rule'], function () use ($route)
+    {
+        $route->get('show', 'JoinController@getJoinRule');
+
+        $route->post('update', 'JoinController@updateJoinRule');
     });
 });
 

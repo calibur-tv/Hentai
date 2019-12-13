@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Modules\Counter\BangumiPatchCounter;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
 use App\Models\Bangumi;
@@ -30,6 +31,32 @@ class BangumiController extends Controller
         }
 
         return $this->resOK($bangumi);
+    }
+
+    public function patch(Request $request)
+    {
+        $slug = $request->get('slug');
+
+        $bangumiRepository = new BangumiRepository();
+        $data = $bangumiRepository->item($slug);
+        if (is_null($data))
+        {
+            return $this->resErrNotFound();
+        }
+
+        $bangumiPatchCounter = new BangumiPatchCounter();
+        $patch = $bangumiPatchCounter->all($slug);
+        $user = $request->user();
+
+        if (!$user)
+        {
+            return $this->resOK($patch);
+        }
+
+        $bangumiId = slug2id($slug);
+        $patch['is_liked'] = $user->hasLiked($bangumiId, Bangumi::class);
+
+        return $this->resOK($patch);
     }
 
     public function rank(Request $request)
