@@ -11,7 +11,7 @@ class BangumiPatchCounter extends HashCounter
 {
     public function __construct()
     {
-        parent::__construct('tags');
+        parent::__construct('bangumis');
     }
 
     public function boot($slug)
