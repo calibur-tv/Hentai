@@ -300,7 +300,7 @@ class JoinController extends Controller
             ::create([
                 'user_slug' => $user->slug,
                 'bangumi_slug' => $slug,
-                'questions_slug' => implode(',', $pins)
+                'question_ids' => implode(',', $pins)
             ]);
 
         return $this->resOK('pending');
@@ -325,7 +325,7 @@ class JoinController extends Controller
             return $this->resErrNotFound('请重新开始答题');
         }
 
-        $ids = explode(',', $sheet->questions_slug);
+        $ids = explode(',', $sheet->question_ids);
         if (empty($ids))
         {
             $sheet->delete();
