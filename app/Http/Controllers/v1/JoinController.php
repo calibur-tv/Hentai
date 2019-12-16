@@ -298,7 +298,7 @@ class JoinController extends Controller
             ->pluck('id')
             ->toArray();
 
-        if (count($ids) < $rule->question_count)
+        if (count($ids) < $count)
         {
             return $this->resOK('no_question');
         }
