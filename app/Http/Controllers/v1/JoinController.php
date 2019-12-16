@@ -228,7 +228,15 @@ class JoinController extends Controller
         $questionRepository = new QuestionRepository();
         $result = $questionRepository->list($ids);
 
+        $answers = BangumiQuestion
+            ::whereIn('id', $ids)
+            ->pluck('right_id', 'id')
+            ->toArray();
+
         return $this->resOK([
+            'extra' => [
+                'answers' => $answers
+            ],
             'result' => $result,
             'no_more' => count($result) < $take,
             'total' => 0

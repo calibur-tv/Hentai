@@ -8,6 +8,8 @@
 
 namespace App\Http\Transformers\Question;
 
+use App\Http\Transformers\Bangumi\BangumiItemResource;
+use App\Http\Transformers\User\UserItemResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class QuestionItemResource extends JsonResource
@@ -18,8 +20,8 @@ class QuestionItemResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'answers' => json_decode($this->answers),
-            'bangumi_slug' => $this->bangumi_slug,
-            'user_slug' => $this->user_slug,
+            'bangumi' => new BangumiItemResource($this->bangumi),
+            'user' => new UserItemResource($this->author),
             'status' => $this->status
         ];
     }
