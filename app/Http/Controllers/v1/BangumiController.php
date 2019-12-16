@@ -253,7 +253,7 @@ class BangumiController extends Controller
             ::where('slug', $slug)
             ->where('type', 4)
             ->update([
-                'alias' => str_replace('|', ',', $alias)
+                'text' => str_replace('|', ',', $alias)
             ]);
 
         $bangumiRepository->item($slug, true);

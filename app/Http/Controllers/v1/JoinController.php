@@ -26,6 +26,13 @@ class JoinController extends Controller
 
         $bangumiRepository = new BangumiRepository();
         $rule = $bangumiRepository->rule($slug);
+        if (!$rule)
+        {
+            $rule = [
+                'right_rate' => 80,
+                'question_count' => 30
+            ];
+        }
 
         return $this->resOK($rule);
     }

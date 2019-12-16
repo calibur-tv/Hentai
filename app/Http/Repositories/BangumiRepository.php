@@ -78,7 +78,7 @@ class BangumiRepository extends Repository
         return $this->RedisItem("bangumi-join-rule:{$slug}", function () use ($slug)
         {
             return BangumiQuestionRule
-                ::where('tag_slug', $slug)
+                ::where('bangumi_slug', $slug)
                 ->first();
         }, $refresh);
     }
