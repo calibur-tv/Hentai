@@ -249,7 +249,7 @@ class BangumiController extends Controller
             ->first();
 
         $bangumi->update([
-            'is_parent' => true
+            'is_parent' => $request->get('result') ?: true
         ]);
 
         return $this->resNoContent();
@@ -269,9 +269,9 @@ class BangumiController extends Controller
             ::where('slug', $parentSlug)
             ->first();
 
-        if (!$parent || !$parent->is_parent)
+        if (!$parent)
         {
-            return $this->resErrBad('指定节点非合集');
+            return $this->resErrNotFound();
         }
 
         $child = Bangumi
@@ -286,6 +286,15 @@ class BangumiController extends Controller
         $child->update([
             'parent_slug' => $parent->slug
         ]);
+
+        if (!$parent->is_parent)
+        {
+            Bangumi
+                ::where('slug', $parentSlug)
+                ->update([
+                    'is_parent' => true
+                ]);
+        }
 
         return $this->resNoContent();
     }
