@@ -252,6 +252,9 @@ class BangumiController extends Controller
             'is_parent' => $request->get('result') ?: true
         ]);
 
+        $bangumiRepository = new BangumiRepository();
+        $bangumiRepository->item($bangumiSlug, true);
+
         return $this->resNoContent();
     }
 
@@ -283,9 +286,13 @@ class BangumiController extends Controller
             return $this->resErrBad();
         }
 
+        $bangumiRepository = new BangumiRepository();
+
         $child->update([
             'parent_slug' => $parent->slug
         ]);
+
+        $bangumiRepository->item($childSlug, true);
 
         if (!$parent->is_parent)
         {
@@ -294,6 +301,8 @@ class BangumiController extends Controller
                 ->update([
                     'is_parent' => true
                 ]);
+
+            $bangumiRepository->item($parentSlug, true);
         }
 
         return $this->resNoContent();
