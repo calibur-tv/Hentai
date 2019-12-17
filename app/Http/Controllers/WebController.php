@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\MessageRepository;
 use App\Http\Repositories\PinRepository;
+use App\Http\Repositories\TagRepository;
 use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
 use App\Models\Tag;
@@ -25,21 +26,15 @@ class WebController extends Controller
 {
     public function index(Request $request)
     {
-        $id = $request->get('id');
-        if (!$id)
-        {
-            return $this->resOK();
-        }
+        $ids = Tag
+            ::where('pin_count', '>', 0)
+            ->pluck('slug')
+            ->toArray();
 
-        $bangumiSource = new BangumiSource();
-        $query = new Query();
+        $tagRepository = new TagRepository();
 
-        $source = $query->getBangumiDetail($id);
-        $bangumi = $bangumiSource->importBangumi($source);
+        $list = $tagRepository->list($ids);
 
-        return $this->resOK([
-            'bangumi' => $bangumi,
-            'source' => $source
-        ]);
+        return $this->resOK($list);
     }
 }
