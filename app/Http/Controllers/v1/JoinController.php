@@ -307,7 +307,7 @@ class JoinController extends Controller
             ::create([
                 'user_slug' => $user->slug,
                 'bangumi_slug' => $slug,
-                'question_ids' => implode(',', $pins)
+                'question_ids' => implode(',', $ids)
             ]);
 
         return $this->resOK('pending');
@@ -340,9 +340,7 @@ class JoinController extends Controller
             return $this->resErrNotFound('请重新开始答题');
         }
 
-        $bangumiRepository = new BangumiRepository();
         $questionRepository = new QuestionRepository();
-
         $answers = BangumiQuestionAnswer
             ::where('user_slug', $user->slug)
             ->whereIn('question_id', $ids)
@@ -353,7 +351,6 @@ class JoinController extends Controller
 
         return $this->resOK([
             'extra' => [
-                'bangumi' => $bangumiRepository->item($slug),
                 'answers' => $answers
             ],
             'result' => $result,
