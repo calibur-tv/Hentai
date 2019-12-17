@@ -141,6 +141,8 @@ class PinController extends Controller
 
     public function createStory(Request $request)
     {
+        return $this->resErrServiceUnavailable('功能升级中...');
+
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
             'area' => 'present|string',
@@ -225,6 +227,8 @@ class PinController extends Controller
 
     public function updateStory(Request $request)
     {
+        return $this->resErrServiceUnavailable('功能升级中...');
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
