@@ -122,6 +122,8 @@ $route->group(['prefix' => 'join', 'middleware' => 'auth'], function () use ($ro
 
     $route->post('submit', 'JoinController@submit');
 
+    $route->post('vote', 'JoinController@vote');
+
     $route->get('result', 'JoinController@result');
 
     $route->get('flow', 'JoinController@flow');

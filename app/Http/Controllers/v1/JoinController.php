@@ -431,6 +431,49 @@ class JoinController extends Controller
         return $this->resOK('pass');
     }
 
+    public function vote(Request $request)
+    {
+        // TODO：题目分发校验
+        $questionId = $request->get('question_id');
+        $answerId = $request->get('answer_id');
+        $user = $request->user();
+
+        $question = BangumiQuestion
+            ::where('id', $questionId)
+            ->first();
+
+        if (!$question)
+        {
+            return $this->resErrNotFound();
+        }
+
+        $answer = BangumiQuestionAnswer
+            ::where('question_id', $questionId)
+            ->where('user_slug', $user->slug)
+            ->first();
+
+        if ($answer)
+        {
+            $answer->update([
+                'answer_id' => $answerId,
+                'is_right' => $answerId === $question->right_id
+            ]);
+        }
+        else
+        {
+            BangumiQuestionAnswer
+                ::create([
+                    'bangumi_slug' => $question->bangumi_slug,
+                    'user_slug' => $user->slug,
+                    'question_id' => $questionId,
+                    'answer_id' => $answerId,
+                    'is_right' => $answerId === $question->right_id
+                ]);
+        }
+
+        return $this->resNoContent();
+    }
+
     /**
      * 查看这道题当前用户是怎么选的
      */
