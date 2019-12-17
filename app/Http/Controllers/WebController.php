@@ -28,6 +28,7 @@ class WebController extends Controller
     {
         $ids = Tag
             ::where('pin_count', '>', 0)
+            ->whereNull('migration_slug')
             ->pluck('slug')
             ->toArray();
 
