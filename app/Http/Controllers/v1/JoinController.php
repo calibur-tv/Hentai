@@ -269,6 +269,11 @@ class JoinController extends Controller
         {
             if ($retry)
             {
+                BangumiQuestionAnswer
+                    ::where('bangumi_slug', $slug)
+                    ->where('user_slug', $user->slug)
+                    ->delete();
+
                 $sheet->delete();
             }
             else
@@ -378,7 +383,7 @@ class JoinController extends Controller
             return $this->resErrNotFound('没有找到试卷');
         }
 
-        $ids = explode(',', $sheet->questions_slug);
+        $ids = explode(',', $sheet->question_ids);
         if (empty($ids))
         {
             $sheet->delete();
@@ -399,7 +404,7 @@ class JoinController extends Controller
             ->first();
 
         $rightRate = 80;
-        if (is_null($rule))
+        if ($rule)
         {
             $rightRate = $rule->right_rate;
         }
@@ -410,11 +415,16 @@ class JoinController extends Controller
             ->where('is_right', 1)
             ->count();
 
-        if (!$rightCount || ($rightCount / count($pins) * 100 < $rightRate))
+        if (!$rightCount || ($rightCount / count($ids) * 100 < $rightRate))
         {
             $sheet->update([
                 'result_type' => 2
             ]);
+
+            BangumiQuestionAnswer
+                ::whereIn('question_id', $ids)
+                ->where('user_slug', $user->slug)
+                ->delete();
 
             return $this->resOK('failed');
         }
