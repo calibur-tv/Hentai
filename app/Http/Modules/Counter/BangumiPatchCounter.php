@@ -29,8 +29,8 @@ class BangumiPatchCounter extends HashCounter
         }
 
         return [
-            'subscribe_user_count' => $bangumi->subscribe_user_count,
-            'like_user_count' => $bangumi->like_user_count
+            'subscribe_user_count' => $bangumi->subscribers()->count(),
+            'like_user_count' => $bangumi->fans()->count()
         ];
     }
 
