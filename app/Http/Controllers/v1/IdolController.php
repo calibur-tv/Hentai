@@ -172,7 +172,7 @@ class IdolController extends Controller
     public function fans(Request $request)
     {
         $slug = $request->get('slug');
-        $page = $request->get('page') ?: 0;
+        $page = $request->get('page') ?: 1;
         $take = $request->get('take') ?: 15;
         $sort = $request->get('sort') ?: 'news';
         $idolRepository = new IdolRepository();
@@ -183,6 +183,7 @@ class IdolController extends Controller
             return $this->resErrNotFound();
         }
 
+        $page = $page - 1;
         $idsObj = $sort === 'news'
             ? $idolRepository->idolNewsFans($slug, $page, $take)
             : $idolRepository->idolHotFans($slug, $page, $take);
