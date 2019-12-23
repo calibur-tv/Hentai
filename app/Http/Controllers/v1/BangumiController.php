@@ -63,19 +63,21 @@ class BangumiController extends Controller
     public function atfield(Request $request)
     {
         $slug = $request->get('slug');
-        if (!$slug)
-        {
-            return $this->resErrBad();
-        }
 
         $trialCount = BangumiQuestion
             ::where('status', 0)
-            ->where('bangumi_slug', $slug)
+            ->when($slug, function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
             ->count();
 
         $passCount = BangumiQuestion
             ::where('status', 1)
-            ->where('bangumi_slug', $slug)
+            ->when($slug, function ($query) use ($slug)
+            {
+                return $query->where('bangumi_slug', $slug);
+            })
             ->count();
 
         return $this->resOK([
