@@ -214,7 +214,7 @@ class JoinController extends Controller
             {
                 return $query->where('user_slug', $userSlug);
             })
-            ->when($status, function ($query) use ($status)
+            ->when($status !== '', function ($query) use ($status)
             {
                 return $query->where('status', $status);
             })
