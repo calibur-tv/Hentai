@@ -202,7 +202,7 @@ class JoinController extends Controller
         $take = $request->get('count') ?: 10;
         $bangumiSlug = $request->get('bangumi_slug') ?: '';
         $userSlug = $request->get('user_slug') ?: '';
-        $status = $request->get('status') ?: '';
+        $status = $request->get('status');
         $sort = $request->get('sort') ?: 'newest';
 
         $ids = BangumiQuestion
@@ -214,7 +214,7 @@ class JoinController extends Controller
             {
                 return $query->where('user_slug', $userSlug);
             })
-            ->when($status !== '', function ($query) use ($status)
+            ->when($status !== null, function ($query) use ($status)
             {
                 return $query->where('status', $status);
             })
