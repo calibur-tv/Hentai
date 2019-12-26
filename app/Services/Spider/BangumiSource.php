@@ -136,7 +136,7 @@ class BangumiSource
         }
 
         $QShell = new Qshell();
-        $alias = implode('|', $source['alias']);
+        $alias = implode('|', array_unique($source['alias']));
         $bangumi = Bangumi
             ::create([
                 'title' => $source['name'],
@@ -209,28 +209,6 @@ class BangumiSource
         return;
     }
 
-    protected function getHottestBangumi($page)
-    {
-        $query = new Query();
-        $list = $query->getBangumiList($page);
-
-        if (empty($list))
-        {
-            Redis::SADD('load-bangumi-failed-page', $page);
-        }
-
-        foreach ($list as $item)
-        {
-            if (!$item)
-            {
-                Redis::SADD('load-bangumi-failed-ids', $id);
-                continue;
-            }
-
-            $this->importBangumi($item);
-        }
-    }
-
     public function importIdol($source, $bangumiSlug)
     {
         if (!$source['name'])
@@ -248,7 +226,7 @@ class BangumiSource
         }
 
         $QShell = new Qshell();
-        $alias = implode('|', $source['alias']);
+        $alias = implode('|', array_unique($source['alias']));
         $idol = Idol
             ::create([
                 'title' => $source['name'],
@@ -273,6 +251,28 @@ class BangumiSource
         ]);
 
         return $slug;
+    }
+
+    protected function getHottestBangumi($page)
+    {
+        $query = new Query();
+        $list = $query->getBangumiList($page);
+
+        if (empty($list))
+        {
+            Redis::SADD('load-bangumi-failed-page', $page);
+        }
+
+        foreach ($list as $item)
+        {
+            if (!$item)
+            {
+                Redis::SADD('load-bangumi-failed-ids', $id);
+                continue;
+            }
+
+            $this->importBangumi($item);
+        }
     }
 
     protected function loadIdolItem($id, $bangumiSlug)
