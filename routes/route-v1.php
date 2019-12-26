@@ -94,6 +94,10 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
     $route->group(['middleware' => 'user'], function () use ($route)
     {
         $route->get('patch', 'BangumiController@patch');
+
+        $route->get('fetch', 'BangumiController@fetch');
+
+        $route->get('create', 'BangumiController@create');
     });
 
     $route->group(['prefix' => 'update', 'middleware' => 'user'], function () use ($route)
@@ -153,6 +157,10 @@ $route->group(['prefix' => 'idol'], function () use ($route)
         $route->post('vote', 'IdolController@vote');
 
         $route->post('update', 'IdolController@update');
+
+        $route->post('fetch', 'IdolController@fetch');
+
+        $route->post('create', 'IdolController@create');
     });
 
     $route->get('batch_patch', 'IdolController@batchPatch');

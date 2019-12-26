@@ -169,7 +169,7 @@ class BangumiController extends Controller
         return $this->resOK($idsObj);
     }
 
-    public function create(Request $request)
+    public function fetch(Request $request)
     {
         $sourceId = $request->get('source_id');
         $hasBangumi = Bangumi
@@ -178,26 +178,38 @@ class BangumiController extends Controller
 
         if ($hasBangumi)
         {
-            return $this->resOK($hasBangumi);
+            return $this->resErrBad($hasBangumi->slug);
         }
 
         $query = new Query();
         $info = $query->getBangumiDetail($sourceId);
 
-        if (is_null($info))
+        return $this->resOK($info);
+    }
+
+    public function create(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_admin)
         {
-            return $this->resErrThrottle('数据爬取失败');
+            return $this->resErrRole();
         }
 
         $bangumiSource = new BangumiSource();
-        $bangumi = $bangumiSource->importBangumi($info);
+        $bangumi = $bangumiSource->importBangumi([
+            'id' => $request->get('source_id'),
+            'name' => $request->get('name'),
+            'alias' => $request->get('alias'),
+            'intro' => $request->get('intro'),
+            'avatar' => $request->get('avatar')
+        ]);
 
         if (is_null($bangumi))
         {
             return $this->resErrServiceUnavailable();
         }
 
-        return $this->resOK($bangumi);
+        return $this->resOK($bangumi->slug);
     }
 
     public function fetchIdols(Request $request)

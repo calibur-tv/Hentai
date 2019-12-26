@@ -10,6 +10,8 @@ use App\Http\Repositories\UserRepository;
 use App\Models\Idol;
 use App\Models\IdolFans;
 use App\Models\Search;
+use App\Services\Spider\BangumiSource;
+use App\Services\Spider\Query;
 use Illuminate\Http\Request;
 
 class IdolController extends Controller
@@ -244,5 +246,48 @@ class IdolController extends Controller
         $idolRepository->item($slug, true);
 
         return $this->resNoContent();
+    }
+
+    public function fetch(Request $request)
+    {
+        $sourceId = $request->get('source_id');
+        $hasIdol = Idol
+            ::where('source_id', $sourceId)
+            ->first();
+
+        if ($hasIdol)
+        {
+            return $this->resErrBad($hasIdol->slug);
+        }
+
+        $query = new Query();
+        $info = $query->getIdolDetail($sourceId);
+
+        return $this->resOK($info);
+    }
+
+    public function create(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_admin)
+        {
+            return $this->resErrRole();
+        }
+
+        $bangumiSource = new BangumiSource();
+        $slug = $bangumiSource->importIdol([
+            'id' => $request->get('source_id'),
+            'name' => $request->get('name'),
+            'alias' => $request->get('alias'),
+            'intro' => $request->get('intro'),
+            'avatar' => $request->get('avatar')
+        ], $request->get('bangumi_slug'));
+
+        if (!$slug)
+        {
+            return $this->resErrServiceUnavailable();
+        }
+
+        return $this->resOK($slug);
     }
 }

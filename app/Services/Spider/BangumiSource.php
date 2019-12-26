@@ -140,7 +140,7 @@ class BangumiSource
         $bangumi = Bangumi
             ::create([
                 'title' => $source['name'],
-                'avatar' => $QShell->fetch($source['avatar']),
+                'avatar' => preg_match('/calibur/', $source['avatar']) ? $source['avatar'] : $QShell->fetch($source['avatar']),
                 'intro' => $source['intro'],
                 'alias' => $alias,
                 'source_id' => $source['id']
@@ -156,7 +156,7 @@ class BangumiSource
         Search::create([
             'type' => 4,
             'slug' => $bangumiSlug,
-            'text' => str_replace('|', ',', $alias),
+            'text' => $alias,
             'score' => 0
         ]);
 
@@ -231,43 +231,30 @@ class BangumiSource
         }
     }
 
-    protected function loadIdolItem($id, $bangumiSlug)
+    public function importIdol($source, $bangumiSlug)
     {
-        if (!$id)
+        if (!$source['name'])
         {
-            return true;
-        }
-
-        $query = new Query();
-        $QShell = new Qshell();
-        $idol = $query->getIdolDetail($id);
-        if (!$idol)
-        {
-            Redis::SADD('load-idol-failed-ids', "{$id}##{$bangumiSlug}");
-            return false;
-        }
-
-        if (!$idol['name'])
-        {
-            return false;
+            return '';
         }
 
         $has = Idol
-            ::where('source_id', $idol['id'])
+            ::where('source_id', $source['id'])
             ->first();
 
         if ($has)
         {
-            return true;
+            return $has->slug;
         }
 
-        $alias = implode('|', $idol['alias']);
+        $QShell = new Qshell();
+        $alias = implode('|', $source['alias']);
         $idol = Idol
             ::create([
-                'title' => $idol['name'],
-                'avatar' => $QShell->fetch($idol['avatar']),
-                'intro' => $idol['intro'],
-                'source_id' => $idol['id'],
+                'title' => $source['name'],
+                'avatar' => preg_match('/calibur/', $source['avatar']) ? $source['avatar'] : $QShell->fetch($source['avatar']),
+                'intro' => $source['intro'],
+                'source_id' => $source['id'],
                 'stock_price' => 1,
                 'alias' => $alias,
                 'bangumi_slug' => $bangumiSlug
@@ -281,10 +268,30 @@ class BangumiSource
         Search::create([
             'type' => 5,
             'slug' => $slug,
-            'text' => str_replace('|', ',', $alias),
+            'text' => $alias,
             'score' => 0
         ]);
 
-        return true;
+        return $slug;
+    }
+
+    protected function loadIdolItem($id, $bangumiSlug)
+    {
+        if (!$id)
+        {
+            return true;
+        }
+
+        $query = new Query();
+        $idol = $query->getIdolDetail($id);
+        if (!$idol)
+        {
+            Redis::SADD('load-idol-failed-ids', "{$id}##{$bangumiSlug}");
+            return false;
+        }
+
+        $result = $this->importIdol($idol, $bangumiSlug);
+
+        return !!$result;
     }
 }
