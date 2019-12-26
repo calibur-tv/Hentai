@@ -97,7 +97,7 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
         $route->get('fetch', 'BangumiController@fetch');
 
-        $route->get('create', 'BangumiController@create');
+        $route->post('create', 'BangumiController@create');
     });
 
     $route->group(['prefix' => 'update', 'middleware' => 'user'], function () use ($route)
@@ -158,7 +158,7 @@ $route->group(['prefix' => 'idol'], function () use ($route)
 
         $route->post('update', 'IdolController@update');
 
-        $route->post('fetch', 'IdolController@fetch');
+        $route->get('fetch', 'IdolController@fetch');
 
         $route->post('create', 'IdolController@create');
     });
