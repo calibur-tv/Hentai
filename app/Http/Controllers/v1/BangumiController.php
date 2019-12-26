@@ -197,7 +197,7 @@ class BangumiController extends Controller
 
         $bangumiSource = new BangumiSource();
         $bangumi = $bangumiSource->importBangumi([
-            'id' => $request->get('source_id'),
+            'id' => $request->get('id'),
             'name' => $request->get('name'),
             'alias' => $request->get('alias'),
             'intro' => $request->get('intro'),

@@ -276,7 +276,7 @@ class IdolController extends Controller
 
         $bangumiSource = new BangumiSource();
         $slug = $bangumiSource->importIdol([
-            'id' => $request->get('source_id'),
+            'id' => $request->get('id'),
             'name' => $request->get('name'),
             'alias' => $request->get('alias'),
             'intro' => $request->get('intro'),
