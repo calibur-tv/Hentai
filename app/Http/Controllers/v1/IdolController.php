@@ -195,7 +195,18 @@ class IdolController extends Controller
         }
 
         $userRepository = new UserRepository();
-        $idsObj['result'] = $userRepository->list($idsObj['result']);
+        $result = [];
+        foreach ($idsObj['result'] as $item)
+        {
+            $user = $userRepository->item($item['slug']);
+            if (!$user)
+            {
+                continue;
+            }
+            $user->list_score = $item['score'];
+            $result[] = $user;
+        }
+        $idsObj['result'] = $result;
 
         return $this->resOK($idsObj);
     }

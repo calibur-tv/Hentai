@@ -86,7 +86,7 @@ class IdolRepository extends Repository
 
     public function idolHotFans($slug, $page, $take, $refresh = false)
     {
-        $list = $this->RedisSort($this->idolFansCacheKey($slug, 'biggest'), function () use ($slug)
+        $cache = $this->RedisSort($this->idolFansCacheKey($slug, 'biggest'), function () use ($slug)
         {
             return IdolFans
                 ::where('idol_slug', $slug)
@@ -94,14 +94,24 @@ class IdolRepository extends Repository
                 ->pluck('stock_count', 'user_slug')
                 ->toArray();
 
-        }, ['force' => $refresh]);
+        }, ['force' => $refresh, 'with_score' => true]);
 
-        return $this->filterIdsByPage($list, $page, $take);
+        $cache = $this->filterIdsByPage($cache, $page, $take, true);
+        $result = [];
+        foreach ($cache['result'] as $key => $val)
+        {
+            $result[] = [
+                'slug' => $key,
+                'score' => intval($val)
+            ];
+        }
+        $cache['result'] = $result;
+        return $cache;
     }
 
     public function idolNewsFans($slug, $page, $take, $refresh = false)
     {
-        $list = $this->RedisSort($this->idolFansCacheKey($slug, 'activity'), function () use ($slug)
+        $cache = $this->RedisSort($this->idolFansCacheKey($slug, 'activity'), function () use ($slug)
         {
             return IdolFans
                 ::where('idol_slug', $slug)
@@ -109,9 +119,19 @@ class IdolRepository extends Repository
                 ->pluck('updated_at', 'user_slug')
                 ->toArray();
 
-        }, ['force' => $refresh, 'is_time' => true]);
+        }, ['force' => $refresh, 'is_time' => true, 'with_score' => true]);
 
-        return $this->filterIdsByPage($list, $page, $take);
+        $cache = $this->filterIdsByPage($cache, $page, $take, true);
+        $result = [];
+        foreach ($cache['result'] as $key => $val)
+        {
+            $result[] = [
+                'slug' => $key,
+                'score' => intval($val)
+            ];
+        }
+        $cache['result'] = $result;
+        return $cache;
     }
 
     public function idolFansCacheKey($slug, $sort)

@@ -426,7 +426,7 @@ class JoinController extends Controller
                 ->where('user_slug', $user->slug)
                 ->delete();
 
-            return $this->resOK('failed');
+            return $this->resOK('挑战失败~');
         }
 
         $sheet->update([
@@ -438,7 +438,7 @@ class JoinController extends Controller
             event(new \App\Events\Bangumi\Pass($user, $bangumi));
         }
 
-        return $this->resOK('pass');
+        return $this->resOK('挑战成功！');
     }
 
     public function vote(Request $request)
