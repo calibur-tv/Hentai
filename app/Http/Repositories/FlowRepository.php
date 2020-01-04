@@ -36,15 +36,14 @@ class FlowRepository extends Repository
         return $idsObj;
     }
 
-    public function index($seenIds, $randId, $take, $refresh = false)
+    public function index($seenIds, $take, $refresh = false)
     {
-        $ids =  $this->RedisSort($this->index_cache_key($randId, false), function () use ($randId)
+        $ids =  $this->RedisSort($this->index_cache_key(), function ()
         {
             return Pin
                 ::where('trial_type', 0)
-                ->where(DB::raw('id % 10'), $randId)
                 ->where('can_up', 1)
-                ->whereNotIn('content_type', [2])
+                ->where('content_type', 1)
                 ->whereNull('last_top_at')
                 ->whereNotNull('published_at')
                 ->select('slug', 'updated_at')
@@ -201,21 +200,21 @@ class FlowRepository extends Repository
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key($pinSlug), $pinSlug);
+        $this->SortAdd($this->index_cache_key(), $pinSlug);
     }
 
     public function update_pin($tagSlug, $pinSlug)
     {
         $this->SortAdd($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortAdd($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortAdd($this->index_cache_key($pinSlug), $pinSlug);
+        $this->SortAdd($this->index_cache_key(), $pinSlug);
     }
 
     public function del_pin($tagSlug, $pinSlug)
     {
         $this->SortRemove($this->newest_cache_key($tagSlug), $pinSlug);
         $this->SortRemove($this->active_cache_key($tagSlug), $pinSlug);
-        $this->SortRemove($this->index_cache_key($pinSlug), $pinSlug);
+        $this->SortRemove($this->index_cache_key(), $pinSlug);
         foreach ($this->times as $time)
         {
             $this->SortRemove($this->hottest_cache_key($tagSlug, $time), $pinSlug);
@@ -237,8 +236,8 @@ class FlowRepository extends Repository
         return "tag-active-{$slug}-all";
     }
 
-    protected function index_cache_key($slug, $convert = true)
+    protected function index_cache_key()
     {
-        return 'flow-index-ids-' . ($convert ? substr(slug2id($slug), -1) : $slug);
+        return 'flow-index-ids';
     }
 }
