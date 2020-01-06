@@ -83,6 +83,7 @@ class ATFieldController extends Controller
 
     public function create(Request $request)
     {
+        return $this->resErrServiceUnavailable();
         $validator = Validator::make($request->all(), [
             'tag_slug' => 'required|string',
             'title' => 'required|string|max:50',
@@ -152,9 +153,7 @@ class ATFieldController extends Controller
             $content,
             $contentType,
             $visitType,
-            $user,
-            $mainAreaSlug,
-            $mainTopicSlug
+            $user
         );
 
         if (is_null($qa))

@@ -143,8 +143,6 @@ class PinController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|array',
-            'area' => 'present|string',
-            'topic' => 'required|string',
             'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
@@ -157,33 +155,7 @@ class PinController extends Controller
         $tagRepository = new TagRepository();
         $user = $request->user();
 
-        $areaSlug = $request->get('area') ?: '';
-        $topicSlug = $request->get('topic') ?: '';
         $notebookSlug = $request->get('notebook') ?: '';
-        $area = null;
-        if ($areaSlug)
-        {
-            $area = $tagRepository->checkTagIsMarked($areaSlug, $user);
-            if (null === $area)
-            {
-                return $this->resErrNotFound('不存在的分区');
-            }
-            if (false === $area)
-            {
-                return $this->resErrRole('未解锁的分区');
-            }
-        }
-
-        $topic = $tagRepository->checkTagIsMarked($topicSlug, $user);
-        if (null === $topic)
-        {
-            return $this->resErrNotFound('不存在的话题');
-        }
-        if (false === $topic)
-        {
-            return $this->resErrRole('未关注的话题');
-        }
-
         $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
         if (null === $notebook)
         {
@@ -204,8 +176,6 @@ class PinController extends Controller
             $contentType,
             $request->get('publish'),
             $user,
-            $areaSlug,
-            $topicSlug,
             $notebookSlug
         );
 
@@ -228,8 +198,6 @@ class PinController extends Controller
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
             'content' => 'required|array',
-            'area' => 'present|string',
-            'topic' => 'required|string',
             'notebook' => 'required|string',
             'publish' => 'required|boolean'
         ]);
@@ -259,33 +227,7 @@ class PinController extends Controller
         $tagRepository = new TagRepository();
         $user = $request->user();
 
-        $areaSlug = $request->get('area') ?: '';
-        $topicSlug = $request->get('topic') ?: '';
         $notebookSlug = $request->get('notebook') ?: '';
-
-        if ($areaSlug)
-        {
-            $area = $tagRepository->checkTagIsMarked($areaSlug, $user);
-            if (null === $area)
-            {
-                return $this->resErrNotFound('不存在的分区');
-            }
-            if (false === $area)
-            {
-                return $this->resErrRole('未解锁的分区');
-            }
-        }
-
-        $topic = $tagRepository->checkTagIsMarked($topicSlug, $user);
-        if (null === $topic)
-        {
-            return $this->resErrNotFound('不存在的话题');
-        }
-        if (false === $topic)
-        {
-            return $this->resErrRole('未关注的话题');
-        }
-
         $notebook = $tagRepository->checkTagIsMarked($notebookSlug, $user);
         if (null === $notebook)
         {
@@ -304,8 +246,6 @@ class PinController extends Controller
             $request->get('content'),
             $request->get('publish'),
             $user,
-            $areaSlug,
-            $topicSlug,
             $notebookSlug
         );
 
