@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Modules\Counter\BangumiPatchCounter;
 use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
+use App\Http\Repositories\UserRepository;
 use App\Models\Bangumi;
 use App\Models\BangumiQuestion;
 use App\Models\Search;
@@ -107,6 +108,25 @@ class BangumiController extends Controller
     public function score(Request $request)
     {
 
+    }
+
+    public function liker(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 10;
+
+        $bangumiRepository = new BangumiRepository();
+        $idsObj = $bangumiRepository->likeUsers($slug, $page - 1, $take);
+        if (!$idsObj['total'])
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $userRepository = new UserRepository();
+        $idsObj['result'] = $userRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     public function relation(Request $request)

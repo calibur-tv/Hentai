@@ -89,6 +89,8 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 
     $route->get('idols', 'BangumiController@idols');
 
+    $route->get('liker', 'BangumiController@liker');
+
     $route->get('relation', 'BangumiController@relation');
 
     $route->group(['middleware' => 'user'], function () use ($route)

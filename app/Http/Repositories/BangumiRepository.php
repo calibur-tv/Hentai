@@ -95,9 +95,12 @@ class BangumiRepository extends Repository
 
             return $bangumi
                 ->fans(User::class)
-                ->pluck('slug')
+                ->withPivot('created_at')
+                ->orderBy('created_at', 'DESC')
+                ->pluck('followables.created_at', 'slug')
                 ->toArray();
-        }, ['force' => $refresh]);
+
+        }, ['force' => $refresh, 'is_time' => true]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }
