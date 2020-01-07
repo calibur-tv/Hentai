@@ -211,11 +211,14 @@ class UserRepository extends Repository
                 return [];
             }
 
-            $user
-                ->likers(Bangumi::class)
-                ->pluck('slug')
+            return $user
+                ->likes(Bangumi::class)
+                ->withPivot('created_at')
+                ->orderBy('created_at', 'DESC')
+                ->pluck('followables.created_at', 'slug')
                 ->toArray();
-        }, ['force' => $refresh]);
+
+        }, ['force' => $refresh, 'is_time' => true]);
 
         return $this->filterIdsByPage($list, $page, $take);
     }

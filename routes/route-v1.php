@@ -41,11 +41,13 @@ $route->group(['prefix' => 'user'], function () use ($route)
 {
     $route->get('show', 'UserController@show');
 
-    $route->get('relation', 'UserController@getUserRelation');
+    $route->get('relation', 'UserController@getUserRelations');
 
     $route->get('timeline', 'UserController@timeline');
 
     $route->get('managers', 'UserController@managers');
+
+    $route->get('like_bangumi', 'UserController@likeBangumi');
 
     $route->get('idols', 'UserController@idols');
 

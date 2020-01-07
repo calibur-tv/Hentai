@@ -118,7 +118,7 @@ class BangumiController extends Controller
 
         $bangumiRepository = new BangumiRepository();
         $idsObj = $bangumiRepository->likeUsers($slug, $page - 1, $take);
-        if (!$idsObj['total'])
+        if (empty($idsObj['result']))
         {
             return $this->resOK($idsObj);
         }

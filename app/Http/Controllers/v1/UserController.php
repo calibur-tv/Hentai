@@ -7,6 +7,7 @@ use App\Http\Modules\Counter\UserPatchCounter;
 use App\Http\Modules\DailyRecord\UserActivity;
 use App\Http\Modules\DailyRecord\UserDailySign;
 use App\Http\Modules\DailyRecord\UserExposure;
+use App\Http\Repositories\BangumiRepository;
 use App\Http\Repositories\IdolRepository;
 use App\Http\Repositories\PinRepository;
 use App\Http\Repositories\TagRepository;
@@ -98,6 +99,26 @@ class UserController extends Controller
         }
 
         return $this->resOK($result);
+    }
+
+    public function likeBangumi(Request $request)
+    {
+        $slug = $request->get('slug');
+        $page = $request->get('page') ?: 1;
+        $take = $request->get('take') ?: 15;
+
+        $userRepository = new UserRepository();
+
+        $idsObj = $userRepository->likeBangumi($slug, $page - 1, $take);
+        if (empty($idsObj['result']))
+        {
+            return $this->resOK($idsObj);
+        }
+
+        $bangumiRepository = new BangumiRepository();
+        $idsObj['result'] = $bangumiRepository->list($idsObj['result']);
+
+        return $this->resOK($idsObj);
     }
 
     public function timeline(Request $request)
@@ -272,7 +293,7 @@ class UserController extends Controller
     /**
      * 用户关系
      */
-    public function getUserRelation(Request $request)
+    public function getUserRelations(Request $request)
     {
         $slug = $request->get('slug');
         $take = $request->get('count') ?: 15;
