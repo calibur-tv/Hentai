@@ -137,13 +137,14 @@ class BangumiSource
 
         $QShell = new Qshell();
         $alias = implode('|', array_unique($source['alias']));
+        $type = isset($source['type']) ? intval($source['type']) : 0;
         $bangumi = Bangumi
             ::create([
                 'title' => $source['name'],
                 'avatar' => preg_match('/calibur/', $source['avatar']) ? $source['avatar'] : $QShell->fetch($source['avatar']),
                 'intro' => $source['intro'],
                 'alias' => $alias,
-                'type' => isset($source['type']) ? $source['type'] : 0,
+                'type' => $type,
                 'source_id' => $source['id']
             ]);
 
@@ -152,7 +153,10 @@ class BangumiSource
             'slug' => $bangumiSlug
         ]);
 
-        $this->getBangumiIdols($source['id'], $bangumiSlug);
+        if ($type === 0)
+        {
+            $this->getBangumiIdols($source['id'], $bangumiSlug);
+        }
 
         Search::create([
             'type' => 4,
