@@ -143,6 +143,7 @@ class BangumiSource
                 'avatar' => preg_match('/calibur/', $source['avatar']) ? $source['avatar'] : $QShell->fetch($source['avatar']),
                 'intro' => $source['intro'],
                 'alias' => $alias,
+                'type' => isset($source['type']) ? $source['type'] : 0,
                 'source_id' => $source['id']
             ]);
 

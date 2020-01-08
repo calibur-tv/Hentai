@@ -221,7 +221,8 @@ class BangumiController extends Controller
             'name' => $request->get('name'),
             'alias' => $request->get('alias'),
             'intro' => $request->get('intro'),
-            'avatar' => $request->get('avatar')
+            'avatar' => $request->get('avatar'),
+            'type' => $request->get('type') ?: 0
         ]);
 
         if (is_null($bangumi))
