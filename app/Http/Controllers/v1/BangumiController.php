@@ -87,7 +87,7 @@ class BangumiController extends Controller
         ]);
     }
 
-    public function rank(Request $request)
+    public function rank250(Request $request)
     {
         $page = $request->get('page') ?: 0;
         $take = $request->get('take') ?: 20;

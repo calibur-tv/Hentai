@@ -63,9 +63,11 @@ class BangumiRepository extends Repository
         {
             return Bangumi
                 ::where('score', '>', 0)
+                ->where('type', 0)
                 ->orderBy('score', 'DESC')
                 ->orderBy('id', 'DESC')
                 ->pluck('score', 'slug')
+                ->take(250)
                 ->toArray();
 
         }, ['force' => $refresh]);

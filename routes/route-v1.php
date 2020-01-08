@@ -85,7 +85,7 @@ $route->group(['prefix' => 'bangumi'], function () use ($route)
 {
     $route->get('show', 'BangumiController@show');
 
-    $route->get('rank', 'BangumiController@rank');
+    $route->get('rank', 'BangumiController@rank250');
 
     $route->get('atfield', 'BangumiController@atfield');
 
