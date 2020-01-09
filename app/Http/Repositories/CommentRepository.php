@@ -22,10 +22,7 @@ class CommentRepository extends Repository
             $comment = Comment
                 ::withTrashed()
                 ->where('id', $id)
-                ->with(['author', 'getter', 'content' => function ($query)
-                {
-                    $query->orderBy('created_at', 'desc');
-                }])
+                ->with(['author', 'getter', 'content'])
                 ->first();
 
             if (is_null($comment))

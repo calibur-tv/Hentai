@@ -42,44 +42,7 @@ class PinRepository extends Repository
             {
                 $pin->notebook = Tag
                     ::where('slug', $pin->main_notebook_slug)
-                    ->with(
-                        [
-                            'content' => function ($query)
-                            {
-                                $query->orderBy('created_at', 'desc');
-                            }
-                        ]
-                    )
-                    ->first();
-            }
-
-            if ($pin->main_area_slug)
-            {
-                $pin->area = Tag
-                    ::where('slug', $pin->main_area_slug)
-                    ->with(
-                        [
-                            'content' => function ($query)
-                            {
-                                $query->orderBy('created_at', 'desc');
-                            }
-                        ]
-                    )
-                    ->first();
-            }
-
-            if ($pin->main_topic_slug)
-            {
-                $pin->topic = Tag
-                    ::where('slug', $pin->main_topic_slug)
-                    ->with(
-                        [
-                            'content' => function ($query)
-                            {
-                                $query->orderBy('created_at', 'desc');
-                            }
-                        ]
-                    )
+                    ->with('content')
                     ->first();
             }
 

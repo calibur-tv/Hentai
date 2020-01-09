@@ -27,10 +27,7 @@ class TagRepository extends Repository
         {
             $tag = Tag
                 ::where('slug', $slug)
-                ->with(['content' => function ($query)
-                {
-                    $query->orderBy('created_at', 'desc');
-                }])
+                ->with('content')
                 ->first();
 
             if (is_null($tag))
@@ -59,14 +56,7 @@ class TagRepository extends Repository
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
                 ->orderBy('seen_user_count', 'desc')
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
+                ->with('content')
                 ->get();
 
             return TagResource::collection($tag);
@@ -99,14 +89,7 @@ class TagRepository extends Repository
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
                 ->orderBy('seen_user_count', 'desc')
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
+                ->with('content')
                 ->take(300)
                 ->get();
 
@@ -131,14 +114,7 @@ class TagRepository extends Repository
                     config('app.tag.topic'),
                     config('app.tag.game')
                 ])
-                ->with(
-                    [
-                        'content' => function ($query)
-                        {
-                            $query->orderBy('created_at', 'desc');
-                        }
-                    ]
-                )
+                ->with('content')
                 ->get();
 
             return TagResource::collection($tag);
@@ -188,10 +164,7 @@ class TagRepository extends Repository
 
             $list = $user
                 ->bookmarks(Tag::class)
-                ->with(['content' => function ($query)
-                {
-                    $query->orderBy('created_at', 'desc');
-                }])
+                ->with('content')
                 ->orderBy('activity_stat', 'desc')
                 ->orderBy('pin_count', 'desc')
                 ->orderBy('followers_count', 'desc')
