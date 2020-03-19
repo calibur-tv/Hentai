@@ -152,9 +152,9 @@ class WordsFilter
 
         return [
             'text' => $text,
-            'words' => array_unique($words),
-            'words_1' => array_unique($words_1),
-            'words_2' => array_unique($words_2),
+            'words' => array_values(array_unique($words)),
+            'words_1' => array_values(array_unique($words_1)),
+            'words_2' => array_values(array_unique($words_2)),
             'delete' => $delete,
             'review' => $review
         ];
